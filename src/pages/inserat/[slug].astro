@@ -11,7 +11,7 @@ const handover = listing.details.find(([label]) => label === 'Übergabe')?.[1] ?
 const related = listings.filter(item => item.slug !== listing.slug && item.status !== 'sold').sort((a, b) => Number(b.category === listing.category) - Number(a.category === listing.category)).slice(0, 3);
 const message = `Hey! Ich interessiere mich für „${listing.subtitle}“ auf Meinhaben. Ist das noch zu haben?`;
 ---
-<Layout title={`${listing.subtitle} – Meinhaben`} description={listing.description[0]}>
+<Layout title={`${listing.subtitle} – Meinhaben`} description={listing.description[0]} image={listing.image} imageAlt={listing.imageAlt}>
   <main id="main" class="container detail-main">
     <nav class="breadcrumb" aria-label="Brotkrümelnavigation"><a href="/">Startseite</a><Icon name="right" /><a href={`/?kategorie=${encodeURIComponent(listing.category)}#dinge`}>{listing.category}</a><Icon name="right" /><span aria-current="page">{listing.subtitle}</span></nav>
     <div class="detail-grid">

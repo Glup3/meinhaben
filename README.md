@@ -30,6 +30,13 @@ Inter is hosted locally under the SIL Open Font License in `public/fonts/OFL.txt
 Search-engine indexing is disabled through page metadata; this is not access
 control or authentication.
 
+Link previews are rendered into the static HTML with Open Graph and Twitter
+metadata. Listing links use the item's main photo; the homepage uses
+`public/images/meinhaben-share.jpg` (1200 × 630). Canonical and image URLs use
+the public `site` origin in `astro.config.mjs`. Search indexing stays disabled
+with `noindex, nofollow`; crawlers can still fetch pages and images for previews.
+After deployment, sharing services may cache older previews until they refresh.
+
 ## Local development
 
 Requires Node >=22.23.4 (Node 24 recommended), npm, and `unzip` on Linux/macOS.

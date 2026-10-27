@@ -1,8 +1,17 @@
 ---
 import '../styles/global.css';
 import Icon from '../components/Icon.astro';
-interface Props { title?: string; description?: string; }
-const { title = 'Meinhaben – Vielleicht bald deins.', description = 'Meine Sachen suchen ein neues Zuhause. Ein kleiner privater Marktplatz für Freunde und Familie.' } = Astro.props;
+interface Props { title?: string; description?: string; image?: string; imageAlt?: string; }
+const {
+  title = 'Meinhaben – Vielleicht bald deins.',
+  description = 'Meine Sachen suchen ein neues Zuhause. Ein kleiner privater Marktplatz für Freunde und Familie.',
+  image = '/images/meinhaben-share.jpg',
+  imageAlt = 'Meinhaben – Vielleicht bald deins. Gute Dinge dürfen weiterziehen.',
+} = Astro.props;
+// Use the public origin, even during builds and local previews. Filter/query
+// variants share the same canonical page and social preview URL.
+const canonicalURL = new URL(Astro.url.pathname, Astro.site!);
+const imageURL = new URL(image, Astro.site!);
 ---
 <!doctype html>
 <html lang="de-AT">
@@ -12,6 +21,20 @@ const { title = 'Meinhaben – Vielleicht bald deins.', description = 'Meine Sac
     <meta name="description" content={description} />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#225c42" />
+    <link rel="canonical" href={canonicalURL} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Meinhaben" />
+    <meta property="og:locale" content="de_AT" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={imageURL} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageURL} />
+    <meta name="twitter:image:alt" content={imageAlt} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>{title}</title>
   </head>
