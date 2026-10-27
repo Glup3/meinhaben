@@ -1,0 +1,28 @@
+---
+import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+interface Props { title?: string; description?: string; }
+const { title = 'Meinhaben – Vielleicht bald deins.', description = 'Meine Sachen suchen ein neues Zuhause. Ein kleiner privater Marktplatz für Freunde und Familie.' } = Astro.props;
+---
+<!doctype html>
+<html lang="de-AT">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#225c42" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Zum Inhalt springen</a>
+    <header class="site-header"><div class="container header-inner">
+      <a class="logo" href="/" aria-label="Meinhaben – Startseite">mein<span>haben.</span></a>
+      <nav class="header-nav" aria-label="Hauptnavigation"><a href="/#dinge">Alle Dinge</a><a href="/#so-gehts">So funktioniert’s</a></nav>
+      <span class="private-label"><span class="status-dot"></span>Für Freunde & Familie</span>
+    </div></header>
+    <slot />
+    <footer class="site-footer"><div class="container footer-inner"><div><a class="logo footer-logo" href="/">mein<span>haben.</span></a><p>Weniger bei mir. Mehr Freude bei dir.</p></div><div class="footer-note"><span>Ein kleiner, privater Marktplatz.</span><span>Von mir. Für euch. <Icon name="leaf" size={15} /></span></div></div></footer>
+  </body>
+</html>

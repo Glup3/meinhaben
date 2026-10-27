@@ -1,0 +1,71 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Icon from '../../components/Icon.astro';
+import ListingCard from '../../components/ListingCard.astro';
+import { listings, formatPrice, statusLabels, type Listing } from '../../data/listings';
+export function getStaticPaths() { return listings.map(listing => ({ params: { slug: listing.slug }, props: { listing } })); }
+interface Props { listing: Listing; }
+const { listing } = Astro.props;
+const photos = [{ src: listing.image, alt: listing.imageAlt }, ...(listing.extraImages || [])];
+const related = listings.filter(item => item.slug !== listing.slug && item.status !== 'sold').sort((a, b) => Number(b.category === listing.category) - Number(a.category === listing.category)).slice(0, 3);
+const message = `Hey! Ich interessiere mich für „${listing.subtitle}“ auf Meinhaben. Ist das noch zu haben?`;
+---
+<Layout title={`${listing.subtitle} – Meinhaben`} description={listing.description[0]}>
+  <main id="main" class="container detail-main">
+    <nav class="breadcrumb" aria-label="Brotkrümelnavigation"><a href="/">Startseite</a><Icon name="right" /><a href={`/?kategorie=${encodeURIComponent(listing.category)}#dinge`}>{listing.category}</a><Icon name="right" /><span aria-current="page">{listing.subtitle}</span></nav>
+    <div class="detail-grid">
+        <section class="gallery" aria-label="Artikelfotos"><button class="gallery-main" id="open-gallery" aria-label="Artikelfoto vergrößern"><img id="gallery-image" src={photos[0].src} alt={photos[0].alt} width="1200" height="1200" fetchpriority="high" /><span class="gallery-zoom"><Icon name="expand" size={16} />Vergrößern</span></button><div class="gallery-thumbs" role="group" aria-label="Foto auswählen">{photos.map((photo, index) => <button class:list={['gallery-thumb', { active: index === 0 }]} data-photo-index={index} data-src={photo.src} data-alt={photo.alt} aria-label={`Foto ${index + 1}: ${photo.alt}`} aria-pressed={index === 0}><img src={photo.src} alt="" width="69" height="59" /></button>)}</div><p class="gallery-caption"><Icon name="expand" size={12} /><span id="photo-count">Foto 1 von {photos.length}</span> · Klick aufs Bild für die große Ansicht</p></section>
+      <section class="detail-info" aria-labelledby="listing-title">
+        <div class="eyebrow">{listing.category}</div><h1 id="listing-title">{listing.title}</h1><p class="detail-subtitle">{listing.subtitle}</p><span class:list={['availability-badge', listing.status]}><span class="status-dot"></span>{statusLabels[listing.status]}</span>
+        <div class="detail-price"><strong>{formatPrice(listing.price)}</strong><small>{listing.price === 0 ? 'Einfach Freude weitergeben' : listing.negotiable ? 'Verhandlungsbasis' : 'Fixpreis'}</small></div>
+        <p class="detail-intro">{listing.description[0]}</p>
+        <dl class="detail-facts"><div><dt>Zustand</dt><dd>{listing.condition}</dd></div><div><dt>Übergabe</dt><dd>Nach Absprache</dd></div></dl>
+        {listing.status === 'reserved' && <p class="reserved-note">Schon für jemanden reserviert. Du kannst mir trotzdem schreiben, falls es doch wieder frei wird.</p>}
+        {listing.status === 'sold' && <p class="sold-note">Dieses Stück hat schon ein neues Zuhause gefunden. Vielleicht ist bei den anderen Dingen etwas für dich dabei.</p>}
+        <button class="button primary contact-button" id="contact-button" disabled={listing.status === 'sold'}><Icon name={listing.status === 'sold' ? 'check' : 'chat'} size={19} />{listing.status === 'sold' ? 'Schon weitergezogen' : 'Interesse? Melde dich'}{listing.status !== 'sold' && <Icon name="arrow" size={17} />}</button>
+        <p class="contact-caption">Wir kennen uns ja schon. Schreib mir auf WhatsApp.</p>
+        <a href="/#dinge" class="text-link back-link"><Icon name="back" size={16} />Zurück zu allen Dingen</a>
+      </section>
+        <section class="description-section" aria-labelledby="description-heading"><h2 id="description-heading">Ein bisschen mehr dazu</h2>{listing.description.map(text => <p>{text}</p>)}</section>
+        <section class="specs-section" aria-labelledby="specs-heading"><h2 id="specs-heading">Die Details</h2><dl class="specs">{listing.details.map(([label, value]) => <div><dt>{label}</dt><dd>{value}</dd></div>)}</dl></section>
+        <div class="private-note"><Icon name="leaf" size={20} /><p>Von mir persönlich, aus meinem eigenen Haushalt. Wenn du Fragen hast oder dir etwas genauer ansehen möchtest, melde dich einfach.</p></div>
+    </div>
+    <section class="related-section" aria-labelledby="related-heading"><div class="related-heading"><h2 id="related-heading">Vielleicht auch etwas für dich<span class="heading-dot">.</span></h2><a href="/#dinge" class="text-link">Alle Dinge <Icon name="arrow" size={17} /></a></div><div class="listing-grid">{related.map(item => <ListingCard listing={item} />)}</div></section>
+  </main>
+  <dialog id="contact-dialog" class="dialog" aria-labelledby="contact-heading" aria-describedby="contact-description">
+    <button class="dialog-close" data-close-dialog aria-label="Kontaktfenster schließen"><Icon name="close" size={18} /></button><div class="dialog-icon"><Icon name="chat" size={27} /></div><div class="section-kicker">Ganz persönlich</div><h2 id="contact-heading">Schreib mir einfach auf WhatsApp.</h2><p id="contact-description">Du hast meine Nummer ja schon. Sag mir, welches Stück dich interessiert, und wir besprechen alles Weitere.</p>
+    <div class="message-preview"><label for="contact-message">Deine Nachricht könnte so aussehen</label><textarea id="contact-message" readonly rows="3">{message}</textarea></div><button class="button primary dialog-copy" id="copy-message"><Icon name="copy" size={17} /><span>Nachricht kopieren</span></button><p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
+  </dialog>
+  <dialog id="lightbox" class="dialog lightbox" aria-label="Artikelfoto in Großansicht"><button class="dialog-close" data-close-dialog aria-label="Großansicht schließen"><Icon name="close" size={18} /></button><img id="lightbox-image" class="lightbox-image" src={photos[0].src} alt={photos[0].alt} width="1200" height="1200" /><div class="lightbox-caption"><span id="lightbox-count" aria-live="polite">Foto 1 von {photos.length}</span>{photos.length > 1 && <div class="lightbox-nav"><button id="previous-photo" aria-label="Vorheriges Foto"><Icon name="left" size={17} /></button><button id="next-photo" aria-label="Nächstes Foto"><Icon name="right" size={17} /></button></div>}</div></dialog>
+</Layout>
+<script>
+  const contact = document.querySelector<HTMLDialogElement>('#contact-dialog')!;
+  const lightbox = document.querySelector<HTMLDialogElement>('#lightbox')!;
+  const thumbnails = [...document.querySelectorAll<HTMLButtonElement>('[data-photo-index]')];
+  let photoIndex = 0;
+  function selectPhoto(index: number) {
+    photoIndex = (index + thumbnails.length) % thumbnails.length;
+    const selected = thumbnails[photoIndex];
+    for (const id of ['gallery-image', 'lightbox-image']) { const image = document.getElementById(id) as HTMLImageElement; image.src = selected.dataset.src!; image.alt = selected.dataset.alt!; }
+    thumbnails.forEach((thumb, i) => { thumb.classList.toggle('active', i === photoIndex); thumb.setAttribute('aria-pressed', String(i === photoIndex)); });
+    for (const id of ['photo-count', 'lightbox-count']) document.getElementById(id)!.textContent = `Foto ${photoIndex + 1} von ${thumbnails.length}`;
+  }
+  thumbnails.forEach((thumb, index) => thumb.addEventListener('click', () => selectPhoto(index)));
+  document.querySelector('#open-gallery')!.addEventListener('click', () => lightbox.showModal());
+  document.querySelector('#contact-button')!.addEventListener('click', () => { document.querySelector('#copy-status')!.textContent = ''; contact.showModal(); });
+  document.querySelector('#previous-photo')?.addEventListener('click', () => selectPhoto(photoIndex - 1));
+  document.querySelector('#next-photo')?.addEventListener('click', () => selectPhoto(photoIndex + 1));
+  lightbox.addEventListener('keydown', event => { if (event.key === 'ArrowLeft') { event.preventDefault(); selectPhoto(photoIndex - 1); } if (event.key === 'ArrowRight') { event.preventDefault(); selectPhoto(photoIndex + 1); } });
+  for (const dialog of [contact, lightbox]) {
+    dialog.querySelector('[data-close-dialog]')!.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', event => { const rect = dialog.getBoundingClientRect(); if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close(); });
+    dialog.addEventListener('close', () => { document.body.style.overflow = ''; });
+  }
+  for (const button of ['#open-gallery', '#contact-button']) document.querySelector(button)!.addEventListener('click', () => { document.body.style.overflow = 'hidden'; });
+  document.querySelector('#copy-message')!.addEventListener('click', async () => {
+    const textarea = document.querySelector<HTMLTextAreaElement>('#contact-message')!;
+    const status = document.querySelector('#copy-status')!;
+    try { await navigator.clipboard.writeText(textarea.value); status.textContent = 'Kopiert! Jetzt in unserem WhatsApp-Chat einfügen.'; }
+    catch { textarea.focus(); textarea.select(); status.textContent = 'Markiert – kopiere den Text und füge ihn in WhatsApp ein.'; }
+  });
+</script>

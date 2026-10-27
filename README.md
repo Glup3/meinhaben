@@ -1,7 +1,34 @@
 # meinhaben
 
-An empty, static Astro project with `astro-loader-pocketbase` and a self-hosted
-PocketBase service. No application collections or sample content are created.
+A static Astro marketplace for sharing used goods with friends and family.
+The German UI currently uses sample listings; PocketBase is not connected yet.
+
+## UI development
+
+Run `npm ci` and `npm run dev` to preview the UI at `http://localhost:4321`.
+PocketBase is not required for this stage. Run `npm run check` and `npm run build`
+to validate the project and generate the static pages.
+
+- `src/data/listings.ts`: typed sample items, categories, prices, availability,
+  descriptions, and image galleries. Replace this build-time source with the
+  PocketBase collection when the backend is ready.
+- `src/pages/index.astro`: live search, category and availability filters, price
+  sorting, and empty states. Filters are preserved in the URL.
+- `src/pages/inserat/[slug].astro`: prebuilt listing pages with accessible photo
+  dialogs, item details, related listings, and the WhatsApp contact message.
+- `src/styles/global.css`: responsive marketplace styling.
+
+The contact button explains that visitors should message the seller on WhatsApp.
+It provides a message to copy; no phone number or messaging integration is needed.
+Reserved items allow enquiries; sold items disable the contact button.
+
+Sample photos are downloaded from Unsplash into `public/images`; the chair detail
+is a crop of the same source photo. The images correspond to the photo IDs used
+in the approved mockups and additional sample items. They are illustrative and
+must be replaced with actual item photos and descriptions before sharing.
+Inter is hosted locally under the SIL Open Font License in `public/fonts/OFL.txt`.
+Search-engine indexing is disabled through page metadata; this is not access
+control or authentication.
 
 ## Local development
 
@@ -111,7 +138,7 @@ push webhook to Coolify. Other branches do not deploy this production resource.
 The webhook secret is stored in GitHub and Coolify, never in this repository.
 You can also use **Deploy** in Coolify to rebuild manually. PocketBase content
 edits still require a manual deployment; they do not trigger the GitHub webhook.
-The initial Astro site deliberately renders a blank page. Verify PocketBase with
+Verify PocketBase with
 `curl --fail https://meinhaben-admin.ditto.glup3.dev/api/health`.
 
 ## Backups and restore
