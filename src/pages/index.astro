@@ -2,8 +2,10 @@
 import Layout from '../layouts/Layout.astro';
 import Icon from '../components/Icon.astro';
 import ListingCard from '../components/ListingCard.astro';
-import { listings, categories } from '../data/listings';
-const categoryIcons = { Wohnen: 'home', Technik: 'tech', Freizeit: 'sun' };
+import { getListings, getCategories } from '../data/listings';
+const [listings, categoryRecords] = await Promise.all([getListings(), getCategories()]);
+const categories = categoryRecords.map(category => category.name);
+const categoryIcons = Object.fromEntries(categoryRecords.map(category => [category.name, category.icon]));
 ---
 <Layout>
   <main id="main" class="container home-main">

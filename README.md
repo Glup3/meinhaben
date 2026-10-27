@@ -1,17 +1,18 @@
 # meinhaben
 
 A static Astro marketplace for sharing used goods with friends and family.
-The German UI currently uses sample listings; PocketBase is not connected yet.
+The German UI loads listings, categories and photo galleries from PocketBase at
+build time. Migrations seed the original ten example listings and their photos.
 
 ## UI development
 
-Run `npm ci` and `npm run dev` to preview the UI at `http://localhost:4321`.
-PocketBase is not required for this stage. Run `npm run check` and `npm run build`
-to validate the project and generate the static pages.
+Follow the local development setup below, then run `npm run dev` to preview the
+UI at `http://localhost:4321`. PocketBase must be running for content sync,
+`npm run check` and `npm run build`; there is no static-data fallback.
 
-- `src/data/listings.ts`: typed sample items, categories, prices, availability,
-  descriptions, and image galleries. Replace this build-time source with the
-  PocketBase collection when the backend is ready.
+- `src/content.config.ts`: public PocketBase loaders with explicit content schemas.
+- `src/data/listings.ts`: maps PocketBase records into the UI model, including
+  category names, German condition labels, cents, paragraphs and ordered photos.
 - `src/pages/index.astro`: live search, category and availability filters, price
   sorting, and empty states. Filters are preserved in the URL.
 - `src/pages/inserat/[slug].astro`: prebuilt listing pages with accessible photo
@@ -45,6 +46,7 @@ Requires Node >=22.23.4 (Node 24 recommended), npm, and `unzip` on Linux/macOS.
 npm ci
 cp .env.example .env
 npm run pb:install
+npm run pb -- migrate up
 npm run pb:dev
 ```
 
@@ -65,17 +67,62 @@ npm run preview
 
 ## Content loading
 
-`src/content.config.ts` includes a commented loader example. Create your own
-PocketBase collection, give it suitable API rules, then enable and adapt that
-example. An explicit Astro schema avoids needing superuser credentials in the
-frontend build. Only publish fields intended for visitors; a public list/view
-rule exposes records directly through the PocketBase API too.
+`src/content.config.ts` loads `categories`, published `listings`, and their
+`listing_images` through public read APIs. Explicit Astro schemas avoid needing
+superuser credentials in the frontend build. All records are fetched on each
+sync; removed or unpublished entries are removed from Astro's content store.
+Run `s` followed by Enter in the Astro dev terminal to sync dashboard edits.
+Only publish fields intended for visitors: public API rules expose those records
+directly, not just through the website. Missing categories/photos fail the build
+with the affected listing's slug instead of silently using static examples.
 
 `POCKETBASE_URL` selects the backend URL at **build time**. The deployed build
 uses `https://meinhaben-admin.ditto.glup3.dev`; local development uses `.env`.
 PocketBase content changes need a new Astro build/deployment. There is no
-automatic content-change rebuild webhook in this starter. Once collections are
-enabled, PocketBase must be reachable when Astro builds.
+automatic content-change rebuild webhook in this starter. PocketBase must be
+reachable when Astro builds.
+
+In Docker Compose, page generation runs when the website container starts,
+after PocketBase is healthy and has applied its migrations. The server-only
+`POCKETBASE_INTERNAL_URL=http://pocketbase:8090` is used for API reads;
+`POCKETBASE_URL` remains the public origin for browser image URLs and previews.
+Restarting the website container also regenerates its static pages from the
+current database. Image builds themselves do not contact PocketBase.
+
+## Editing marketplace content
+
+- `categories`: name, unique slug, existing icon key (`home`, `tech`, `sun`),
+  and numeric filter order.
+- `listings`: unique slug, title, subtitle, plain-text description (blank lines
+  separate paragraphs), category, integer `price_cents`, negotiable flag,
+  condition, availability status, handover, JSON details, publication flag/date.
+  `price_cents = 0` means free. Conditions use `new`, `like_new`, `very_good`,
+  `good`, `fair`; status uses `available`, `reserved`, `sold`.
+- `listing_images`: listing relation, one uploaded image, alt text and unique
+  numeric position per listing. The lowest position is the cover photo.
+
+Create a listing as an unpublished draft with a status and `details` array
+(`[]` is valid). Save it, upload its photos, set `published_at`, then publish.
+Hooks validate details and require a date and existing photo before publishing.
+Deleting or reassigning the last photo of a published listing is rejected in a
+transaction; unpublish first or add another photo. Deleting the whole listing
+still cascades normally.
+Details use `[{"label":"Marke","value":"Patagonia"}]`; handover is a separate
+field and is appended to the displayed details. Keep published slugs stable to
+avoid breaking shared links. Deleting a listing deletes its photo records too.
+
+All create/update/delete API rules are locked to superusers. Public list/view
+rules hide draft listings and their photo records. Uploaded files are ordinary
+public files: knowing a draft photo URL still permits access. Use protected files
+and authorized delivery if draft images must be confidential.
+
+The one-time seed migration imports 3 categories, 10 listings and 12 actual
+uploads from the repository's `public/images` directory; no remote photo download
+is needed. Docker copies these into `/pb/seed_images`; `PB_SEED_IMAGES_DIR` can
+override the seed source directory. Subsequent restarts/migrations do not reset
+edits or recreate deleted examples. These are illustrative examples, not real
+inventory. The seed rollback intentionally refuses to delete possibly edited
+content; use a backup or remove example records manually instead.
 
 ## Schema migrations and hooks
 
@@ -111,7 +158,8 @@ Public source: <https://github.com/Glup3/meinhaben>, branch `main`.
 Deploy the root `docker-compose.yaml` using Coolify's **Docker Compose** build
 pack on `ditto-cloud-1`. Both services build from this repository:
 
-- `website`: Astro builds to HTML, served by Nginx on port 80 at
+- `website`: after PocketBase is healthy, Astro generates HTML on container
+  startup, served by Nginx on port 80 at
   <https://meinhaben.ditto.glup3.dev>.
 - `pocketbase`: checksum-verified PocketBase on port 8090, with API and dashboard
   at <https://meinhaben-admin.ditto.glup3.dev/_/>.
@@ -144,9 +192,19 @@ Pushes to `main` automatically deploy both services through a signed GitHub
 push webhook to Coolify. Other branches do not deploy this production resource.
 The webhook secret is stored in GitHub and Coolify, never in this repository.
 You can also use **Deploy** in Coolify to rebuild manually. PocketBase content
-edits still require a manual deployment; they do not trigger the GitHub webhook.
+edits still require a website restart or deployment; they do not trigger the GitHub webhook.
 Verify PocketBase with
 `curl --fail https://meinhaben-admin.ditto.glup3.dev/api/health`.
+
+### First deployment with the content collections
+
+Deploy the Compose resource normally. Both images build without database API
+requests. PocketBase applies migrations and seed data before its health check
+passes; Compose then starts the website, which generates pages from that live
+database before starting Nginx. A failed content build exits without serving
+partial output. This works for both an empty database and an existing deployment
+without the new collections, with no manual backend-first rollout. Keep the
+existing persistent volume; no throwaway seed database is used for page builds.
 
 ## Backups and restore
 

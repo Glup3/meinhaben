@@ -2,10 +2,14 @@
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import ListingCard from '../../components/ListingCard.astro';
-import { listings, formatPrice, statusLabels, type Listing } from '../../data/listings';
-export function getStaticPaths() { return listings.map(listing => ({ params: { slug: listing.slug }, props: { listing } })); }
+import { getListings, formatPrice, statusLabels, type Listing } from '../../data/listings';
+export async function getStaticPaths() {
+  const listings = await getListings();
+  return listings.map(listing => ({ params: { slug: listing.slug }, props: { listing } }));
+}
 interface Props { listing: Listing; }
 const { listing } = Astro.props;
+const listings = await getListings();
 const photos = [{ src: listing.image, alt: listing.imageAlt }, ...(listing.extraImages || [])];
 const handover = listing.details.find(([label]) => label === 'Übergabe')?.[1] ?? 'Nach Absprache';
 const related = listings.filter(item => item.slug !== listing.slug && item.status !== 'sold').sort((a, b) => Number(b.category === listing.category) - Number(a.category === listing.category)).slice(0, 3);

@@ -3,9 +3,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        POCKETBASE_URL: ${POCKETBASE_URL:-https://meinhaben-admin.ditto.glup3.dev}
     restart: unless-stopped
+    depends_on:
+      pocketbase:
+        condition: service_healthy
+    environment:
+      POCKETBASE_URL: ${POCKETBASE_URL:-https://meinhaben-admin.ditto.glup3.dev}
+      POCKETBASE_INTERNAL_URL: http://pocketbase:8090
     expose:
       - "80"
 

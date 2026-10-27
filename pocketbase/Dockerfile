@@ -13,6 +13,8 @@ RUN set -eu; \
     chmod +x pocketbase
 COPY pocketbase/pb_migrations ./pb_migrations
 COPY pocketbase/pb_hooks ./pb_hooks
+COPY public/images ./seed_images
+ENV PB_SEED_IMAGES_DIR=/pb/seed_images
 COPY pocketbase/entrypoint.sh ./entrypoint.sh
 RUN chmod +x entrypoint.sh
 EXPOSE 8090
