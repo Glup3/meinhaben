@@ -18,8 +18,8 @@ to validate the project and generate the static pages.
   dialogs, item details, related listings, and the WhatsApp contact message.
 - `src/styles/global.css`: responsive marketplace styling.
 
-The contact button explains that visitors should message the seller on WhatsApp.
-It provides a message to copy; no phone number or messaging integration is needed.
+The contact dialog links to the seller's WhatsApp username `glup3` through
+`https://wa.me/glup3` and provides a listing-specific message to copy into the chat.
 Reserved items allow enquiries; sold items disable the contact button.
 
 Sample photos are downloaded from Unsplash into `public/images`; the chair detail

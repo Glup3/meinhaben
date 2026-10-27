@@ -1068,8 +1068,12 @@ h2 {
   line-height: 1.8;
   min-height: 95px;
 }
+.dialog-whatsapp,
 .dialog-copy {
   width: 100%;
+}
+.dialog-whatsapp {
+  margin-bottom: 12px;
 }
 .copy-status {
   font-size: 10px !important;
