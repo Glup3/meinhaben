@@ -106,8 +106,11 @@ to the configured value on restart; change it in Coolify, then restart to rotate
 it. Retrieve the initial credentials in Coolify's environment panel. Frontend
 builds do not need these secrets.
 
-After pushing to `main`, use **Deploy** in Coolify to rebuild both services. Git
-pushes and content edits do not trigger deployments automatically in this setup.
+Pushes to `main` automatically deploy both services through a signed GitHub
+push webhook to Coolify. Other branches do not deploy this production resource.
+The webhook secret is stored in GitHub and Coolify, never in this repository.
+You can also use **Deploy** in Coolify to rebuild manually. PocketBase content
+edits still require a manual deployment; they do not trigger the GitHub webhook.
 The initial Astro site deliberately renders a blank page. Verify PocketBase with
 `curl --fail https://meinhaben-admin.ditto.glup3.dev/api/health`.
 
