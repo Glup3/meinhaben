@@ -7,6 +7,7 @@ export function getStaticPaths() { return listings.map(listing => ({ params: { s
 interface Props { listing: Listing; }
 const { listing } = Astro.props;
 const photos = [{ src: listing.image, alt: listing.imageAlt }, ...(listing.extraImages || [])];
+const handover = listing.details.find(([label]) => label === 'Übergabe')?.[1] ?? 'Nach Absprache';
 const related = listings.filter(item => item.slug !== listing.slug && item.status !== 'sold').sort((a, b) => Number(b.category === listing.category) - Number(a.category === listing.category)).slice(0, 3);
 const message = `Hey! Ich interessiere mich für „${listing.subtitle}“ auf Meinhaben. Ist das noch zu haben?`;
 ---
@@ -19,7 +20,7 @@ const message = `Hey! Ich interessiere mich für „${listing.subtitle}“ auf M
         <div class="eyebrow">{listing.category}</div><h1 id="listing-title">{listing.title}</h1><p class="detail-subtitle">{listing.subtitle}</p><span class:list={['availability-badge', listing.status]}><span class="status-dot"></span>{statusLabels[listing.status]}</span>
         <div class="detail-price"><strong>{formatPrice(listing.price)}</strong><small>{listing.price === 0 ? 'Einfach Freude weitergeben' : listing.negotiable ? 'Verhandlungsbasis' : 'Fixpreis'}</small></div>
         <p class="detail-intro">{listing.description[0]}</p>
-        <dl class="detail-facts"><div><dt>Zustand</dt><dd>{listing.condition}</dd></div><div><dt>Übergabe</dt><dd>Nach Absprache</dd></div></dl>
+        <dl class="detail-facts"><div><dt>Zustand</dt><dd>{listing.condition}</dd></div><div><dt>Übergabe</dt><dd>{handover}</dd></div></dl>
         {listing.status === 'reserved' && <p class="reserved-note">Schon für jemanden reserviert. Du kannst mir trotzdem schreiben, falls es doch wieder frei wird.</p>}
         {listing.status === 'sold' && <p class="sold-note">Dieses Stück hat schon ein neues Zuhause gefunden. Vielleicht ist bei den anderen Dingen etwas für dich dabei.</p>}
         <button class="button primary contact-button" id="contact-button" disabled={listing.status === 'sold'}><Icon name={listing.status === 'sold' ? 'check' : 'chat'} size={19} />{listing.status === 'sold' ? 'Schon weitergezogen' : 'Interesse? Melde dich'}{listing.status !== 'sold' && <Icon name="arrow" size={17} />}</button>

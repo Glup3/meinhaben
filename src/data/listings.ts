@@ -20,6 +20,35 @@ export interface Listing {
 // Temporary build-time content. Replace this source with PocketBase records later.
 export const listings: Listing[] = [
   {
+    slug: "patagonia-jacke",
+    title: "Patagonia Jacke – so gut wie neu",
+    subtitle: "Robuste Jacke in Rot und Blau",
+    category: "Freizeit",
+    price: 89,
+    negotiable: false,
+    condition: "So gut wie neu",
+    status: "available",
+    image: "/images/patagonia-jacke-vorne.jpg",
+    imageAlt: "Rot-blaue Patagonia Jacke mit Kapuze und Logo auf der Vorderseite",
+    date: "2026-10-27",
+    extraImages: [
+      {
+        src: "/images/patagonia-jacke-hinten.jpg",
+        alt: "Rückseite der Patagonia Jacke in Blau mit roten Ärmeln und Kapuze",
+      },
+    ],
+    description: [
+      "Patagonia Jacke so gut wie neu – nur einmal getragen. Robustes Material in Rot und Blau, komplett modern.",
+      "Nur Selbstabholung – 89 €.",
+    ],
+    details: [
+      ["Marke", "Patagonia"],
+      ["Farbe", "Rot / Blau"],
+      ["Material", "Robustes Material"],
+      ["Übergabe", "Nur Selbstabholung"],
+    ],
+  },
+  {
     slug: "loungesessel",
     title: "Ein Platz zum Abschalten",
     subtitle: "Gemütlicher Loungesessel",
