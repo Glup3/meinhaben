@@ -464,6 +464,19 @@ h2 {
   object-fit: cover;
   transition: transform 0.5s;
 }
+.photo-loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 40px 20px;
+  background: #e9ece4;
+  color: var(--green);
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.6;
+  pointer-events: none;
+}
 .listing-card:hover .card-photo img {
   transform: scale(1.035);
 }
@@ -856,6 +869,17 @@ h2 {
 .detail-price small {
   font-size: 10px;
   color: #6e7d65;
+}
+.price-joke {
+  margin-top: 12px;
+  font-size: 12px;
+}
+.price-joke button {
+  padding: 8px 0;
+}
+.price-joke p {
+  margin-top: 4px;
+  color: var(--green);
 }
 .detail-intro {
   font-size: 12px;

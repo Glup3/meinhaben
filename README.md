@@ -23,6 +23,11 @@ The contact dialog links to the seller's WhatsApp username `glup3` through
 `https://wa.me/glup3` and provides a listing-specific message to copy into the chat.
 Reserved items allow enquiries; sold items disable the contact button.
 
+Small marketplace jokes appear while listing photos take longer than 600 ms to
+load and on the 404 page. Paid, unsold listings also have a “Was letzte Preis?”
+button that reveals the asking price with a wink, without changing it or sending
+a message. Free and sold listings omit the button.
+
 Sample photos are downloaded from Unsplash into `public/images`; the chair detail
 is a crop of the same source photo. The images correspond to the photo IDs used
 in the approved mockups and additional sample items. They are illustrative and

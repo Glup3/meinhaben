@@ -23,6 +23,7 @@ const message = `Hey! Ich interessiere mich für „${listing.subtitle}“ auf M
       <section class="detail-info" aria-labelledby="listing-title">
         <div class="eyebrow">{listing.category}</div><h1 id="listing-title">{listing.title}</h1><p class="detail-subtitle">{listing.subtitle}</p><span class:list={['availability-badge', listing.status]}><span class="status-dot"></span>{statusLabels[listing.status]}</span>
         <div class="detail-price"><strong>{formatPrice(listing.price)}</strong><small>{listing.price === 0 ? 'Einfach Freude weitergeben' : listing.negotiable ? 'Verhandlungsbasis' : 'Fixpreis'}</small></div>
+        {listing.price > 0 && listing.status !== 'sold' && <div class="price-joke"><button type="button" class="text-link" id="last-price-button" aria-expanded="false" aria-controls="last-price-reply">Was letzte Preis?</button><p id="last-price-reply" role="status" hidden>Für dich? {formatPrice(listing.price)}. 😉</p></div>}
         <p class="detail-intro">{listing.description[0]}</p>
         <dl class="detail-facts"><div><dt>Zustand</dt><dd>{listing.condition}</dd></div><div><dt>Übergabe</dt><dd>{handover}</dd></div></dl>
         {listing.status === 'reserved' && <p class="reserved-note">Schon für jemanden reserviert. Du kannst mir trotzdem schreiben, falls es doch wieder frei wird.</p>}
@@ -44,6 +45,12 @@ const message = `Hey! Ich interessiere mich für „${listing.subtitle}“ auf M
   <dialog id="lightbox" class="dialog lightbox" aria-label="Artikelfoto in Großansicht"><button class="dialog-close" data-close-dialog aria-label="Großansicht schließen"><Icon name="close" size={18} /></button><img id="lightbox-image" class="lightbox-image" src={photos[0].src} alt={photos[0].alt} width="1200" height="1200" /><div class="lightbox-caption"><span id="lightbox-count" aria-live="polite">Foto 1 von {photos.length}</span>{photos.length > 1 && <div class="lightbox-nav"><button id="previous-photo" aria-label="Vorheriges Foto"><Icon name="left" size={17} /></button><button id="next-photo" aria-label="Nächstes Foto"><Icon name="right" size={17} /></button></div>}</div></dialog>
 </Layout>
 <script>
+  document.querySelector<HTMLButtonElement>('#last-price-button')?.addEventListener('click', event => {
+    const button = event.currentTarget as HTMLButtonElement;
+    const reply = document.querySelector<HTMLElement>('#last-price-reply')!;
+    reply.hidden = !reply.hidden;
+    button.setAttribute('aria-expanded', String(!reply.hidden));
+  });
   const contact = document.querySelector<HTMLDialogElement>('#contact-dialog')!;
   const lightbox = document.querySelector<HTMLDialogElement>('#lightbox')!;
   const thumbnails = [...document.querySelectorAll<HTMLButtonElement>('[data-photo-index]')];

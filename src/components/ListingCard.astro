@@ -1,12 +1,13 @@
 ---
 import { formatPrice, statusLabels, type Listing } from '../data/listings';
 import Icon from './Icon.astro';
+import LoadingMessage from './LoadingMessage.astro';
 interface Props { listing: Listing; eager?: boolean; }
 const { listing, eager = false } = Astro.props;
 ---
 <article class:list={['listing-card', { 'is-sold': listing.status === 'sold' }]} data-listing data-category={listing.category} data-status={listing.status} data-price={listing.price} data-date={listing.date} data-search={`${listing.title} ${listing.subtitle} ${listing.category} ${listing.condition}`}>
   <a href={`/inserat/${listing.slug}/`} class="card-link">
-    <div class="card-photo"><img src={listing.image} alt={listing.imageAlt} width="1200" height="900" loading={eager ? 'eager' : 'lazy'} decoding="async" /><span class:list={['photo-label', listing.status !== 'available' ? listing.status : 'condition-label']}>{listing.status === 'available' ? (listing.price === 0 ? 'Zu verschenken' : `${listing.condition}er Zustand`) : statusLabels[listing.status]}</span><span class="card-open"><Icon name="arrow" size={19} /></span></div>
+    <div class="card-photo"><img src={listing.image} alt={listing.imageAlt} width="1200" height="900" loading={eager ? 'eager' : 'lazy'} decoding="async" /><LoadingMessage /><span class:list={['photo-label', listing.status !== 'available' ? listing.status : 'condition-label']}>{listing.status === 'available' ? (listing.price === 0 ? 'Zu verschenken' : `${listing.condition}er Zustand`) : statusLabels[listing.status]}</span><span class="card-open"><Icon name="arrow" size={19} /></span></div>
     <div class="card-body"><p class="card-category">{listing.category}</p><h3>{listing.title}</h3><p class="card-subtitle">{listing.subtitle}</p><div class="card-bottom"><span class:list={['card-price', { 'free-price': listing.price === 0 }]}>{formatPrice(listing.price)}</span><span class="card-price-note">{listing.price === 0 ? 'Einfach mitnehmen' : listing.negotiable ? 'VB' : 'Fixpreis'}</span></div></div>
   </a>
 </article>

@@ -1,0 +1,23 @@
+<span class="photo-loading" data-photo-loading hidden aria-hidden="true">Verkäufer sucht noch das Ladekabel …</span>
+
+<script>
+  const messages = [
+    'Verkäufer sucht noch das Ladekabel …',
+    'Ein Foto geht noch. Ohne Daumen vor der Linse …',
+    'Komme fix gleich. Also wirklich gleich …',
+  ];
+  document.querySelectorAll<HTMLElement>('[data-photo-loading]').forEach(message => {
+    const image = message.parentElement?.querySelector('img');
+    if (!image || image.complete) return;
+    message.textContent = messages[Math.floor(Math.random() * messages.length)];
+    const timeout = window.setTimeout(() => {
+      message.hidden = image.complete;
+    }, 600);
+    const finish = () => {
+      window.clearTimeout(timeout);
+      message.hidden = true;
+    };
+    image.addEventListener('load', finish, { once: true });
+    image.addEventListener('error', finish, { once: true });
+  });
+</script>
