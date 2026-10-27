@@ -15,9 +15,12 @@ services:
       dockerfile: pocketbase/Dockerfile
     restart: unless-stopped
     environment:
-      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL:?Set PB_ADMIN_EMAIL}
-      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD:?Set PB_ADMIN_PASSWORD}
-      PB_ENCRYPTION_KEY: ${PB_ENCRYPTION_KEY:?Set a 32-character PB_ENCRYPTION_KEY}
+      # Coolify parses Compose with a separate build-time environment. Empty
+      # defaults let image builds proceed without runtime secrets; entrypoint.sh
+      # requires all three values before starting the production server.
+      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL:-}
+      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD:-}
+      PB_ENCRYPTION_KEY: ${PB_ENCRYPTION_KEY:-}
     volumes:
       - pocketbase_data:/pb/pb_data
     expose:
