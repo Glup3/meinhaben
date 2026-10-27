@@ -1,0 +1,28 @@
+services:
+  website:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        POCKETBASE_URL: ${POCKETBASE_URL:-https://meinhaben-admin.ditto.glup3.dev}
+    restart: unless-stopped
+    expose:
+      - "80"
+
+  pocketbase:
+    build:
+      context: .
+      dockerfile: pocketbase/Dockerfile
+    restart: unless-stopped
+    environment:
+      PB_ADMIN_EMAIL: ${PB_ADMIN_EMAIL:?Set PB_ADMIN_EMAIL}
+      PB_ADMIN_PASSWORD: ${PB_ADMIN_PASSWORD:?Set PB_ADMIN_PASSWORD}
+      PB_ENCRYPTION_KEY: ${PB_ENCRYPTION_KEY:?Set a 32-character PB_ENCRYPTION_KEY}
+    volumes:
+      - pocketbase_data:/pb/pb_data
+    expose:
+      - "8090"
+    stop_grace_period: 30s
+
+volumes:
+  pocketbase_data:

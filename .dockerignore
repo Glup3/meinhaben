@@ -1,0 +1,9 @@
+.git
+node_modules
+dist
+.astro
+.env
+.env.*
+pocketbase/.bin
+pocketbase/pb_data
+pocketbase/pb_public

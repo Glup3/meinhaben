@@ -1,0 +1,25 @@
+{
+  "name": "meinhaben",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22.23.4" },
+  "scripts": {
+    "dev": "astro dev --host 0.0.0.0",
+    "build": "astro build",
+    "preview": "astro preview --host 0.0.0.0",
+    "check": "astro check",
+    "astro": "astro",
+    "pb:install": "node scripts/pocketbase.mjs install",
+    "pb:dev": "node scripts/pocketbase.mjs serve --http=127.0.0.1:8090 --dev",
+    "pb": "node scripts/pocketbase.mjs"
+  },
+  "dependencies": {
+    "astro": "7.4.2",
+    "astro-loader-pocketbase": "4.0.8"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.9.3"
+  }
+}
