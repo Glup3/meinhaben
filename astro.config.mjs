@@ -1,6 +1,6 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://meinhaben.ditto.glup3.dev',
+  site: process.env.SITE_URL || 'https://meinhaben.ditto.glup3.dev',
   output: 'static',
 });

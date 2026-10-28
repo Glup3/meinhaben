@@ -179,6 +179,45 @@ pack on `ditto-cloud-1`. Both services build from this repository:
 - `pocketbase`: checksum-verified PocketBase on port 8090, with API and dashboard
   at <https://meinhaben-admin.ditto.glup3.dev/_/>.
 
+### Pull-request preview environments
+
+The same Coolify application supports automatic Docker Compose previews for
+repository members' pull requests. Enable **Preview Deployments**, keep public
+fork deployments disabled, and subscribe the signed GitHub repository webhook
+to both `push` and `pull_request` events. Use the preview URL template
+`{{pr_id}}.{{domain}}` and wildcard DNS pointing to `ditto-cloud-1` for both
+production domains. Coolify provisions HTTPS for the resulting preview domains.
+For PR 42, these are `https://42.meinhaben.ditto.glup3.dev` and
+`https://42.meinhaben-admin.ditto.glup3.dev`.
+
+Set `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`, and `PB_ENCRYPTION_KEY` separately
+under **Preview Deployment Environment Variables**, using preview-only values.
+These values are shared across this application's previews, separate from
+production. Retrieve credentials in Coolify; never commit them or expose them
+in PR comments. The current setup uses the signed repository webhook, so it
+does not post automatic GitHub App preview comments.
+
+On container startup, `deploy/website-entrypoint.sh` uses Coolify's generated
+`SERVICE_URL_WEBSITE` for the Astro site origin, `SERVICE_URL_POCKETBASE` for
+public image URLs, and `SERVICE_NAME_POCKETBASE` for the internal API hostname.
+The last value includes Coolify's PR suffix, so builds read their own backend.
+Outside Coolify, the configured `SITE_URL`, `POCKETBASE_URL`, and
+`POCKETBASE_INTERNAL_URL` still work; export `SITE_URL` before standalone builds.
+
+Each preview has its own containers, network, and generated named
+`pocketbase_data` volume. Its first deployment applies the PR's migrations and
+loads the sample listings; production content is not copied. Updating the PR
+retains that preview's database and applies pending migrations. Containers
+share the deployment server's resources.
+
+Closing or merging the PR deletes the preview and its Coolify-generated named
+volumes and network. Stopping a preview is not the same as deleting it. Do not
+give this volume a fixed `name`, mark it `external`, or replace it with a shared
+host bind mount: those storage types are excluded from generated-volume cleanup
+and can break data isolation. Cleanup can fail if the server is unreachable or
+a volume remains in use; check the server after a failed cleanup. Reopening a
+deleted preview starts again with fresh sample data.
+
 Coolify terminates HTTPS and routes the domains to the respective service ports.
 The Compose file exposes no host ports. Its `pocketbase_data` named volume mounts
 at `/pb/pb_data`, preserving SQLite, uploads and local backups across redeploys.

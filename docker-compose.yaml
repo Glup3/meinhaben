@@ -8,6 +8,7 @@ services:
       pocketbase:
         condition: service_healthy
     environment:
+      SITE_URL: ${SITE_URL:-https://meinhaben.ditto.glup3.dev}
       POCKETBASE_URL: ${POCKETBASE_URL:-https://meinhaben-admin.ditto.glup3.dev}
       POCKETBASE_INTERNAL_URL: http://pocketbase:8090
     expose:
