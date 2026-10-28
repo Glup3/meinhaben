@@ -2,6 +2,11 @@
 interface Props { name: string; size?: number; class?: string; }
 const { name, size = 20, class: className } = Astro.props;
 const paths: Record<string, string> = {
+  star: 'm12 3 2.8 5.7 6.3.9-4.5 4.4 1.1 6.2-5.7-3-5.7 3 1.1-6.2L2.9 9.6l6.3-.9L12 3Z',
+  list: 'M8 5h13M8 12h13M8 19h13M3 5h1M3 12h1M3 19h1',
+  menu: 'M3 6h18M3 12h18M3 18h18',
+  user: 'M20 21v-2a7 7 0 0 0-14 0v2M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0',
+  share: 'M18 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM6 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm12 7a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8.5 10.5l7-4M8.5 13.5l7 4',
   search: 'm21 21-4.4-4.4M19 11a8 8 0 1 1-16 0 8 8 0 0 1 16 0',
   arrow: 'M7 17 17 7M7 7h10v10', back: 'M19 12H5m7-7-7 7 7 7',
   right: 'm9 5 7 7-7 7', left: 'm15 5-7 7 7 7', check: 'm5 12 4 4L19 6', close: 'm6 6 12 12M6 18 18 6',

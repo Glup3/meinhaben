@@ -21,8 +21,12 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
 - `src/components/SaveButton.astro` and `src/scripts/favorites.ts`: shared favorites
   controls, browser storage, accessible saved-state announcements, and tab sync.
 
-The interface uses a blue marketplace identity, category navigation, compact listing
-cards, and responsive layouts shared with item details and dialogs.
+The interface closely follows willhaben’s marketplace: an original MEINHABEN
+speech-bubble logo, locally hosted Open Sans, a compact cyan search strip,
+inventory-derived photo category tiles, and a category directory. Search results
+use a filter sidebar and list rows, with a working grid toggle. Item pages place
+the title above the gallery and price/contact panel. Only inventory categories
+and working controls are shown; there are no unrelated marketplace verticals.
 
 The homepage includes budget and condition filters, quick filters for free items
 and favorites, and a compact willhaben-inspired search panel. All filters are combined and
@@ -45,7 +49,8 @@ Sample photos are downloaded from Unsplash into `public/images`; the chair detai
 is a crop of the same source photo. The images correspond to the photo IDs used
 in the approved mockups and additional sample items. They are illustrative and
 must be replaced with actual item photos and descriptions before sharing.
-Inter is hosted locally under the SIL Open Font License in `public/fonts/OFL.txt`.
+Open Sans is hosted locally under the SIL Open Font License in
+`public/fonts/OpenSans-OFL.txt`. The original Inter asset and license are retained.
 Search-engine indexing is disabled through page metadata; this is not access
 control or authentication.
 
