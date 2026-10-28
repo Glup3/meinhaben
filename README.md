@@ -6,9 +6,9 @@ build time. Migrations seed the original ten example listings and their photos.
 
 ## UI development
 
-Follow the local development setup below, then run `npm run dev` to preview the
+Follow the local development setup below, then run `pnpm run dev` to preview the
 UI at `http://localhost:4321`. PocketBase must be running for content sync,
-`npm run check` and `npm run build`; there is no static-data fallback.
+`pnpm run check` and `pnpm run build`; there is no static-data fallback.
 
 - `src/content.config.ts`: public PocketBase loaders with explicit content schemas.
 - `src/data/listings.ts`: maps PocketBase records into the UI model, including
@@ -55,17 +55,19 @@ After deployment, sharing services may cache older previews until they refresh.
 
 ## Local development
 
-Requires Node >=22.23.4 (Node 24 recommended), npm, and `unzip` on Linux/macOS.
+Requires Node >=22.23.4 (Node 24 recommended), pnpm 12.15.0, and `unzip` on Linux/macOS.
+The `packageManager` field pins pnpm. With Corepack installed, run
+`corepack enable` once to make the pinned version available.
 
 ```sh
-npm ci
+pnpm install --frozen-lockfile
 cp .env.example .env
-npm run pb:install
-npm run pb -- migrate up
-npm run pb:dev
+pnpm run pb:install
+pnpm run pb migrate up
+pnpm run pb:dev
 ```
 
-In another terminal, run `npm run dev`. Astro is at `http://localhost:4321` and
+In another terminal, run `pnpm run dev`. Astro is at `http://localhost:4321` and
 PocketBase is at `http://127.0.0.1:8090/_/`. Follow the first-run installer link
 printed by PocketBase to create a local superuser. Local data and downloaded
 binaries are ignored by Git. The installer verifies the pinned SHA-256 checksum.
@@ -75,9 +77,9 @@ PocketBase. This binds only to localhost and writes data, migrations and hooks
 into the same local directories as the native CLI.
 
 ```sh
-npm run check
-npm run build
-npm run preview
+pnpm run check
+pnpm run build
+pnpm run preview
 ```
 
 ## Content loading
@@ -146,20 +148,20 @@ content; use a backup or remove example records manually instead.
 - `pocketbase/pb_data/`: local SQLite databases, uploads and backups; never commit.
 - `pocketbase/version` and `pocketbase/checksums.txt`: pinned PocketBase release.
 
-While `npm run pb:dev` is running, schema changes in the local dashboard generate
+While `pnpm run pb:dev` is running, schema changes in the local dashboard generate
 migration files automatically. Review and commit those files alongside code.
 Create a custom data migration with:
 
 ```sh
-npm run pb -- migrate create your_migration_name
-npm run pb -- migrate up
+pnpm run pb migrate create your_migration_name
+pnpm run pb migrate up
 ```
 
 Production runs `migrate up` before serving and disables automatic generation.
 Only pending migrations run; the applied history lives in the persistent database.
 Make production schema changes through committed migrations rather than editing
 the production dashboard. Hooks ship in the image and take effect on redeploy.
-Export a schema if needed with `npm run pb -- migrate collections`.
+Export a schema if needed with `pnpm run pb migrate collections`.
 
 Back up before schema changes. Rolling back an application image does **not**
 reverse migrations. If a reviewed migration has a safe down function, stop the

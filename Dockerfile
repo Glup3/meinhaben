@@ -1,8 +1,9 @@
 FROM node:24-alpine
 WORKDIR /app
 RUN apk add --no-cache nginx && mkdir -p /run/nginx
-COPY package.json package-lock.json ./
-RUN npm ci
+RUN corepack enable
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 COPY . .
 COPY deploy/nginx.conf /etc/nginx/http.d/default.conf
 COPY --chmod=755 deploy/website-entrypoint.sh /usr/local/bin/website-entrypoint

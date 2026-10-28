@@ -1,4 +1,4 @@
-# Optional local alternative to npm run pb:dev. Binds only to localhost.
+# Optional local alternative to pnpm run pb:dev. Binds only to localhost.
 services:
   pocketbase:
     build:

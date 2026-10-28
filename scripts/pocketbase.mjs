@@ -31,7 +31,7 @@ if (args[0] === 'install') {
   if (extraction.error) throw extraction.error;
   if (extraction.status !== 0) throw new Error('Archive extraction failed');
   await chmod(binary, 0o755);
-  console.log(`Installed PocketBase ${version}. Run npm run pb:dev.`);
+  console.log(`Installed PocketBase ${version}. Run pnpm run pb:dev.`);
 } else {
   const pocketbaseRoot = path.join(root, 'pocketbase');
   const child = spawn(binary, [
@@ -42,7 +42,7 @@ if (args[0] === 'install') {
     ...args,
   ], { cwd: pocketbaseRoot, stdio: 'inherit' });
   child.on('error', (error) => {
-    console.error(error.code === 'ENOENT' ? 'Run npm run pb:install first.' : error.message);
+    console.error(error.code === 'ENOENT' ? 'Run pnpm run pb:install first.' : error.message);
     process.exitCode = 1;
   });
   for (const signal of ['SIGINT', 'SIGTERM']) process.on(signal, () => child.kill(signal));
