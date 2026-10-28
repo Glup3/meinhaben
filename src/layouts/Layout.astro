@@ -21,7 +21,7 @@ const imageURL = new URL(image, Astro.site!);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#225c42" />
+    <meta name="theme-color" content="#0082c3" />
     <link rel="canonical" href={canonicalURL} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Meinhaben" />
@@ -42,13 +42,13 @@ const imageURL = new URL(image, Astro.site!);
   <body>
     <a href="#main" class="skip-link">Zum Inhalt springen</a>
     <header class="site-header"><div class="container header-inner">
-      <a class="logo" href="/" aria-label="Meinhaben – Startseite">mein<span>haben.</span></a>
-      <nav class="header-nav" aria-label="Hauptnavigation"><a href="/#dinge">Alle Dinge</a><a href="/#so-gehts">So funktioniert’s</a></nav>
+      <a class="logo" href="/" aria-label="Meinhaben – Startseite">mein<span>haben</span></a>
+      <span class="brand-tagline">Was meins ist, kann deins werden.</span><nav class="header-nav" aria-label="Hauptnavigation"><a href="/#so-gehts">So funktioniert’s</a></nav>
       <a class="saved-nav" href="/?gemerkt=1#dinge"><Icon name="heart" size={19} /><span>Merkliste</span><span data-saved-count>0</span></a>
-    </div></header>
+    </div><nav class="market-nav" aria-label="Marktplatz"><div class="container market-nav-inner"><a href="/#dinge" class="market-nav-active"><Icon name="grid" size={19} />Marktplatz</a><a href="/?gratis=1#dinge"><Icon name="box" size={19} />Zu verschenken</a><span class="market-nav-note">Privat. Persönlich. Ohne Gebühren.</span></div></nav></header>
     <slot />
     <p id="saved-status" class="sr-only" role="status" aria-live="polite"></p>
-    <footer class="site-footer"><div class="container footer-inner"><div><a class="logo footer-logo" href="/">mein<span>haben.</span></a><p>Weniger bei mir. Mehr Freude bei dir.</p></div><div class="footer-note"><span>Ein kleiner, privater Marktplatz.</span><span>Von mir. Für euch. <Icon name="leaf" size={15} /></span></div></div></footer>
+    <footer class="site-footer"><div class="container footer-inner"><div><a class="logo footer-logo" href="/">mein<span>haben</span></a><p>Weniger bei mir. Mehr Freude bei dir.</p></div><div class="footer-note"><span>Ein privater Marktplatz für Freunde & Familie.</span><span>Schon irgendwie bekannt. Aber alles meins. <Icon name="leaf" size={15} /></span></div></div></footer>
   </body>
 </html>
 

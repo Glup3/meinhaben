@@ -21,8 +21,11 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
 - `src/components/SaveButton.astro` and `src/scripts/favorites.ts`: shared favorites
   controls, browser storage, accessible saved-state announcements, and tab sync.
 
+The interface uses a blue marketplace identity, category navigation, compact listing
+cards, and responsive layouts shared with item details and dialogs.
+
 The homepage includes budget and condition filters, quick filters for free items
-and favorites, and a featured available listing. All filters are combined and
+and favorites, and a compact willhaben-inspired search panel. All filters are combined and
 preserved in the URL; reset clears them together. Favorites are stored locally
 in this browser, without an account or server synchronization. If storage is
 blocked, saving works for the current page and announces that limitation.
