@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import '../styles/marketplace.css';
 import Icon from '../components/Icon.astro';
 interface Props { title?: string; description?: string; image?: string; imageAlt?: string; }
 const {
@@ -43,9 +44,14 @@ const imageURL = new URL(image, Astro.site!);
     <header class="site-header"><div class="container header-inner">
       <a class="logo" href="/" aria-label="Meinhaben – Startseite">mein<span>haben.</span></a>
       <nav class="header-nav" aria-label="Hauptnavigation"><a href="/#dinge">Alle Dinge</a><a href="/#so-gehts">So funktioniert’s</a></nav>
-      <span class="private-label"><span class="status-dot"></span>Für Freunde & Familie</span>
+      <a class="saved-nav" href="/?gemerkt=1#dinge"><Icon name="heart" size={19} /><span>Merkliste</span><span data-saved-count>0</span></a>
     </div></header>
     <slot />
+    <p id="saved-status" class="sr-only" role="status" aria-live="polite"></p>
     <footer class="site-footer"><div class="container footer-inner"><div><a class="logo footer-logo" href="/">mein<span>haben.</span></a><p>Weniger bei mir. Mehr Freude bei dir.</p></div><div class="footer-note"><span>Ein kleiner, privater Marktplatz.</span><span>Von mir. Für euch. <Icon name="leaf" size={15} /></span></div></div></footer>
   </body>
 </html>
+
+<script>
+  import "../scripts/favorites";
+</script>

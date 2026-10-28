@@ -17,7 +17,17 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
   sorting, and empty states. Filters are preserved in the URL.
 - `src/pages/inserat/[slug].astro`: prebuilt listing pages with accessible photo
   dialogs, item details, related listings, and the WhatsApp contact message.
-- `src/styles/global.css`: responsive marketplace styling.
+- `src/styles/global.css` and `src/styles/marketplace.css`: responsive marketplace styling.
+- `src/components/SaveButton.astro` and `src/scripts/favorites.ts`: shared favorites
+  controls, browser storage, accessible saved-state announcements, and tab sync.
+
+The homepage includes budget and condition filters, quick filters for free items
+and favorites, and a featured available listing. All filters are combined and
+preserved in the URL; reset clears them together. Favorites are stored locally
+in this browser, without an account or server synchronization. If storage is
+blocked, saving works for the current page and announces that limitation.
+Listing pages support native sharing where available, with clipboard and visible
+link fallbacks. Existing availability, gallery and contact flows are preserved.
 
 The contact dialog links to the seller's WhatsApp username `glup3` through
 `https://wa.me/glup3` and provides a listing-specific message to copy into the chat.

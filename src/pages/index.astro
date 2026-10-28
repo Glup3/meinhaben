@@ -4,25 +4,33 @@ import Icon from '../components/Icon.astro';
 import ListingCard from '../components/ListingCard.astro';
 import { getListings, getCategories } from '../data/listings';
 const [listings, categoryRecords] = await Promise.all([getListings(), getCategories()]);
+const featured = listings.find(item => item.status === 'available' && item.price > 0);
+const conditions = [...new Set(listings.map(item => item.condition))];
 const categories = categoryRecords.map(category => category.name);
 const categoryIcons = Object.fromEntries(categoryRecords.map(category => [category.name, category.icon]));
 ---
 <Layout>
   <main id="main" class="container home-main">
     <section class="hero" aria-labelledby="hero-heading">
-      <div class="hero-decoration" aria-hidden="true"><Icon name="leaf" size={158} /></div>
-      <div class="eyebrow"><span></span>Gute Dinge dürfen weiterziehen</div>
-      <h1 id="hero-heading">Vielleicht <span>bald deins.</span></h1>
-      <p>Meine Sachen suchen ein neues Zuhause.<br />Schau dich um. Vielleicht ist etwas für dich dabei.</p>
+      <div class="hero-copy">
+      <div class="eyebrow"><span></span>Dein privater Marktplatz</div>
+      <h1 id="hero-heading">Gute Dinge.<br /><span>Neue Lieblingsstücke.</span></h1>
+      <p>Schöne Dinge verdienen eine zweite Runde. Entdecke meine Fundstücke – von mir, für Freunde & Familie.</p>
       <form role="search" class="search-form" id="search-form"><Icon name="search" size={22} /><label class="sr-only" for="search">Dinge durchsuchen</label><input id="search" type="search" name="q" placeholder="Was könntest du brauchen?" autocomplete="off" /><button type="submit" class="button primary">Suchen <Icon name="arrow" size={18} /></button></form>
-      <div class="hero-footnote"><Icon name="check" size={14} />Von mir persönlich <span>·</span> Mit Freude weitergeben</div>
+      <div class="hero-footnote"><Icon name="check" size={16} />Ohne Anmeldung<span>·</span><Icon name="leaf" size={16} />Persönlich weitergeben</div>
+      </div>
+      {featured && <a class="hero-feature" href={`/inserat/${featured.slug}/`} aria-label={`${featured.title} entdecken`}><img src={featured.image} alt={featured.imageAlt} width="900" height="900" fetchpriority="high" /><span class="feature-tag"><Icon name="leaf" size={15} />Eine zweite Runde, bitte.</span><span class="feature-caption"><span><small>Vielleicht dein nächster Fund</small><strong>{featured.title}</strong></span><span class="feature-arrow"><Icon name="arrow" size={22} /></span></span></a>}
     </section>
     <section class="listings-section" id="dinge" aria-labelledby="listings-heading">
       <div class="filter-bar"><div class="category-filters" role="group" aria-label="Nach Kategorie filtern"><button class="filter-chip active" data-category-filter="all" aria-pressed="true"><Icon name="grid" size={16} />Alle Dinge<span>{listings.length}</span></button>{categories.map(category => <button class="filter-chip" data-category-filter={category} aria-pressed="false"><Icon name={categoryIcons[category]} size={17} />{category}<span>{listings.filter(item => item.category === category).length}</span></button>)}</div><label class="availability-toggle"><input type="checkbox" id="available-only" /><span class="toggle-track"></span>Nur Verfügbares</label></div>
-      <div class="listings-heading"><div><div class="section-kicker">Zum Stöbern & Entdecken</div><h2 id="listings-heading">Das gibt’s gerade<span class="heading-dot">.</span></h2><p id="result-count" role="status" aria-live="polite">{listings.length} Dinge, die weiterziehen dürfen</p></div><label class="sort-label"><span class="sr-only">Sortieren nach</span><select id="sort"><option value="newest">Neueste zuerst</option><option value="price-asc">Preis aufsteigend</option><option value="price-desc">Preis absteigend</option></select></label></div>
-      <div class="active-search" id="active-search" hidden><span id="search-summary"></span><button id="clear-search">Suche löschen <Icon name="close" size={14} /></button></div>
+      <div class="discovery-tools" aria-label="Weitere Filter">
+        <div class="quick-filters"><button class="quick-filter" id="saved-only" aria-pressed="false"><Icon name="heart" size={16} />Meine Merkliste</button><button class="quick-filter" id="free-only" aria-pressed="false"><Icon name="box" size={16} />Zu verschenken</button></div>
+        <div class="refine-filters"><label>Budget bis <span class="price-input"><input id="max-price" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Alle" aria-label="Maximaler Preis in Euro" /><span>€</span></span></label><label><span class="sr-only">Zustand</span><select id="condition"><option value="all">Jeder Zustand</option>{conditions.map(condition => <option value={condition}>{condition}</option>)}</select></label></div>
+      </div>
+      <div class="listings-heading"><div><div class="section-kicker">Weniger neu kaufen. Mehr Freude finden.</div><h2 id="listings-heading">Entdecke deine nächsten Lieblingsstücke<span class="heading-dot">.</span></h2><p id="result-count" role="status" aria-live="polite">{listings.length} Dinge, die weiterziehen dürfen</p></div><label class="sort-label"><span class="sr-only">Sortieren nach</span><select id="sort"><option value="newest">Neueste zuerst</option><option value="price-asc">Preis aufsteigend</option><option value="price-desc">Preis absteigend</option></select></label></div>
+      <div class="active-search" id="active-search" hidden><span id="search-summary"></span><button id="clear-search">Filter zurücksetzen <Icon name="close" size={14} /></button></div>
       <div class="listing-grid" id="listing-grid">{listings.map((listing, index) => <ListingCard listing={listing} eager={index < 3} />)}</div>
-      <div class="empty-state" id="empty-state" hidden><span class="empty-icon"><Icon name="search" size={30} /></span><h3>Gerade nichts Passendes dabei.</h3><p>Versuch einen anderen Suchbegriff oder schau in eine andere Kategorie.</p><button class="button primary" id="reset-filters">Alle Dinge anzeigen <Icon name="arrow" size={18} /></button></div>
+      <div class="empty-state" id="empty-state" hidden><span class="empty-icon"><Icon name="search" size={30} /></span><h3>Gerade nichts Passendes dabei.</h3><p>Passe deine Filter an oder merke dir ein Lieblingsstück mit dem Herz. Deine Merkliste bleibt in diesem Browser gespeichert.</p><button class="button primary" id="reset-filters">Alle Dinge anzeigen <Icon name="arrow" size={18} /></button></div>
       <p class="listing-end"><span></span>Das war’s fürs Erste. Schau bald wieder rein.<Icon name="leaf" size={17} /><span></span></p>
     </section>
     <section class="how-section" id="so-gehts" aria-labelledby="how-heading"><div class="how-intro"><div class="section-kicker">Ganz unkompliziert</div><h2 id="how-heading">Wir kennen uns ja schon.</h2><p>Kein Warenkorb, keine Anmeldung.<br />Einfach schöne Dinge weitergeben.</p></div><ol class="how-steps"><li><span class="step-icon"><Icon name="search" size={22} /></span><div><span class="step-number">01</span><h3>Lieblingsstück finden</h3><p>Stöbere durch die Dinge und schau dir alle Details in Ruhe an.</p></div></li><li><span class="step-icon"><Icon name="chat" size={22} /></span><div><span class="step-number">02</span><h3>Schreib mir auf WhatsApp</h3><p>Du hast meine Nummer. Sag mir einfach, was dich interessiert.</p></div></li><li><span class="step-icon"><Icon name="box" size={22} /></span><div><span class="step-number">03</span><h3>Ein neues Zuhause schenken</h3><p>Alles Weitere zur Übergabe machen wir uns persönlich aus.</p></div></li></ol></section>
@@ -35,22 +43,36 @@ const categoryIcons = Object.fromEntries(categoryRecords.map(category => [catego
   const grid = document.querySelector<HTMLElement>('#listing-grid')!;
   const cards = [...document.querySelectorAll<HTMLElement>('[data-listing]')];
   const chips = [...document.querySelectorAll<HTMLButtonElement>('[data-category-filter]')];
+  const maxPrice = document.querySelector<HTMLInputElement>('#max-price')!;
+  const condition = document.querySelector<HTMLSelectElement>('#condition')!;
+  const savedButton = document.querySelector<HTMLButtonElement>('#saved-only')!;
+  const freeButton = document.querySelector<HTMLButtonElement>('#free-only')!;
+  let savedOnly = false;
+  let freeOnly = false;
   let category = 'all';
   const normalize = (value: string) => value.toLocaleLowerCase('de-AT').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ß/g, 'ss');
   function update() {
     const terms = normalize(search.value.trim()).split(/\s+/).filter(Boolean);
+    const budget = maxPrice.value !== '' && Number.isFinite(maxPrice.valueAsNumber) && maxPrice.valueAsNumber >= 0 ? maxPrice.valueAsNumber : Infinity;
+    const filtered = !!(terms.length || category !== 'all' || available.checked || savedOnly || freeOnly || budget !== Infinity || condition.value !== 'all');
     let count = 0;
     cards.forEach(card => {
-      const matches = (category === 'all' || card.dataset.category === category) && (!available.checked || card.dataset.status === 'available') && terms.every(term => normalize(card.dataset.search || '').includes(term));
+      const matches = (!savedOnly || card.dataset.saved === 'true') && (!freeOnly || Number(card.dataset.price) === 0) && Number(card.dataset.price) <= budget && (condition.value === 'all' || card.dataset.condition === condition.value) && (category === 'all' || card.dataset.category === category) && (!available.checked || card.dataset.status === 'available') && terms.every(term => normalize(card.dataset.search || '').includes(term));
       card.hidden = !matches;
       if (matches) count++;
     });
     [...cards].sort((a, b) => sort.value === 'price-asc' ? Number(a.dataset.price) - Number(b.dataset.price) : sort.value === 'price-desc' ? Number(b.dataset.price) - Number(a.dataset.price) : (b.dataset.date || '').localeCompare(a.dataset.date || '')).forEach(card => grid.append(card));
-    document.querySelector('#result-count')!.textContent = `${count} ${count === 1 ? 'Ding' : 'Dinge'}${terms.length || category !== 'all' || available.checked ? ' gefunden' : ', die weiterziehen dürfen'}`;
+    document.querySelector('#result-count')!.textContent = `${count} ${count === 1 ? 'Ding' : 'Dinge'}${filtered ? ' gefunden' : ', die weiterziehen dürfen'}`;
     document.querySelector<HTMLElement>('#empty-state')!.hidden = count > 0;
-    document.querySelector<HTMLElement>('#active-search')!.hidden = !search.value.trim();
-    document.querySelector('#search-summary')!.textContent = `Suchergebnisse für „${search.value.trim()}“`;
+    document.querySelector<HTMLElement>('#active-search')!.hidden = !filtered;
+    document.querySelector('#search-summary')!.textContent = [search.value.trim() ? `„${search.value.trim()}“` : '', category !== 'all' ? category : '', savedOnly ? 'Meine Merkliste' : '', freeOnly ? 'Zu verschenken' : '', budget !== Infinity ? `Bis € ${budget.toLocaleString('de-AT')}` : '', condition.value !== 'all' ? condition.value : '', available.checked ? 'Nur verfügbar' : ''].filter(Boolean).join(' · ');
+    savedButton.setAttribute('aria-pressed', String(savedOnly));
+    freeButton.setAttribute('aria-pressed', String(freeOnly));
     const params = new URLSearchParams();
+    if (savedOnly) params.set('gemerkt', '1');
+    if (freeOnly) params.set('gratis', '1');
+    if (budget !== Infinity) params.set('budget', String(budget));
+    if (condition.value !== 'all') params.set('zustand', condition.value);
     if (search.value.trim()) params.set('q', search.value.trim());
     if (category !== 'all') params.set('kategorie', category);
     if (available.checked) params.set('verfuegbar', '1');
@@ -61,19 +83,33 @@ const categoryIcons = Object.fromEntries(categoryRecords.map(category => [catego
   function restore() {
     const params = new URLSearchParams(location.search);
     search.value = params.get('q') || '';
+    savedOnly = params.get('gemerkt') === '1';
+    freeOnly = params.get('gratis') === '1';
+    const budget = params.get('budget');
+    maxPrice.value = budget !== null && budget.trim() !== '' && Number.isFinite(Number(budget)) && Number(budget) >= 0 ? String(Number(budget)) : '';
+    condition.value = [...condition.options].some(option => option.value === params.get('zustand')) ? params.get('zustand')! : 'all';
     const initialCategory = params.get('kategorie') || 'all';
     setCategory(chips.some(chip => chip.dataset.categoryFilter === initialCategory) ? initialCategory : 'all');
     available.checked = params.get('verfuegbar') === '1';
     sort.value = ['price-asc', 'price-desc'].includes(params.get('sortierung') || '') ? params.get('sortierung')! : 'newest';
     update();
   }
+  function resetFilters() {
+    search.value = ''; setCategory('all'); available.checked = false; sort.value = 'newest';
+    savedOnly = false; freeOnly = false; maxPrice.value = ''; condition.value = 'all'; update();
+  }
+  savedButton.addEventListener('click', () => { savedOnly = !savedOnly; update(); });
+  freeButton.addEventListener('click', () => { freeOnly = !freeOnly; update(); });
+  maxPrice.addEventListener('input', update);
+  condition.addEventListener('change', update);
+  window.addEventListener('favoriteschange', update);
   chips.forEach(chip => chip.addEventListener('click', () => { setCategory(chip.dataset.categoryFilter!); update(); }));
   search.addEventListener('input', update);
   available.addEventListener('change', update);
   sort.addEventListener('change', update);
   document.querySelector('#search-form')!.addEventListener('submit', event => { event.preventDefault(); update(); document.querySelector('#dinge')!.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
-  document.querySelector('#clear-search')!.addEventListener('click', () => { search.value = ''; update(); search.focus(); });
-  document.querySelector('#reset-filters')!.addEventListener('click', () => { search.value = ''; setCategory('all'); available.checked = false; sort.value = 'newest'; update(); });
+  document.querySelector('#clear-search')!.addEventListener('click', resetFilters);
+  document.querySelector('#reset-filters')!.addEventListener('click', resetFilters);
   window.addEventListener('pageshow', restore);
   window.addEventListener('popstate', restore);
   restore();
