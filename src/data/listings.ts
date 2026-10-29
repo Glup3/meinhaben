@@ -76,5 +76,5 @@ export const statusLabels: Record<ListingStatus, string> = {
 };
 export const formatPrice = (price: number) =>
   price === 0
-    ? 'Zu verschenken'
+    ? 'Gratis'
     : `€ ${new Intl.NumberFormat('de-AT', { minimumFractionDigits: Number.isInteger(price) ? 0 : 2, maximumFractionDigits: 2 }).format(price)}`;

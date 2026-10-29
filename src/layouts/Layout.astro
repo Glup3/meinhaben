@@ -1,8 +1,10 @@
 ---
 import '../styles/global.css';
 import '../styles/marketplace.css';
-import Icon from '../components/Icon.astro';
 import Logo from '../components/Logo.astro';
+import DittoOutline from '../components/DittoOutline.astro';
+import { verticals } from '../data/verticals';
+const marketActive = Astro.url.pathname.startsWith('/anzeigen') || Astro.url.pathname.startsWith('/inserat');
 import { getListings, getCategories } from '../data/listings';
 const [headerListings, headerCategories] = await Promise.all([getListings(), getCategories()]);
 const populatedCategories = headerCategories.filter(category => headerListings.some(item => item.category === category.name));
@@ -47,25 +49,87 @@ const imageURL = new URL(image, Astro.site!);
     <a href="#main" class="skip-link">Zum Inhalt springen</a>
     <header class="site-header container">
       <div class="header-inner">
+        <span class="nav-hover-oval" aria-hidden="true"></span>
         <a class="logo" href="/" aria-label="Meinhaben – Startseite"><Logo /></a>
-        <nav class="header-tools" aria-label="Hauptnavigation">
-          <a class="header-search" href="/anzeigen/" aria-label="Anzeigen suchen"><Icon name="search" size={17} /><span>Suchen</span></a>
-          <a href="/#so-gehts" aria-label="Kontakt und Übergabe"><Icon name="chat" size={16} /><span>Kontakt & Übergabe</span></a>
-        </nav>
         <nav class="market-nav" aria-label="Marktplatz">
-          <a href="/" class="market-nav-active">Marktplatz <small>{headerListings.length}</small></a>
-          {populatedCategories.map(category => <a href={`/anzeigen/?kategorie=${encodeURIComponent(category.name)}#dinge`}>{category.name}<small>{headerListings.filter(item => item.category === category.name).length}</small></a>)}
+          <a href="/anzeigen/" class:list={{ 'market-nav-active': marketActive }} aria-current={marketActive ? 'page' : undefined}>Marktplatz</a>
+          {verticals.map(vertical => <a href={`/${vertical.slug}/`} class:list={{ 'market-nav-active': Astro.url.pathname.replace(/\/$/, '') === `/${vertical.slug}` }} aria-current={Astro.url.pathname.replace(/\/$/, '') === `/${vertical.slug}` ? 'page' : undefined}>{vertical.name}</a>)}
         </nav>
       </div>
     </header>
     <slot />
     <footer class="site-footer container">
       <div class="footer-columns">
-        <div><h2>Über meinhaben</h2><a href="/#so-gehts">Kontakt & Übergabe</a><p>Mein privater Marktplatz.<br />Von mir, für Freunde & Familie.</p></div>
+        <div><h2>Über meinhaben</h2><a href="/#so-gehts">Kontakt & Übergabe</a></div>
         <div><h2>Marktplatz</h2>{populatedCategories.map(category => <a href={`/anzeigen/?kategorie=${encodeURIComponent(category.name)}#dinge`}>{category.name}</a>)}</div>
+        <div><h2>Auch noch da</h2>{verticals.map(vertical => <a href={`/${vertical.slug}/`}>{vertical.name}</a>)}</div>
         <div><h2>Dein nächster Fund</h2><a href="/anzeigen/">Alle Anzeigen</a><a href="/anzeigen/?gratis=1#dinge">Zu verschenken</a></div>
       </div>
-      <div class="footer-bottom"><a class="logo" href="/" aria-label="Meinhaben – Startseite"><Logo /></a><span>Heute noch meins. Vielleicht morgen schon deins.</span></div>
+      <div class="footer-bottom"><div class="footer-message"><p class="footer-motto">Meine Sachen = Dein nächstes Lieblingsstück!</p><p class="footer-about">Mein privater Marktplatz.<br />Von mir, für Freunde & Familie.</p></div><a class="logo footer-logo" href="/" aria-label="Meinhaben – Startseite"><DittoOutline /><Logo /></a><span>Heute noch meins. Vielleicht morgen schon deins.</span></div>
     </footer>
   </body>
 </html>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.header-inner')!;
+  const nav = header.querySelector<HTMLElement>('.market-nav')!;
+  const logo = header.querySelector<HTMLElement>('.logo')!;
+  const oval = header.querySelector<HTMLElement>('.nav-hover-oval')!;
+  const currentLink = nav.querySelector<HTMLElement>('.market-nav-active');
+  let visible = false;
+  let activeLink: HTMLElement | null = null;
+
+  function moveTo(link: HTMLElement, immediate = false) {
+    if (visible && activeLink === link) return;
+    activeLink = link;
+    const origin = header.getBoundingClientRect();
+    const bounds = link.getBoundingClientRect();
+    const start = logo.getBoundingClientRect();
+    const width = bounds.width - 8;
+    const height = Math.min(50, bounds.height - 8);
+    const centerX = bounds.left + bounds.width / 2;
+    // The rounded logo body is centered at y=27 in its 68-unit viewBox.
+    const centerY = start.top + start.height * (27 / 68);
+    oval.style.width = `${width}px`;
+    oval.style.height = `${height}px`;
+    if (!visible) {
+      oval.style.transition = 'none';
+      oval.style.transform = `translate(${start.left - origin.left + (start.width - width) / 2}px, ${centerY - origin.top - height / 2}px)`;
+      oval.style.opacity = '0';
+      // Commit the logo position before animating toward the item.
+      oval.getBoundingClientRect();
+      oval.style.removeProperty('transition');
+      visible = true;
+    }
+    if (immediate) oval.style.transition = 'none';
+    oval.style.opacity = '1';
+    oval.style.transform = `translate(${centerX - origin.left - width / 2}px, ${centerY - origin.top - height / 2}px)`;
+    if (immediate) {
+      oval.getBoundingClientRect();
+      oval.style.removeProperty('transition');
+    }
+  }
+  function restore(immediate = false) {
+    const focusedLink = nav.querySelector<HTMLElement>('a:focus-visible');
+    const restingLink = focusedLink || currentLink;
+    if (restingLink) moveTo(restingLink, immediate);
+    else { visible = false; activeLink = null; oval.style.opacity = '0'; }
+  }
+  nav.addEventListener('pointerover', event => {
+    if (event.pointerType === 'touch') return;
+    const link = (event.target as Element).closest('a');
+    if (link) moveTo(link);
+  });
+  nav.addEventListener('pointerleave', () => restore());
+  nav.addEventListener('focusin', event => {
+    const link = (event.target as Element).closest('a');
+    if (link?.matches(':focus-visible')) moveTo(link);
+  });
+  nav.addEventListener('focusout', event => {
+    if (!nav.contains(event.relatedTarget as Node | null)) restore();
+  });
+  function realign() { activeLink = null; restore(true); }
+  nav.addEventListener('scroll', realign);
+  window.addEventListener('resize', realign);
+  restore(true);
+</script>

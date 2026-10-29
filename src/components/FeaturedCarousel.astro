@@ -1,0 +1,39 @@
+---
+import Icon from './Icon.astro';
+const slides = [
+  { label: 'Gute Dinge dürfen weiterziehen', title: 'Heute noch meins.\nMorgen dein Lieblingsstück.', cta: 'Jetzt stöbern', href: '/anzeigen/', photos: ['sessel.jpg', 'lampe.jpg', 'kopfhoerer.jpg', 'pflanze.jpg'], theme: 'blue', tag: 'ZWEITE RUNDE. ERSTE WAHL.' },
+  { label: 'Unbezahlbar günstig', title: 'Die besten Dinge\nkosten manchmal nichts.', cta: 'Zu verschenken entdecken', href: '/anzeigen/?gratis=1', photos: ['buecher.jpg', 'pflanze.jpg', 'kaffee.jpg', 'sessel.jpg'], theme: 'purple', tag: '0 EURO. VIEL FREUDE.' },
+  { label: 'Exklusiv für Menschen mit Humor', title: 'Traumimmobilie?\nFast. Ein Sessel.', cta: 'Immobilien entdecken', href: '/immobilien/', photos: ['sessel.jpg', 'lampe.jpg', 'pflanze.jpg', 'buecher.jpg'], theme: 'orange', tag: 'LAGE, LAGE, SITZLAGE.' },
+];
+---
+<section class="featured-carousel" aria-label="Meinhaben Empfehlungen" aria-roledescription="Karussell" data-carousel>
+  <div class="showcase-slides">
+    {slides.map((slide, index) => <article class={`showcase-slide showcase-${slide.theme}`} hidden={index !== 0} aria-roledescription="Folie" aria-label={`${index + 1} von ${slides.length}`} data-slide>
+      <div class="showcase-collage" aria-hidden="true">{slide.photos.map((photo, i) => <img class={`showcase-object object-${i}`} src={`/images/${photo}`} alt="" width="220" height="220" loading="eager" />)}<span class="showcase-sticker">{slide.tag}</span></div>
+      <div class="showcase-copy"><p class="showcase-kicker">{slide.label}</p><h2>{slide.title}</h2><a href={slide.href}>{slide.cta}<Icon name="arrow" size={24} /></a><small>Gute Dinge. Kleine Geschichten. Große Gefühle.</small></div>
+    </article>)}
+    <button class="showcase-arrow showcase-prev" aria-label="Vorherige Empfehlung" data-prev><Icon name="left" size={30} /></button>
+    <button class="showcase-arrow showcase-next" aria-label="Nächste Empfehlung" data-next><Icon name="right" size={30} /></button>
+  </div>
+  <p class="sr-only" aria-live="polite" data-status></p>
+</section>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach(root => {
+    const slides = [...root.querySelectorAll<HTMLElement>('[data-slide]')];
+    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let current = 0;
+    let paused = motion.matches;
+    function show(index: number, announce = false) {
+      current = (index + slides.length) % slides.length;
+      slides.forEach((slide, i) => slide.hidden = i !== current);
+      if (announce) root.querySelector('[data-status]')!.textContent = `Empfehlung ${current + 1} von ${slides.length}`;
+    }
+    root.querySelector('[data-prev]')!.addEventListener('click', () => show(current - 1, true));
+    root.querySelector('[data-next]')!.addEventListener('click', () => show(current + 1, true));
+    motion.addEventListener('change', () => { paused = motion.matches; });
+    const timer = window.setInterval(() => {
+      if (!paused && !document.hidden && !root.matches(':hover') && !root.contains(document.activeElement)) show(current + 1);
+    }, 6500);
+    window.addEventListener('pagehide', () => window.clearInterval(timer), { once: true });
+  });
+</script>

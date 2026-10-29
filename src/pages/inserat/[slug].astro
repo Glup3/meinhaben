@@ -35,7 +35,7 @@ const message = `Hey! Ich interessiere mich für „${listing.subtitle}“ auf M
         {listing.status === 'reserved' && <p class="reserved-note">Schon reserviert. Du kannst mir trotzdem schreiben, falls es doch wieder frei wird.</p>}
         {listing.status === 'sold' && <p class="sold-note">Dieses Stück ist schon vergeben. Schau dir gerne meine anderen Anzeigen an.</p>}
         <button class="button primary contact-button" id="contact-button" disabled={listing.status === 'sold'}><Icon name={listing.status === 'sold' ? 'check' : 'chat'} size={19} />{listing.status === 'sold' ? 'Bereits vergeben' : 'Nachricht'}</button>
-        <a href="/anzeigen/" class="button outline seller-more">Weitere Anzeigen von mir</a>
+        <a href="/anzeigen/" class="button outline seller-more">Alle Anzeigen</a>
         <p class="contact-caption">Kontakt über WhatsApp · Ohne Anmeldung</p>
         {listing.price > 0 && listing.status !== 'sold' && <div class="price-joke"><button type="button" class="text-link" id="last-price-button" aria-expanded="false" aria-controls="last-price-reply">Was letzte Preis?</button><p id="last-price-reply" role="status" hidden>Für dich? {formatPrice(listing.price)}. 😉</p></div>}
       </section>
@@ -43,7 +43,7 @@ const message = `Hey! Ich interessiere mich für „${listing.subtitle}“ auf M
         <section class="description-section" aria-labelledby="description-heading"><h2 id="description-heading">Beschreibung</h2>{listing.description.map(text => <p>{text}</p>)}</section>
         <div class="private-note"><Icon name="leaf" size={20} /><p>Von mir persönlich, aus meinem eigenen Haushalt. Wenn du Fragen hast oder dir etwas genauer ansehen möchtest, melde dich einfach.</p></div>
     </div>
-    <section class="related-section" aria-labelledby="related-heading"><div class="related-heading"><h2 id="related-heading">Weitere Anzeigen von mir</h2><a href="/anzeigen/" class="text-link">Alle Anzeigen <Icon name="arrow" size={17} /></a></div><div class="listing-grid">{related.map(item => <ListingCard listing={item} />)}</div></section>
+    <section class="related-section" aria-labelledby="related-heading"><div class="related-heading"><h2 id="related-heading">Weitere Anzeigen von mir</h2><a href="/anzeigen/" class="text-link all-listings-link">Alle Anzeigen <Icon name="arrow" size={17} /></a></div><div class="listing-grid">{related.map(item => <ListingCard listing={item} />)}</div></section>
   </main>
   <dialog id="contact-dialog" class="dialog" aria-labelledby="contact-heading" aria-describedby="contact-description">
     <button class="dialog-close" data-close-dialog aria-label="Kontaktfenster schließen"><Icon name="close" size={18} /></button><div class="dialog-icon"><Icon name="chat" size={27} /></div><div class="section-kicker">Ganz persönlich</div><h2 id="contact-heading">Schreib mir einfach auf WhatsApp.</h2><p id="contact-description">Du findest mich als @glup3 auf WhatsApp. Sag mir, welches Stück dich interessiert, und wir besprechen alles Weitere.</p>

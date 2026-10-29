@@ -1,0 +1,19 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import { verticals } from '../data/verticals';
+export function getStaticPaths() {
+  return verticals.map(vertical => ({ params: { vertical: vertical.slug }, props: { vertical } }));
+}
+const { vertical } = Astro.props;
+---
+<Layout title={`${vertical.name} – Meinhaben`} description={vertical.text}>
+  <main id="main" class="container vertical-main">
+    <section class={`vertical-hero vertical-${vertical.slug}`}>
+      <div class="vertical-copy"><p class="showcase-kicker">{vertical.name} · {vertical.kicker}</p><h1>{vertical.headline}</h1><p>{vertical.text}</p><a class="button" href={vertical.href}>{vertical.cta}<Icon name="right" size={18} /></a></div>
+      <div class="vertical-art" aria-hidden="true"><span>{vertical.symbol}</span><small>MEINHABEN<br />{vertical.name.toUpperCase()}</small></div>
+    </section>
+    <div class="vertical-facts">{vertical.facts.map((fact, index) => <div><span>0{index + 1}</span><p>{fact}</p></div>)}</div>
+    <div class="vertical-note"><Icon name={vertical.icon} size={28} /><div><h2>{vertical.stamp}</h2><p>Hier gibt’s nur einen kleinen Schmäh. Meine echten Sachen findest du am Marktplatz.</p></div></div>
+  </main>
+</Layout>
