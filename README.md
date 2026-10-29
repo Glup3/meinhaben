@@ -13,7 +13,8 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
 - `src/content.config.ts`: public PocketBase loaders with explicit content schemas.
 - `src/data/listings.ts`: maps PocketBase records into the UI model, including
   category names, German condition labels, cents, paragraphs and ordered photos.
-- `src/pages/index.astro`: live search, category and availability filters, price
+- `src/pages/index.astro`: discovery homepage with category tiles and selected listings.
+- `src/pages/anzeigen.astro`: live search, category and availability filters, price
   sorting, and empty states. Filters are preserved in the URL.
 - `src/pages/inserat/[slug].astro`: prebuilt listing pages with accessible photo
   dialogs, item details, related listings, and the WhatsApp contact message.
@@ -28,8 +29,11 @@ use a filter sidebar and list rows, with a working grid toggle. Item pages place
 the title above the gallery and price/contact panel. Only inventory categories
 and working controls are shown; there are no unrelated marketplace verticals.
 
-The homepage includes budget and condition filters, quick filters for free items
-and favorites, and a compact willhaben-inspired search panel. All filters are combined and
+The homepage has a compact search banner, category directory, and horizontal
+listing rails. Search, category tiles, favorites, and “Alle Anzeigen” open the
+dedicated `/anzeigen/` results page, which includes budget and condition filters
+and quick filters for free items and favorites. Previously shared homepage
+filter URLs are forwarded to the results page with their query state intact. All filters are combined and
 preserved in the URL; reset clears them together. Favorites are stored locally
 in this browser, without an account or server synchronization. If storage is
 blocked, saving works for the current page and announces that limitation.

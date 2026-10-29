@@ -198,9 +198,9 @@
   .header-inner > .logo { grid-row: 1; width: 120px; margin: 0; }
   .header-tools { border-bottom: 0; gap: 12px; font-size: 12px; }
   .header-tools a { gap: 4px; }
-  .header-tools > a:first-child span { display: none; }
-  .header-tools > a:first-child { width: 32px; justify-content: center; }
-  .header-tools > a:first-child svg { width: 22px; height: 22px; }
+  .header-tools > a[aria-label="Kontakt und Übergabe"] span { display: none; }
+  .header-tools > a[aria-label="Kontakt und Übergabe"] { width: 32px; justify-content: center; }
+  .header-tools > a[aria-label="Kontakt und Übergabe"] svg { width: 22px; height: 22px; }
   .market-nav { grid-column: 1 / -1; margin-inline: -16px; padding-inline: 16px; overflow-x: auto; border-top: 1px solid var(--line); justify-content: start; }
   .market-nav a { font-size: 14px; padding: 10px 16px; }
   .market-nav a:first-child { padding-left: 0; }
@@ -281,4 +281,30 @@
   .list-view .card-photo { flex-basis: 100px; width: 100px; height: 110px; }
   .refine-filters select { max-width: 150px; }
   .price-input input { width: 40px; }
+}
+
+/* Landing page discovery rails stay separate from the full search-results interface. */
+.home-picks { padding: 24px 16px; border-top: 1px solid var(--line); }
+.home-section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 14px; }
+.home-section-heading .section-label { margin-bottom: 0; }
+.home-section-heading > a { display: inline-flex; align-items: center; gap: 4px; color: var(--brand-dark); font-size: 12px; white-space: nowrap; }
+.home-listing-rail { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 48px) / 4); gap: 16px; overflow-x: auto; padding-bottom: 6px; }
+.home-listing-rail .card-photo { aspect-ratio: 1.2; }
+.home-listing-rail .card-meta { padding-top: 12px; }
+.home-callout { display: flex; align-items: center; gap: 20px; padding: 24px 20px; margin: 0 16px 24px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; }
+.home-callout > svg { color: var(--brand); }
+.home-callout > div { flex: 1; }
+.home-callout h2 { font-size: 18px; margin-bottom: 6px; }
+.home-callout p { font-size: 13px; line-height: 1.6; }
+.home-callout .button { font-size: 12px; flex-shrink: 0; }
+@media (max-width: 760px) {
+  .header-search span { display: none; }
+  .header-search { min-width: 28px; justify-content: center; }
+  .header-tools { gap: 8px; }
+  .home-picks { padding: 24px 0; }
+  .home-listing-rail { grid-auto-columns: 160px; gap: 12px; margin-right: -16px; padding-right: 16px; }
+  .home-callout { margin-inline: 0; flex-wrap: wrap; gap: 12px; padding: 20px 16px; }
+  .home-callout > svg { width: 28px; }
+  .home-callout h2 { font-size: 16px; }
+  .home-callout .button { margin-left: 40px; }
 }

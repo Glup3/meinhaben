@@ -49,12 +49,13 @@ const imageURL = new URL(image, Astro.site!);
       <div class="header-inner">
         <a class="logo" href="/" aria-label="Meinhaben – Startseite"><Logo /></a>
         <nav class="header-tools" aria-label="Hauptnavigation">
+          <a class="header-search" href="/anzeigen/" aria-label="Anzeigen suchen"><Icon name="search" size={17} /><span>Suchen</span></a>
           <a href="/#so-gehts" aria-label="Kontakt und Übergabe"><Icon name="chat" size={16} /><span>Kontakt & Übergabe</span></a>
-          <a class="saved-nav" href="/?gemerkt=1#dinge"><Icon name="star" size={17} /><span>Merkliste</span><span data-saved-count>0</span></a>
+          <a class="saved-nav" href="/anzeigen/?gemerkt=1#dinge"><Icon name="star" size={17} /><span>Merkliste</span><span data-saved-count>0</span></a>
         </nav>
         <nav class="market-nav" aria-label="Marktplatz">
           <a href="/" class="market-nav-active">Marktplatz <small>{headerListings.length}</small></a>
-          {populatedCategories.map(category => <a href={`/?kategorie=${encodeURIComponent(category.name)}#dinge`}>{category.name}<small>{headerListings.filter(item => item.category === category.name).length}</small></a>)}
+          {populatedCategories.map(category => <a href={`/anzeigen/?kategorie=${encodeURIComponent(category.name)}#dinge`}>{category.name}<small>{headerListings.filter(item => item.category === category.name).length}</small></a>)}
         </nav>
       </div>
     </header>
@@ -63,8 +64,8 @@ const imageURL = new URL(image, Astro.site!);
     <footer class="site-footer container">
       <div class="footer-columns">
         <div><h2>Über meinhaben</h2><a href="/#so-gehts">Kontakt & Übergabe</a><p>Mein privater Marktplatz.<br />Von mir, für Freunde & Familie.</p></div>
-        <div><h2>Marktplatz</h2>{populatedCategories.map(category => <a href={`/?kategorie=${encodeURIComponent(category.name)}#dinge`}>{category.name}</a>)}</div>
-        <div><h2>Dein nächster Fund</h2><a href="/#dinge">Alle Anzeigen</a><a href="/?gratis=1#dinge">Zu verschenken</a><a href="/?gemerkt=1#dinge">Meine Merkliste</a></div>
+        <div><h2>Marktplatz</h2>{populatedCategories.map(category => <a href={`/anzeigen/?kategorie=${encodeURIComponent(category.name)}#dinge`}>{category.name}</a>)}</div>
+        <div><h2>Dein nächster Fund</h2><a href="/anzeigen/">Alle Anzeigen</a><a href="/anzeigen/?gratis=1#dinge">Zu verschenken</a><a href="/anzeigen/?gemerkt=1#dinge">Meine Merkliste</a></div>
       </div>
       <div class="footer-bottom"><a class="logo" href="/" aria-label="Meinhaben – Startseite"><Logo /></a><span>Heute noch meins. Vielleicht morgen schon deins.</span></div>
     </footer>
