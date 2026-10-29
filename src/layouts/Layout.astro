@@ -88,12 +88,13 @@ const imageURL = new URL(image, Astro.site!);
     const width = bounds.width - 8;
     const height = Math.min(50, bounds.height - 8);
     const centerX = bounds.left + bounds.width / 2;
-    const centerY = start.top + start.height / 2;
+    // The rounded logo body is centered at y=27 in its 68-unit viewBox.
+    const centerY = start.top + start.height * (27 / 68);
     oval.style.width = `${width}px`;
     oval.style.height = `${height}px`;
     if (!visible) {
       oval.style.transition = 'none';
-      oval.style.transform = `translate(${start.left - origin.left + (start.width - width) / 2}px, ${start.top - origin.top + (start.height - height) / 2}px)`;
+      oval.style.transform = `translate(${start.left - origin.left + (start.width - width) / 2}px, ${centerY - origin.top - height / 2}px)`;
       oval.style.opacity = '0';
       // Commit the logo position before animating toward the item.
       oval.getBoundingClientRect();
