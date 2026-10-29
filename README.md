@@ -18,6 +18,8 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
   sorting, and empty states. Filters are preserved in the URL.
 - `src/pages/inserat/[slug].astro`: prebuilt listing pages with accessible photo
   dialogs, item details, related listings, and the WhatsApp contact message.
+- `src/components/react/`: hydrated React islands for the featured carousel and
+  photo gallery. Astro renders their initial HTML; React owns interactive state.
 - `src/styles/global.css`: Tailwind CSS v4 entry point and CSS theme (brand colors,
   Open Sans, 4px spacing, and shared radius).
 
@@ -34,7 +36,7 @@ of Preflight so native controls, dialogs, and image sizing retain their appearan
 
 The interface follows willhaben’s marketplace with an original MEINHABEN
 speech-bubble logo, locally hosted Open Sans, linked vertical cards beneath the featured carousel. The homepage has a three-slide featured carousel
-with arrows, automatic switching that pauses on hover or focus, and reduced-motion support.
+with arrows, keyboard navigation, and reduced-motion support.
 Immobilien, Auto & Motor, and Jobs link to individual humorous pages;
 these verticals contain no sale listings.
 
@@ -94,6 +96,7 @@ PocketBase. This binds only to localhost and writes data, migrations and hooks
 into the same local directories as the native CLI.
 
 ```sh
+pnpm test
 pnpm run check
 pnpm run build
 pnpm run preview
@@ -194,7 +197,7 @@ pack on `ditto-cloud-1`. Both services build from this repository:
 
 - `website`: after PocketBase is healthy, Astro generates HTML on container
   startup, served by Nginx on port 80 at
-  <https://meinhaben.ditto.glup3.dev>.
+  <https://meinhaben.glup3.dev>.
 - `pocketbase`: checksum-verified PocketBase on port 8090, with API and dashboard
   at <https://meinhaben-admin.ditto.glup3.dev/_/>.
 
@@ -248,7 +251,7 @@ fork deployments disabled, and subscribe the signed GitHub repository webhook
 to both `push` and `pull_request` events. Use the preview URL template
 `{{pr_id}}.{{domain}}` and wildcard DNS pointing to `ditto-cloud-1` for both
 production domains. Coolify provisions HTTPS for the resulting preview domains.
-For PR 42, these are `https://42.meinhaben.ditto.glup3.dev` and
+For PR 42, these are `https://42.meinhaben.glup3.dev` and
 `https://42.meinhaben-admin.ditto.glup3.dev`.
 
 Set `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`, and `PB_ENCRYPTION_KEY` separately

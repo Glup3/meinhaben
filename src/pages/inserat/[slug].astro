@@ -1,4 +1,5 @@
 ---
+import PhotoGallery from '../../components/react/PhotoGallery';
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import ListingCard from '../../components/ListingCard.astro';
@@ -23,11 +24,7 @@ const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Mein
     <div class="flex justify-between gap-3 text-[12px] text-muted mb-4 flex-wrap max-[760px]:text-[11px]"><span>{listing.category} · {listing.condition}</span><span>Veröffentlicht: {new Date(listing.date).toLocaleDateString('de-AT', { timeZone: 'Europe/Vienna' })} | meinhaben-Code: {listing.slug}</span></div>
     <p id="share-status" role="status" class="text-[12px] text-brand-dark wrap-anywhere [&:not(:empty)]:my-2.5"></p>
     <div class="grid grid-cols-[minmax(0,_1fr)_300px] items-start gap-y-0 gap-x-4 max-[760px]:grid-cols-[minmax(0,_1fr)] max-[760px]:gap-0">
-      <section class="min-w-0 [grid-column:1]" aria-label="Artikelfotos">
-        <button class="block w-full p-0 border-0 relative bg-[#f3f5fa] aspect-[4/3] cursor-zoom-in [&_>_img]:w-full [&_>_img]:h-full [&_>_img]:object-contain max-[760px]:aspect-[4/3]" id="open-gallery" aria-haspopup="dialog" aria-controls="lightbox" aria-label="Artikelfoto vergrößern"><img id="gallery-image" src={photos[0].src} alt={photos[0].alt} width="1200" height="1200" fetchpriority="high" /><span class="absolute top-0 left-0 py-0.5 px-2 text-[12px] bg-[#8e9bb5aa] text-white" id="gallery-position">1 / {photos.length}</span><span class="grid place-items-center absolute top-2.5 right-2.5 w-7.5 h-7.5 bg-[#fffe] rounded-ui"><Icon name="expand" size={20} /></span></button>
-        <div class="flex gap-2 mt-2 overflow-x-auto p-0.5" role="group" aria-label="Foto auswählen">{photos.map((photo, index) => <button class="flex-none border-2 border-transparent p-0 bg-panel [&[aria-pressed=true]]:border-brand [&_img]:w-19 [&_img]:h-13.75 [&_img]:object-cover" data-photo-index={index} data-src={photo.src} data-alt={photo.alt} aria-label={`Foto ${index + 1}: ${photo.alt}`} aria-pressed={index === 0}><img src={photo.src} alt="" width="76" height="55" /></button>)}</div>
-        <p class="text-[11px] text-muted mt-2 max-[760px]:text-[10px]"><span id="photo-count">Foto 1 von {photos.length}</span> · Klick aufs Bild zum Vergrößern</p>
-      </section>
+      <PhotoGallery photos={photos} client:load />
       <section data-ui="detail-info" class="self-start bg-panel border border-line p-4 rounded-ui [grid-column:2] [grid-row:1_/_span_4] max-[760px]:row-auto max-[760px]:mt-5 max-[760px]:min-h-0 max-[760px]:[grid-column:1]" aria-label="Preis und Kontakt">
         <div class="[&_strong]:block [&_strong]:text-brand [&_strong]:text-[28px] [&_strong]:leading-[1.2] [&_small]:block [&_small]:text-[12px] [&_small]:text-muted [&_small]:mt-1"><strong>{formatPrice(listing.price)}</strong><small>{listing.price === 0 ? 'Zu verschenken' : listing.negotiable ? 'Verhandlungsbasis' : 'Verkaufspreis'}</small></div>
         <span class="inline-flex items-center gap-1.5 text-[12px] text-[#3b7660] mb-4 [&[data-status=reserved]]:text-[#97651c] [&[data-status=sold]]:text-muted [[data-ui~=detail-info]_&]:mt-3" data-status={listing.status}><span class="size-1.5 rounded-full bg-current"></span>{statusLabels[listing.status]}</span>
@@ -49,7 +46,7 @@ const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Mein
     <button class="absolute top-2 right-2 w-9 h-9 grid place-items-center text-muted bg-panel rounded-ui" data-close-dialog aria-label="Kontaktfenster schließen"><Icon name="close" size={18} /></button><div class="dialog-icon text-brand mb-3.5"><Icon name="chat" size={27} /></div><div class="text-muted text-[12px] mb-2.5">Ganz persönlich</div><h2 id="contact-heading">Schreib mir einfach auf WhatsApp.</h2><p id="contact-description">Du findest mich als @glup3 auf WhatsApp. Sag mir, welches Stück dich interessiert, und wir besprechen alles Weitere.</p>
     <div class="p-3.5 bg-panel border border-line rounded-ui mt-5 mx-0 mb-4 [&_label]:block [&_label]:text-[11px] [&_label]:uppercase [&_label]:text-muted [&_label]:mb-2 [&_textarea]:block [&_textarea]:w-full [&_textarea]:min-h-23.75 [&_textarea]:bg-transparent [&_textarea]:border-0 [&_textarea]:resize-y [&_textarea]:text-ink [&_textarea]:text-[13px] [&_textarea]:leading-[1.7]"><label for="contact-message">Deine Nachricht könnte so aussehen</label><textarea id="contact-message" readonly rows="3">{message}</textarea></div><a class="inline-flex justify-center items-center gap-2 min-h-10 py-2.25 px-4 border border-transparent rounded-ui font-bold text-[14px] text-center bg-brand text-white w-full mb-2.5 [&:hover]:bg-brand-dark [[data-ui~=vertical-copy]_&]:bg-[#093d96] [[data-ui~=vertical-copy]_&]:text-white [[data-ui~=vertical-copy]_&]:mt-7" href="https://wa.me/glup3"><Icon name="chat" size={17} />WhatsApp öffnen<Icon name="arrow" size={17} /></a><button class="inline-flex justify-center items-center gap-2 min-h-10 py-2.25 px-4 border rounded-ui font-bold text-[14px] text-center text-brand-dark border-brand bg-white w-full mb-2.5 [&:hover]:bg-[#eaf8ff] [[data-ui~=vertical-copy]_&]:bg-[#093d96] [[data-ui~=vertical-copy]_&]:text-white [[data-ui~=vertical-copy]_&]:mt-7" id="copy-message"><Icon name="copy" size={17} /><span>Nachricht kopieren</span></button><p class="text-[12px] min-h-5" id="copy-status" role="status" aria-live="polite"></p>
   </dialog>
-  <dialog id="lightbox" class="fixed m-auto max-h-[calc(100dvh_-_40px)] overflow-auto border border-line rounded-ui bg-white text-ink [box-shadow:0_12px_50px_#0003] max-w-237.5 w-[calc(100%_-_32px)] p-3 [&::backdrop]:bg-[#17233b99] [&_h2]:text-[23px] [&_h2]:mb-3.5 [&_>_p]:text-[13px] [&_>_p]:leading-[1.7]" aria-label="Artikelfoto in Großansicht"><button class="absolute top-2 right-2 w-9 h-9 grid place-items-center text-muted bg-panel rounded-ui" data-close-dialog aria-label="Großansicht schließen"><Icon name="close" size={18} /></button><img id="lightbox-image" class="w-full max-h-[75dvh] object-contain" src={photos[0].src} alt={photos[0].alt} width="1200" height="1200" /><div class="flex justify-between items-center pt-3 text-[12px] text-muted"><span id="lightbox-count" aria-live="polite">Foto 1 von {photos.length}</span>{photos.length > 1 && <div class="flex gap-1.5 [&_button]:w-10 [&_button]:h-10 [&_button]:grid [&_button]:place-items-center [&_button]:bg-panel"><button id="previous-photo" aria-label="Vorheriges Foto"><Icon name="left" size={17} /></button><button id="next-photo" aria-label="Nächstes Foto"><Icon name="right" size={17} /></button></div>}</div></dialog>
+
 </Layout>
 <script>
   document.querySelector('#share-listing')?.addEventListener('click', async () => {
@@ -70,29 +67,11 @@ const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Mein
     button.setAttribute('aria-expanded', String(!reply.hidden));
   });
   const contact = document.querySelector<HTMLDialogElement>('#contact-dialog')!;
-  const lightbox = document.querySelector<HTMLDialogElement>('#lightbox')!;
-  const thumbnails = [...document.querySelectorAll<HTMLButtonElement>('[data-photo-index]')];
-  let photoIndex = 0;
-  function selectPhoto(index: number) {
-    photoIndex = (index + thumbnails.length) % thumbnails.length;
-    const selected = thumbnails[photoIndex];
-    for (const id of ['gallery-image', 'lightbox-image']) { const image = document.getElementById(id) as HTMLImageElement; image.src = selected.dataset.src!; image.alt = selected.dataset.alt!; }
-    document.querySelector('#gallery-position')!.textContent = `${photoIndex + 1} / ${thumbnails.length}`;
-    thumbnails.forEach((thumb, i) => { thumb.setAttribute('aria-pressed', String(i === photoIndex)); });
-    for (const id of ['photo-count', 'lightbox-count']) document.getElementById(id)!.textContent = `Foto ${photoIndex + 1} von ${thumbnails.length}`;
-  }
-  thumbnails.forEach((thumb, index) => thumb.addEventListener('click', () => selectPhoto(index)));
-  document.querySelector('#open-gallery')!.addEventListener('click', () => lightbox.showModal());
   document.querySelector('#contact-button')!.addEventListener('click', () => { document.querySelector('#copy-status')!.textContent = ''; contact.showModal(); });
-  document.querySelector('#previous-photo')?.addEventListener('click', () => selectPhoto(photoIndex - 1));
-  document.querySelector('#next-photo')?.addEventListener('click', () => selectPhoto(photoIndex + 1));
-  lightbox.addEventListener('keydown', event => { if (event.key === 'ArrowLeft') { event.preventDefault(); selectPhoto(photoIndex - 1); } if (event.key === 'ArrowRight') { event.preventDefault(); selectPhoto(photoIndex + 1); } });
-  for (const dialog of [contact, lightbox]) {
+  for (const dialog of [contact]) {
     dialog.querySelector('[data-close-dialog]')!.addEventListener('click', () => dialog.close());
     dialog.addEventListener('click', event => { const rect = dialog.getBoundingClientRect(); if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close(); });
-    dialog.addEventListener('close', () => { document.body.style.overflow = ''; });
   }
-  for (const button of ['#open-gallery', '#contact-button']) document.querySelector(button)!.addEventListener('click', () => { document.body.style.overflow = 'hidden'; });
   document.querySelector('#copy-message')!.addEventListener('click', async () => {
     const textarea = document.querySelector<HTMLTextAreaElement>('#contact-message')!;
     const status = document.querySelector('#copy-status')!;
