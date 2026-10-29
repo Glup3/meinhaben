@@ -8,7 +8,7 @@ export function getStaticPaths() {
 const { vertical } = Astro.props;
 ---
 <Layout title={`${vertical.name} – Meinhaben`} description={vertical.text}>
-  <main id="main" class="container vertical-main">
+  <main id="main" class="page-container vertical-main">
     <section class={`vertical-hero vertical-${vertical.slug}`}>
       <div class="vertical-copy"><p class="showcase-kicker">{vertical.name} · {vertical.kicker}</p><h1>{vertical.headline}</h1><p>{vertical.text}</p><a class="button" href={vertical.href}>{vertical.cta}<Icon name="right" size={18} /></a></div>
       <div class="vertical-art" aria-hidden="true"><span>{vertical.symbol}</span><small>MEINHABEN<br />{vertical.name.toUpperCase()}</small></div>

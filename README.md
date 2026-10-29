@@ -18,7 +18,21 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
   sorting, and empty states. Filters are preserved in the URL.
 - `src/pages/inserat/[slug].astro`: prebuilt listing pages with accessible photo
   dialogs, item details, related listings, and the WhatsApp contact message.
-- `src/styles/global.css` and `src/styles/marketplace.css`: responsive marketplace styling.
+- `src/styles/global.css`: Tailwind CSS v4 entry point and CSS theme (brand colors,
+  Open Sans, 4px spacing, and shared radius).
+- `src/styles/marketplace.css` and `src/styles/homepage.css`: responsive components
+  composed with Tailwind utilities through `@apply`.
+
+Tailwind runs through `@tailwindcss/vite` in `astro.config.mjs`, following
+[Astro’s Tailwind 4 setup](https://docs.astro.build/en/guides/styling/#add-tailwind-4).
+Use utilities directly in Astro markup for simple styles. Reusable styles and
+script-controlled states stay in the `components` layer; page-scoped styles use
+`@reference` to access the shared theme without emitting Tailwind again. Keep
+complex grid, animation, and accessibility rules in CSS where clearer. The
+spacing token uses pixels to preserve the design with the 14px root font size;
+use explicit pixel font sizes when matching existing typography. Tailwind’s theme
+and utilities are imported separately, keeping the existing base reset instead
+of Preflight so native controls, dialogs, and image sizing retain their appearance.
 
 The interface follows willhaben’s marketplace with an original MEINHABEN
 speech-bubble logo, locally hosted Open Sans, linked vertical cards beneath the featured carousel. The homepage has a three-slide featured carousel

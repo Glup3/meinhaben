@@ -1,39 +1,43 @@
-/* Homepage discovery stays compact so the inventory starts near the top. */
-.home-main .featured-carousel { margin: 12px 0 8px; }
-.home-main .showcase-slides { display: grid; isolation: isolate; }
-.home-main .showcase-slide { grid-area: 1 / 1; min-width: 0; visibility: hidden; }
-.home-main .showcase-slide.is-active,
-.home-main .showcase-slide.is-transitioning { visibility: visible; }
-.home-main .showcase-slide { grid-template-columns: 42% 58%; min-height: 260px; }
-.home-main .showcase-collage { min-height: 260px; }
-.home-main .showcase-copy { min-height: 0; padding: 24px 64px 24px 32px; }
-.home-main .showcase-kicker { margin-bottom: 10px; font-size: 10px; }
-.home-main .showcase-copy h2 { font-size: clamp(26px, 2.6vw, 36px); }
-.home-main .showcase-copy > a { margin-top: 16px; }
-.home-main .showcase-copy > small { margin-top: 12px; }
-.home-main .showcase-sticker { padding: 8px 12px; font-size: 10px; }
-.home-main .showcase-controls { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
-.home-main .showcase-arrow { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: auto; width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 50%; color: var(--navy); background: white; }
-.home-main .showcase-arrow:hover { background: #e8f7ff; }
-.home-main .showcase-status { min-width: 36px; text-align: center; font-size: 12px; color: var(--navy); }
-.home-main .vertical-boxes { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 24px 0 12px; }
-.home-main .vertical-box { background: #f2f9fd; border-color: var(--line); transition: none; }
-.home-main .vertical-box:hover { transform: none; border-color: var(--brand); }
-.home-main .vertical-box-heading { justify-content: flex-start; min-height: 36px; padding: 8px 12px 0; background: transparent; }
-.home-main .vertical-box-heading h2 { font-size: 14px; }
-.home-main .vertical-box-heading svg { width: 18px; height: 18px; }
-.home-main .vertical-box > p { min-height: 0; padding: 6px 12px 12px; font-size: 12px; color: var(--navy); }
-@media (max-width: 760px) {
-  .home-main .featured-carousel { margin-top: 10px; }
-  .home-main .showcase-slide { grid-template-columns: 1fr; min-height: 0; }
-  .home-main .showcase-collage { display: none; }
-  .home-main .showcase-copy { min-height: 196px; padding: 20px 60px; }
-  .home-main .showcase-copy h2 { font-size: clamp(23px, 5.6vw, 30px); }
-  .home-main .showcase-kicker { margin-bottom: 6px; letter-spacing: .6px; }
-  .home-main .showcase-copy > a { margin-top: 12px; font-size: 14px; }
-  .home-main .showcase-copy > small { display: none; }
-  .home-main .vertical-boxes { grid-template-columns: 1fr; gap: 6px; }
-  .home-main .vertical-box { display: grid; grid-template-columns: 130px 1fr; align-items: center; }
-  .home-main .vertical-box-heading { padding: 10px; }
-  .home-main .vertical-box > p { padding: 10px; }
+@reference "./global.css";
+
+@layer components {
+  /* Homepage discovery stays compact so the inventory starts near the top. */
+  .home-main .featured-carousel { @apply mt-3 mx-0 mb-2; }
+  .home-main .showcase-slides { @apply grid isolate; }
+  .home-main .showcase-slide { @apply min-w-0 invisible; grid-area: 1 / 1; }
+  .home-main .showcase-slide.is-active,
+  .home-main .showcase-slide.is-transitioning { @apply visible; }
+  .home-main .showcase-slide { @apply grid-cols-[42%_58%] min-h-65; }
+  .home-main .showcase-collage { @apply min-h-65; }
+  .home-main .showcase-copy { @apply min-h-0 pt-6 pr-16 pb-6 pl-8; }
+  .home-main .showcase-kicker { @apply mb-2.5 text-[10px]; }
+  .home-main .showcase-copy h2 { @apply text-[clamp(26px,_2.6vw,_36px)]; }
+  .home-main .showcase-copy > a { @apply mt-4; }
+  .home-main .showcase-copy > small { @apply mt-3; }
+  .home-main .showcase-sticker { @apply py-2 px-3 text-[10px]; }
+  .home-main .showcase-controls { @apply absolute inset-0 z-2 pointer-events-none; }
+  .home-main .showcase-arrow { @apply absolute top-[50%] pointer-events-auto w-11 h-11 border border-line rounded-full text-navy bg-white; transform: translateY(-50%); }
+  .home-main .showcase-arrow:hover { @apply bg-[#e8f7ff]; }
+  .home-main .showcase-status { @apply min-w-9 text-center text-[12px] text-navy; }
+  .home-main .vertical-boxes { @apply grid-cols-4 gap-2.5 mt-6 mx-0 mb-3; }
+  .home-main .vertical-box { @apply bg-[#f2f9fd] border-line; transition: none; }
+  .home-main .vertical-box:hover { @apply border-brand; transform: none; }
+  .home-main .vertical-box-heading { @apply justify-start min-h-9 pt-2 px-3 pb-0 bg-transparent; }
+  .home-main .vertical-box-heading h2 { @apply text-[14px]; }
+  .home-main .vertical-box-heading svg { @apply w-4.5 h-4.5; }
+  .home-main .vertical-box > p { @apply min-h-0 pt-1.5 px-3 pb-3 text-[12px] text-navy; }
+  @media (max-width: 760px) {
+    .home-main .featured-carousel { @apply mt-2.5; }
+    .home-main .showcase-slide { @apply grid-cols-[1fr] min-h-0; }
+    .home-main .showcase-collage { @apply hidden; }
+    .home-main .showcase-copy { @apply min-h-49 py-5 px-15; }
+    .home-main .showcase-copy h2 { @apply text-[clamp(23px,_5.6vw,_30px)]; }
+    .home-main .showcase-kicker { @apply mb-1.5 tracking-[.6px]; }
+    .home-main .showcase-copy > a { @apply mt-3 text-[14px]; }
+    .home-main .showcase-copy > small { @apply hidden; }
+    .home-main .vertical-boxes { @apply grid-cols-[1fr] gap-1.5; }
+    .home-main .vertical-box { @apply grid grid-cols-[130px_1fr] items-center; }
+    .home-main .vertical-box-heading { @apply p-2.5; }
+    .home-main .vertical-box > p { @apply p-2.5; }
+  }
 }
