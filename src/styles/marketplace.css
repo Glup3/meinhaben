@@ -8,6 +8,7 @@
 .market-nav a { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 14px 20px; text-transform: uppercase; border-bottom: 4px solid transparent; white-space: nowrap; font-weight: 600; }
 .market-nav small { color: var(--muted); font-size: 11px; font-weight: 400; }
 .market-nav .market-nav-active { color: var(--brand); }
+.market-nav a:hover, .market-nav a:focus-visible { color: var(--navy); }
 .market-nav .market-nav-active small { color: inherit; }
 .home-main { padding-top: 17px; }
 .marketplace-title { display: flex; align-items: baseline; gap: 6px; margin-bottom: 10px; }
@@ -84,8 +85,8 @@
 .empty-state h3 { font-size: 18px; }
 .empty-state p { margin: 12px 0 20px; line-height: 1.6; }
 .how-section { border-top: 4px solid var(--brand); border-radius: 8px 8px 0 0; background: #eaf8ff; padding: 40px 32px; margin-block: 24px 0; }
-.how-section > h2 { margin-bottom: 32px; color: var(--navy); font-size: 28px; font-weight: 700; }
-.how-intro { margin-bottom: 32px; }
+.how-section > h2 { text-align: center; margin-bottom: 32px; color: var(--navy); font-size: 28px; font-weight: 700; }
+.how-intro { margin-bottom: 64px; }
 .how-intro h3 { font-size: 18px; margin-bottom: 8px; }
 .how-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
 .how-columns h3 { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 14px; font-size: 16px; text-align: center; }
