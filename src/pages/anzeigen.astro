@@ -22,7 +22,7 @@ const categories = categoryRecords.map(category => category.name).filter(categor
           <div class="results-toolbar"><button id="clear-search">Filter zurücksetzen</button><label class="sort-label"><span class="sr-only">Sortieren nach</span><select id="sort"><option value="newest">Aktualität</option><option value="price-asc">Preis aufsteigend</option><option value="price-desc">Preis absteigend</option></select></label></div>
           <div class="active-search" id="active-search" hidden><span id="search-summary"></span></div>
           <div class="listing-grid list-view" id="listing-grid">{listings.map((listing, index) => <ListingCard listing={listing} eager={index < 3} />)}</div>
-          <div class="empty-state" id="empty-state" hidden><Icon name="search" size={30} /><h3>Keine Anzeigen gefunden</h3><p>Versuche einen anderen Suchbegriff oder passe deine Filter an.</p><button class="button primary" id="reset-filters">Alle Anzeigen anzeigen</button></div>
+          <div class="empty-state" id="empty-state" hidden><Icon name="search" size={30} /><h3>Keine Anzeigen gefunden</h3><p>Versuche einen anderen Suchbegriff oder passe deine Filter an.</p><button class="button primary" id="reset-filters">Alle Anzeigen</button></div>
           <p class="listing-end">Alle Anzeigen gesehen. Was dabei? Dann meld dich.</p>
         </div>
       </div>
