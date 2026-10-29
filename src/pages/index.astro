@@ -50,7 +50,7 @@ const categoryIcons = Object.fromEntries(categoryRecords.map(category => [catego
 </Layout>
 <script>
   // Keep previously shared homepage filter URLs working after splitting discovery and results.
-  const filters = ['q', 'kategorie', 'gemerkt', 'gratis', 'budget', 'zustand', 'verfuegbar', 'sortierung'];
+  const filters = ['q', 'kategorie', 'gratis', 'budget', 'zustand', 'verfuegbar', 'sortierung'];
   const params = new URLSearchParams(location.search);
   if (filters.some(key => params.has(key))) location.replace(`/anzeigen/${location.search}${location.hash}`);
 </script>

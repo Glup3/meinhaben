@@ -19,8 +19,6 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
 - `src/pages/inserat/[slug].astro`: prebuilt listing pages with accessible photo
   dialogs, item details, related listings, and the WhatsApp contact message.
 - `src/styles/global.css` and `src/styles/marketplace.css`: responsive marketplace styling.
-- `src/components/SaveButton.astro` and `src/scripts/favorites.ts`: shared favorites
-  controls, browser storage, accessible saved-state announcements, and tab sync.
 
 The interface closely follows willhaben’s marketplace: an original MEINHABEN
 speech-bubble logo, locally hosted Open Sans, a compact cyan search strip,
@@ -30,14 +28,11 @@ the title above the gallery and price/contact panel. Only inventory categories
 and working controls are shown; there are no unrelated marketplace verticals.
 
 The homepage has a compact search banner, category directory, and horizontal
-listing rails. Search, category tiles, favorites, and “Alle Anzeigen” open the
+listing rails. Search, category tiles, and “Alle Anzeigen” open the
 dedicated `/anzeigen/` results page, which includes budget and condition filters
-and quick filters for free items and favorites. Previously shared homepage
+and a quick filter for free items. Previously shared homepage
 filter URLs are forwarded to the results page with their query state intact. All filters are combined and
-preserved in the URL; reset clears them together. Favorites are stored locally
-in this browser, without an account or server synchronization. If storage is
-blocked, saving works for the current page and announces that limitation.
-Listing pages support native sharing where available, with clipboard and visible
+preserved in the URL; reset clears them together. Listing pages support native sharing where available, with clipboard and visible
 link fallbacks. Existing availability, gallery and contact flows are preserved.
 
 The contact dialog links to the seller's WhatsApp username `glup3` through

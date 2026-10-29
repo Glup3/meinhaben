@@ -1,5 +1,4 @@
 ---
-import SaveButton from '../../components/SaveButton.astro';
 import Layout from '../../layouts/Layout.astro';
 import Icon from '../../components/Icon.astro';
 import ListingCard from '../../components/ListingCard.astro';
@@ -19,7 +18,7 @@ const message = `Hey! Ich interessiere mich für „${listing.subtitle}“ auf M
 <Layout title={`${listing.subtitle} – Meinhaben`} description={listing.description[0]} image={listing.image} imageAlt={listing.imageAlt}>
   <main id="main" class="container detail-main">
     <nav class="breadcrumb" aria-label="Brotkrümelnavigation"><a href="/">Startseite</a><Icon name="right" /><a href={`/anzeigen/?kategorie=${encodeURIComponent(listing.category)}#dinge`}>{listing.category}</a><Icon name="right" /><span aria-current="page">{listing.subtitle}</span></nav>
-    <div class="detail-heading"><h1 id="listing-title">{listing.subtitle}</h1><div class="detail-actions"><SaveButton slug={listing.slug} title={listing.subtitle} /><button type="button" class="share-button" id="share-listing" aria-label="Anzeige teilen"><Icon name="share" size={19} /><span class="share-label">Teilen</span></button></div></div>
+    <div class="detail-heading"><h1 id="listing-title">{listing.subtitle}</h1><div class="detail-actions"><button type="button" class="share-button" id="share-listing" aria-label="Anzeige teilen"><Icon name="share" size={19} /><span class="share-label">Teilen</span></button></div></div>
     <div class="detail-meta"><span>{listing.category} · {listing.condition}</span><span>Veröffentlicht: {new Date(listing.date).toLocaleDateString('de-AT', { timeZone: 'Europe/Vienna' })} | meinhaben-Code: {listing.slug}</span></div>
     <p id="share-status" role="status" class="share-status"></p>
     <div class="detail-grid">

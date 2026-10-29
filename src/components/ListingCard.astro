@@ -1,6 +1,5 @@
 ---
 import { formatPrice, statusLabels, type Listing } from '../data/listings';
-import SaveButton from './SaveButton.astro';
 import LoadingMessage from './LoadingMessage.astro';
 interface Props { listing: Listing; eager?: boolean; }
 const { listing, eager = false } = Astro.props;
@@ -10,5 +9,4 @@ const { listing, eager = false } = Astro.props;
     <div class="card-photo"><img src={listing.image} alt={listing.imageAlt} width="1200" height="900" loading={eager ? 'eager' : 'lazy'} decoding="async" /><LoadingMessage /><span class:list={['photo-label', listing.status !== 'available' ? listing.status : 'condition-label']}>{listing.status === 'available' ? (listing.price === 0 ? 'Zu verschenken' : listing.condition) : statusLabels[listing.status]}</span></div>
     <div class="card-body"><h3>{listing.subtitle}</h3><div class="card-bottom"><span class:list={['card-price', { 'free-price': listing.price === 0 }]}>{formatPrice(listing.price)}</span><span class="card-price-note">{listing.price === 0 ? 'Einfach mitnehmen' : listing.negotiable ? 'VB' : 'Fixpreis'}</span></div><p class="card-subtitle">{listing.title}</p><div class="card-meta"><span>{listing.category} · {listing.condition}</span><time datetime={listing.date}>{new Date(listing.date).toLocaleDateString("de-AT", { day: "2-digit", month: "2-digit", year: "numeric", timeZone: "Europe/Vienna" })}</time></div></div>
   </a>
-  <SaveButton slug={listing.slug} title={listing.title} compact />
 </article>
