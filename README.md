@@ -191,103 +191,100 @@ Never run multiple PocketBase processes against the same SQLite data directory.
 
 ## Coolify deployment
 
-Public source: <https://github.com/Glup3/meinhaben>, branch `main`.
-Deploy the root `docker-compose.yaml` using Coolify's **Docker Compose** build
-pack on `ditto-cloud-1`. Both services build from this repository:
+Public source: <https://github.com/Glup3/meinhaben>, branch `main`, on
+`ditto-cloud-1`. Production uses two independent Coolify applications from this
+repository:
 
-- `website`: after PocketBase is healthy, Astro generates HTML on container
-  startup, served by Nginx on port 80 at
-  <https://meinhaben.glup3.dev>.
-- `pocketbase`: checksum-verified PocketBase on port 8090, with API and dashboard
-  at <https://meinhaben-admin.ditto.glup3.dev/_/>.
+| Resource | Build configuration | Purpose |
+| --- | --- | --- |
+| `meinhaben website` | Dockerfile, `/Dockerfile`, port 80 | Rolling website deployments at <https://meinhaben.glup3.dev> |
+| `meinhaben PocketBase` | Docker Compose, `/docker-compose.production.yaml` | Existing database and uploads at <https://meinhaben-admin.ditto.glup3.dev> |
 
-Coolify terminates HTTPS and routes the domains to the respective service ports.
-The Compose file exposes no host ports. Its `pocketbase_data` named volume mounts
-at `/pb/pb_data`, preserving SQLite, uploads and local backups across redeploys.
-Keep the same Coolify resource/volume; deleting its volume deletes the data.
+### Website
 
-Set these **runtime** environment variables in Coolify before deploying:
+Set runtime `SITE_URL=https://meinhaben.glup3.dev` and
+`POCKETBASE_URL=https://meinhaben-admin.ditto.glup3.dev`. The website reads the
+public PocketBase API during startup; it needs no database credentials or
+persistent storage. Leave `POCKETBASE_INTERNAL_URL` unset for this independent
+resource. Nginx starts only after Astro successfully generates the complete
+site. A failed build cannot serve a partial site.
 
-```text
-PB_ADMIN_EMAIL=<superuser email>
-PB_ADMIN_PASSWORD=<strong generated password>
-PB_ENCRYPTION_KEY=<32-character random key>
-```
+Enable the HTTP readiness check on `/`, host `127.0.0.1`, port 80, with a
+60-second start period,
+5-second interval/timeout and 12 retries. Keep timestamped container names and
+no host port mappings so Coolify can run old and new containers together. Allow
+30 seconds for graceful shutdown; the Dockerfile uses Nginx's `SIGQUIT` signal.
+Coolify waits for the replacement to become healthy before retiring the old
+website. Restarting/deploying the website rebuilds pages from current content.
+Content edits do not automatically trigger a deployment.
 
-Generate an encryption key with `openssl rand -hex 16`. Keep it in your password
-manager as well as Coolify: it encrypts stored PocketBase settings and is needed
-when restoring them. Do not rotate it without following PocketBase's settings
-decryption/re-encryption procedure. Do not commit real environment files.
+The signed GitHub push webhook deploys the website for frontend/build changes.
+Its watch paths cover `src/**`, `public/**`, `deploy/**`, `Dockerfile`,
+`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `astro.config.mjs`,
+`tsconfig.json`, and `.dockerignore` (one pattern per line in Coolify).
 
-The entrypoint applies migrations, creates/updates the bootstrap superuser from
-these environment values, and starts PocketBase. That user's password is reset
-to the configured value on restart; change it in Coolify, then restart to rotate
-it. Retrieve the initial credentials in Coolify's environment panel. Frontend
-builds do not need these secrets.
+### PocketBase and persistent data
 
-Pushes to `main` automatically deploy both services through a signed GitHub
-push webhook to Coolify. Other branches do not deploy this production resource.
-The webhook secret is stored in GitHub and Coolify, never in this repository.
-You can also use **Deploy** in Coolify to rebuild manually. PocketBase content
-edits still require a website restart or deployment; they do not trigger the GitHub webhook.
-Verify PocketBase with
-`curl --fail https://meinhaben-admin.ditto.glup3.dev/api/health`.
+The backend keeps the original Coolify resource UUID
+`feg5q24qi2u3qvndetgwyqay` and volume
+`feg5q24qi2u3qvndetgwyqay_pocketbase-data`, mounted at `/pb/pb_data`.
+**Do not recreate the resource, rename its volume key, delete its storage, or
+start another PocketBase process against that volume.** The production Compose
+file intentionally retains the original `pocketbase_data` key. No database is
+copied into a new service during the split.
 
-### First deployment with the content collections
+Keep the existing runtime `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`, and
+`PB_ENCRYPTION_KEY` values in this resource. Never rotate the encryption key as
+part of a deployment or store credentials in Git. The entrypoint applies pending
+migrations and updates the bootstrap superuser before starting PocketBase.
+Existing content is not reset by the seed migrations.
 
-Deploy the Compose resource normally. Both images build without database API
-requests. PocketBase applies migrations and seed data before its health check
-passes; Compose then starts the website, which generates pages from that live
-database before starting Nginx. A failed content build exits without serving
-partial output. This works for both an empty database and an existing deployment
-without the new collections, with no manual backend-first rollout. Keep the
-existing persistent volume; no throwaway seed database is used for page builds.
+Backend auto-deployment is disabled deliberately. After reviewing and backing up
+changes to `pocketbase/**` or `docker-compose.production.yaml`, deploy PocketBase
+first, verify its health and migrations, then deploy the website. This explicit
+ordering prevents a frontend build from racing a schema migration. Backend
+updates still have a short interruption; routine website deployments do not
+restart PocketBase. Keep migrations compatible with the old website during
+rollout. Verify health at `/api/health`.
 
 ### Pull-request preview environments
 
-The same Coolify application supports automatic Docker Compose previews for
-repository members' pull requests. Enable **Preview Deployments**, keep public
-fork deployments disabled, and subscribe the signed GitHub repository webhook
-to both `push` and `pull_request` events. Use the preview URL template
-`{{pr_id}}.{{domain}}` and wildcard DNS pointing to `ditto-cloud-1` for both
-production domains. Coolify provisions HTTPS for the resulting preview domains.
-For PR 42, these are `https://42.meinhaben.glup3.dev` and
+`meinhaben previews` is a separate, preview-only Coolify application using the
+full `/docker-compose.yaml`. Its production auto-deployment is disabled; do not
+manually deploy its main environment. Enable member-only Preview Deployments,
+keep public fork deployments disabled, and use `{{pr_id}}.{{domain}}` with the
+same website/backend base domains. Wildcard DNS and the signed repository
+webhook (`push` and `pull_request` events) provide URLs such as
+`https://42.meinhaben.glup3.dev` and
 `https://42.meinhaben-admin.ditto.glup3.dev`.
 
-Set `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`, and `PB_ENCRYPTION_KEY` separately
-under **Preview Deployment Environment Variables**, using preview-only values.
-These values are shared across this application's previews, separate from
-production. Retrieve credentials in Coolify; never commit them or expose them
-in PR comments. The current setup uses the signed repository webhook, so it
-does not post automatic GitHub App preview comments. Instead,
-`.github/workflows/preview-link.yml` appends a preview link to each eligible PR's
-description on open, reopen, or update, and marks it closed when the PR closes.
-It preserves the rest of the description and updates the same marked block.
-The link identifies the environment; it does not report deployment success.
-This workflow needs to be merged into the default branch to handle PR events.
-It uses `pull_request_target` with PR write permission, checks repository
-membership, and never checks out or executes PR code.
+The preview resource has preview-only `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`,
+and `PB_ENCRYPTION_KEY` values; it never receives production credentials or
+storage. Each PR gets its own generated volume, network and seeded database.
+Updating a PR retains that preview's data. Closing it removes its containers,
+network and generated volumes. Never make preview storage external or assign a
+fixed shared volume name. Preview deployments may briefly interrupt their own
+preview environment; production rolling updates are independent.
 
-On container startup, `deploy/website-entrypoint.sh` uses Coolify's generated
-`SERVICE_URL_WEBSITE` for the Astro site origin, `SERVICE_URL_POCKETBASE` for
-public image URLs, and `SERVICE_NAME_POCKETBASE` for the internal API hostname.
-The last value includes Coolify's PR suffix, so builds read their own backend.
-Outside Coolify, the configured `SITE_URL`, `POCKETBASE_URL`, and
-`POCKETBASE_INTERNAL_URL` still work; export `SITE_URL` before standalone builds.
+`deploy/website-entrypoint.sh` uses Coolify's `SERVICE_URL_WEBSITE`,
+`SERVICE_URL_POCKETBASE`, and `SERVICE_NAME_POCKETBASE` in Compose previews so
+site URLs, uploaded image URLs, and content reads stay scoped to that PR.
+`.github/workflows/preview-link.yml` maintains the preview link in PR descriptions
+without checking out or executing PR code. The link does not report readiness.
 
-Each preview has its own containers, network, and generated named
-`pocketbase_data` volume. Its first deployment applies the PR's migrations and
-loads the sample listings; production content is not copied. Updating the PR
-retains that preview's database and applies pending migrations. Containers
-share the deployment server's resources.
+### Migration and recovery
 
-Closing or merging the PR deletes the preview and its Coolify-generated named
-volumes and network. Stopping a preview is not the same as deleting it. Do not
-give this volume a fixed `name`, mark it `external`, or replace it with a shared
-host bind mount: those storage types are excluded from generated-volume cleanup
-and can break data isolation. Cleanup can fail if the server is unreachable or
-a volume remains in use; check the server after a failed cleanup. Reopening a
-deleted preview starts again with fresh sample data.
+Before splitting production, create a PocketBase backup containing SQLite and
+uploads, download it off the deployment server, and verify the archive. Bring
+up and check the independent website before switching the original resource to
+`docker-compose.production.yaml`. Keep the exact backend resource and volume.
+Compare all content records and uploaded files before and after the migration.
+
+To reverse the split, stop routing the independent website and restore the
+original resource's `/docker-compose.yaml` configuration and website domain.
+Retain the existing backend volume and credentials. Do not restore an older
+data backup merely to undo deployment configuration; that would discard newer
+edits. Database recovery is a separate operation described below.
 
 ## Backups and restore
 
