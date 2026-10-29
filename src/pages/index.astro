@@ -1,6 +1,5 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import '../styles/homepage.css';
 import FeaturedCarousel from '../components/FeaturedCarousel.astro';
 import VerticalBoxes from '../components/VerticalBoxes.astro';
 import Icon from '../components/Icon.astro';
@@ -11,16 +10,47 @@ const latest = listings.filter(item => item.status === "available" && item.price
 const freeListings = listings.filter(item => item.status === "available" && item.price === 0).slice(0, 8);
 ---
 <Layout>
-  <main id="main" class="page-container home-main">
-    <div class="marketplace-title"><h1>Der vermutlich kleinste Marktplatz Österreichs</h1><span>{listings.length} Anzeigen</span></div>
+  <main id="main" class="w-[min(1440px,_calc(100%_-_2_*_var(--page-gutter)))] mx-auto pt-4.25 max-[760px]:pt-0">
+    <div class="flex items-baseline gap-1.5 mb-2.5 [&_h1]:text-brand [&_h1]:text-[16px] [&_h1]:font-bold [&_>_span]:text-[14px] [&_>_span]:border-l [&_>_span]:border-muted [&_>_span]:pl-1.5 max-[760px]:absolute max-[760px]:w-0.25 max-[760px]:h-0.25 max-[760px]:overflow-hidden max-[760px]:whitespace-nowrap max-[760px]:[clip-path:inset(100%)]"><h1>Der vermutlich kleinste Marktplatz Österreichs</h1><span>{listings.length} Anzeigen</span></div>
     <FeaturedCarousel />
     <VerticalBoxes />
-    <section class="home-picks" id="dinge" aria-labelledby="new-heading">
-      <div class="home-section-heading"><h2 id="new-heading" class="section-label fresh-heading flex items-center gap-2 [&_svg]:text-brand"><Icon name="sprout" size={24} />Frisch auf meinhaben</h2><a class="all-listings-link" href="/anzeigen/">Alle Anzeigen <Icon name="right" size={15} /></a></div>
-      <div class="home-listing-rail">{latest.map(listing => <ListingCard listing={listing} />)}</div>
+    <section class="py-6 px-4 border-t border-line max-[760px]:py-6 max-[760px]:px-0" id="dinge" aria-labelledby="new-heading">
+      <div data-ui="home-section-heading" class="flex justify-between items-baseline gap-4 mb-3.5 [&_>_a]:inline-flex [&_>_a]:items-center [&_>_a]:gap-1 [&_>_a]:text-brand-dark [&_>_a]:text-[12px] [&_>_a]:whitespace-nowrap"><h2 id="new-heading" class="text-[14px] leading-[1.4] uppercase text-muted font-bold mb-3 [[data-ui~=home-section-heading]_&]:mb-0 flex items-center gap-2 [&_svg]:text-brand"><Icon name="sprout" size={24} />Frisch auf meinhaben</h2><a class="[transition:transform_150ms_ease-out] [transform-origin:right_center] [@media(hover:hover)]:[&:hover]:[transform:scale(1.06)]" href="/anzeigen/">Alle Anzeigen <Icon name="right" size={15} /></a></div>
+      <div data-ui="home-listing-rail" class="grid grid-flow-col auto-cols-[clamp(230px,_calc((100%_-_80px)_/_5),_260px)] gap-5 overflow-x-auto p-2 -mx-2 grid-rows-[repeat(4,_auto)] max-[760px]:auto-cols-[160px] max-[760px]:gap-3 max-[760px]:-mr-4 max-[760px]:pr-4">{latest.map(listing => <ListingCard listing={listing} />)}</div>
     </section>
-    {freeListings.length > 0 && <section class="home-picks" aria-labelledby="free-heading"><div class="home-section-heading"><h2 id="free-heading" class="section-label fresh-heading flex items-center gap-2 [&_svg]:text-brand"><Icon name="gift" size={24} />ZU VERSCHENKEN</h2><a class="all-listings-link" href="/anzeigen/?gratis=1">Alle Anzeigen <Icon name="right" size={15} /></a></div><div class="home-listing-rail">{freeListings.map(listing => <ListingCard listing={listing} />)}</div></section>}
-    <section class="how-section" id="so-gehts" aria-labelledby="how-heading"><h2 id="how-heading">Kontakt & Übergabe</h2><div class="how-intro"><h3>Gefunden wonach du gesucht hast?<span class="how-intro-line block text-left my-4">Oder vielleicht sogar was gefunden, was du eigentlich nicht gesucht hast?</span>Dann meld dich bei mir!</h3></div><div class="how-columns"><div><h3><Icon name="search" size={20} /><span>1. Lieblingsstück finden</span></h3><p>Alle Anzeigen sind aus meinem eigenen Haushalt. Schau dir Fotos, Zustand und Beschreibung an.</p></div><div><h3><Icon name="chat" size={20} /><span>2. Nachricht schreiben</span></h3><p>Schreib mir auf WhatsApp als <a href="https://wa.me/glup3">@glup3</a>. Den passenden Nachrichtentext findest du beim Artikel.</p></div><div><h3><Icon name="box" size={20} /><span>3. Übergabe ausmachen</span></h3><p>Alles Weitere besprechen wir persönlich. Ohne Anmeldung und ohne Gebühren.</p></div></div></section>
+    {freeListings.length > 0 && <section class="py-6 px-4 border-t border-line max-[760px]:py-6 max-[760px]:px-0" aria-labelledby="free-heading"><div data-ui="home-section-heading" class="flex justify-between items-baseline gap-4 mb-3.5 [&_>_a]:inline-flex [&_>_a]:items-center [&_>_a]:gap-1 [&_>_a]:text-brand-dark [&_>_a]:text-[12px] [&_>_a]:whitespace-nowrap"><h2 id="free-heading" class="text-[14px] leading-[1.4] uppercase text-muted font-bold mb-3 [[data-ui~=home-section-heading]_&]:mb-0 flex items-center gap-2 [&_svg]:text-brand"><Icon name="gift" size={24} />ZU VERSCHENKEN</h2><a class="[transition:transform_150ms_ease-out] [transform-origin:right_center] [@media(hover:hover)]:[&:hover]:[transform:scale(1.06)]" href="/anzeigen/?gratis=1">Alle Anzeigen <Icon name="right" size={15} /></a></div><div data-ui="home-listing-rail" class="grid grid-flow-col auto-cols-[clamp(230px,_calc((100%_-_80px)_/_5),_260px)] gap-5 overflow-x-auto p-2 -mx-2 grid-rows-[repeat(4,_auto)] max-[760px]:auto-cols-[160px] max-[760px]:gap-3 max-[760px]:-mr-4 max-[760px]:pr-4">{freeListings.map(listing => <ListingCard listing={listing} />)}</div></section>}
+    <section id="so-gehts" aria-labelledby="how-heading" class="border-t border-line px-4 py-6 max-[760px]:px-0">
+      <h2 id="how-heading" class="mb-3 flex items-center gap-2 text-[14px] font-bold uppercase leading-[1.4] text-muted">
+        <Icon name="chat" size={24} class="text-brand" />Kontakt & Übergabe
+      </h2>
+      <div class="mb-5 max-w-[75ch]">
+        <p class="text-[18px] font-semibold leading-[1.5] text-navy">Gefunden wonach du gesucht hast?</p>
+        <p class="mt-1 text-[13px] leading-[1.7] text-muted">Oder vielleicht sogar was gefunden, was du eigentlich nicht gesucht hast? Dann meld dich bei mir!</p>
+      </div>
+      <ol class="m-0 grid list-none grid-cols-3 gap-3 p-0 max-[760px]:grid-cols-1">
+        <li class="rounded-ui border border-line bg-panel p-4">
+          <div class="mb-3 flex items-center gap-3">
+            <span class="grid size-9 shrink-0 place-items-center rounded-ui bg-[#eaf8ff] text-brand-dark"><Icon name="search" size={20} /></span>
+            <div><p class="mb-0.5 text-[11px] text-muted">Schritt 1</p><h3 class="text-[14px] font-semibold text-navy">Lieblingsstück finden</h3></div>
+          </div>
+          <p class="text-[13px] leading-[1.7] text-muted">Alle Anzeigen sind aus meinem eigenen Haushalt. Schau dir Fotos, Zustand und Beschreibung an.</p>
+        </li>
+        <li class="rounded-ui border border-line bg-panel p-4">
+          <div class="mb-3 flex items-center gap-3">
+            <span class="grid size-9 shrink-0 place-items-center rounded-ui bg-[#eaf8ff] text-brand-dark"><Icon name="chat" size={20} /></span>
+            <div><p class="mb-0.5 text-[11px] text-muted">Schritt 2</p><h3 class="text-[14px] font-semibold text-navy">Nachricht schreiben</h3></div>
+          </div>
+          <p class="text-[13px] leading-[1.7] text-muted">Schreib mir auf WhatsApp als <a href="https://wa.me/glup3" class="font-semibold text-brand-dark hover:underline">@glup3</a>. Den passenden Nachrichtentext findest du beim Artikel.</p>
+        </li>
+        <li class="rounded-ui border border-line bg-panel p-4">
+          <div class="mb-3 flex items-center gap-3">
+            <span class="grid size-9 shrink-0 place-items-center rounded-ui bg-[#eaf8ff] text-brand-dark"><Icon name="box" size={20} /></span>
+            <div><p class="mb-0.5 text-[11px] text-muted">Schritt 3</p><h3 class="text-[14px] font-semibold text-navy">Übergabe ausmachen</h3></div>
+          </div>
+          <p class="text-[13px] leading-[1.7] text-muted">Alles Weitere besprechen wir persönlich. Ohne Anmeldung und ohne Gebühren.</p>
+        </li>
+      </ol>
+    </section>
   </main>
 </Layout>
 <script>
