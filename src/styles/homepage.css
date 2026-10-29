@@ -1,0 +1,39 @@
+/* Homepage discovery stays compact so the inventory starts near the top. */
+.home-main .featured-carousel { margin: 12px 0 8px; }
+.home-main .showcase-slides { display: grid; isolation: isolate; }
+.home-main .showcase-slide { grid-area: 1 / 1; min-width: 0; visibility: hidden; }
+.home-main .showcase-slide.is-active,
+.home-main .showcase-slide.is-transitioning { visibility: visible; }
+.home-main .showcase-slide { grid-template-columns: 42% 58%; min-height: 260px; }
+.home-main .showcase-collage { min-height: 260px; }
+.home-main .showcase-copy { min-height: 0; padding: 24px 64px 24px 32px; }
+.home-main .showcase-kicker { margin-bottom: 10px; font-size: 10px; }
+.home-main .showcase-copy h2 { font-size: clamp(26px, 2.6vw, 36px); }
+.home-main .showcase-copy > a { margin-top: 16px; }
+.home-main .showcase-copy > small { margin-top: 12px; }
+.home-main .showcase-sticker { padding: 8px 12px; font-size: 10px; }
+.home-main .showcase-controls { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.home-main .showcase-arrow { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: auto; width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 50%; color: var(--navy); background: white; }
+.home-main .showcase-arrow:hover { background: #e8f7ff; }
+.home-main .showcase-status { min-width: 36px; text-align: center; font-size: 12px; color: var(--navy); }
+.home-main .vertical-boxes { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 24px 0 12px; }
+.home-main .vertical-box { background: #f2f9fd; border-color: var(--line); transition: none; }
+.home-main .vertical-box:hover { transform: none; border-color: var(--brand); }
+.home-main .vertical-box-heading { justify-content: flex-start; min-height: 36px; padding: 8px 12px 0; background: transparent; }
+.home-main .vertical-box-heading h2 { font-size: 14px; }
+.home-main .vertical-box-heading svg { width: 18px; height: 18px; }
+.home-main .vertical-box > p { min-height: 0; padding: 6px 12px 12px; font-size: 12px; color: var(--navy); }
+@media (max-width: 760px) {
+  .home-main .featured-carousel { margin-top: 10px; }
+  .home-main .showcase-slide { grid-template-columns: 1fr; min-height: 0; }
+  .home-main .showcase-collage { display: none; }
+  .home-main .showcase-copy { min-height: 196px; padding: 20px 60px; }
+  .home-main .showcase-copy h2 { font-size: clamp(23px, 5.6vw, 30px); }
+  .home-main .showcase-kicker { margin-bottom: 6px; letter-spacing: .6px; }
+  .home-main .showcase-copy > a { margin-top: 12px; font-size: 14px; }
+  .home-main .showcase-copy > small { display: none; }
+  .home-main .vertical-boxes { grid-template-columns: 1fr; gap: 6px; }
+  .home-main .vertical-box { display: grid; grid-template-columns: 130px 1fr; align-items: center; }
+  .home-main .vertical-box-heading { padding: 10px; }
+  .home-main .vertical-box > p { padding: 10px; }
+}

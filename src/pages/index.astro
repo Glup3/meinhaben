@@ -1,13 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import '../styles/homepage.css';
 import FeaturedCarousel from '../components/FeaturedCarousel.astro';
 import VerticalBoxes from '../components/VerticalBoxes.astro';
 import Icon from '../components/Icon.astro';
 import ListingCard from '../components/ListingCard.astro';
 import { getListings } from '../data/listings';
 const listings = await getListings();
-const latest = listings.filter(item => item.status === "available" && item.price > 0).slice(0, 4);
-const freeListings = listings.filter(item => item.status === "available" && item.price === 0).slice(0, 4);
+const latest = listings.filter(item => item.status === "available" && item.price > 0).slice(0, 8);
+const freeListings = listings.filter(item => item.status === "available" && item.price === 0).slice(0, 8);
 ---
 <Layout>
   <main id="main" class="container home-main">
