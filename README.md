@@ -244,7 +244,14 @@ under **Preview Deployment Environment Variables**, using preview-only values.
 These values are shared across this application's previews, separate from
 production. Retrieve credentials in Coolify; never commit them or expose them
 in PR comments. The current setup uses the signed repository webhook, so it
-does not post automatic GitHub App preview comments.
+does not post automatic GitHub App preview comments. Instead,
+`.github/workflows/preview-link.yml` appends a preview link to each eligible PR's
+description on open, reopen, or update, and marks it closed when the PR closes.
+It preserves the rest of the description and updates the same marked block.
+The link identifies the environment; it does not report deployment success.
+This workflow needs to be merged into the default branch to handle PR events.
+It uses `pull_request_target` with PR write permission, checks repository
+membership, and never checks out or executes PR code.
 
 On container startup, `deploy/website-entrypoint.sh` uses Coolify's generated
 `SERVICE_URL_WEBSITE` for the Astro site origin, `SERVICE_URL_POCKETBASE` for
