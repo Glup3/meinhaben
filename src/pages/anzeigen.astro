@@ -1,0 +1,115 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from '../components/Icon.astro';
+import ListingCard from '../components/ListingCard.astro';
+import { getListings, getCategories } from '../data/listings';
+const [listings, categoryRecords] = await Promise.all([getListings(), getCategories()]);
+const conditions = [...new Set(listings.map(item => item.condition))];
+const categories = categoryRecords.map(category => category.name).filter(category => listings.some(item => item.category === category));
+---
+<Layout title="Anzeigen suchen – Meinhaben">
+  <main id="main" class="container home-main results-main">
+    <div class="marketplace-title"><h1>Anzeigen suchen</h1><span>{listings.length} Anzeigen</span></div>
+    <section class="search-banner" aria-label="Anzeigen suchen">
+      <form role="search" class="search-form" id="search-form">
+        <label class="sr-only" for="search">Anzeigen durchsuchen</label>
+        <input id="search" type="search" name="q" placeholder="Was suchst du?" autocomplete="off" />
+        <button type="submit" aria-label="Suchen"><Icon name="search" size={22} /></button>
+      </form>
+      <div class="search-slogan"><strong>MEINHABEN</strong><span>EINFACH FINDEN UND<br />WEITERGEBEN</span></div>
+    </section>
+    <section class="listings-section" id="dinge" aria-labelledby="listings-heading">
+      <div class="listings-heading"><h2 id="listings-heading" tabindex="-1">Alle Anzeigen <span id="result-count" role="status" aria-live="polite">({listings.length})</span></h2><div class="view-switch" role="group" aria-label="Darstellung"><button data-view="list" aria-label="Listenansicht" aria-pressed="true"><Icon name="list" size={20} /></button><button data-view="grid" aria-label="Rasteransicht" aria-pressed="false"><Icon name="grid" size={18} /></button></div></div>
+      <div class="results-layout">
+        <aside class="filter-sidebar" aria-label="Anzeigen filtern">
+          <div class="sidebar-panel"><h3>Kategorie</h3><div class="category-filters" role="group" aria-label="Nach Kategorie filtern"><button class="filter-chip active" data-category-filter="all" aria-pressed="true">Alle Anzeigen<span>{listings.length}</span></button>{categories.map(category => <button class="filter-chip" data-category-filter={category} aria-pressed="false">{category}<span>{listings.filter(item => item.category === category).length}</span></button>)}</div></div>
+          <div class="sidebar-panel"><h3>Verfügbarkeit</h3><label class="availability-toggle"><input type="checkbox" id="available-only" />Nur verfügbare Anzeigen</label><button class="quick-filter" id="free-only" aria-pressed="false"><Icon name="box" size={17} />Zu verschenken</button></div>
+        </aside>
+        <div class="results-content">
+          <div class="refine-filters"><label><span class="sr-only">Zustand</span><select id="condition"><option value="all">Zustand: alle</option>{conditions.map(condition => <option value={condition}>{condition}</option>)}</select></label><label class="price-input"><span>Preis bis</span><input id="max-price" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Alle" aria-label="Maximaler Preis in Euro" /><span>€</span></label></div>
+          <div class="results-toolbar"><button id="clear-search">Filter zurücksetzen</button><label class="sort-label"><span class="sr-only">Sortieren nach</span><select id="sort"><option value="newest">Aktualität</option><option value="price-asc">Preis aufsteigend</option><option value="price-desc">Preis absteigend</option></select></label></div>
+          <div class="active-search" id="active-search" hidden><span id="search-summary"></span></div>
+          <div class="listing-grid list-view" id="listing-grid">{listings.map((listing, index) => <ListingCard listing={listing} eager={index < 3} />)}</div>
+          <div class="empty-state" id="empty-state" hidden><Icon name="search" size={30} /><h3>Keine Anzeigen gefunden</h3><p>Versuche einen anderen Suchbegriff oder passe deine Filter an.</p><button class="button primary" id="reset-filters">Alle Anzeigen anzeigen</button></div>
+          <p class="listing-end">Alle Anzeigen gesehen. Was dabei? Dann meld dich.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+</Layout>
+<script>
+  const search = document.querySelector<HTMLInputElement>('#search')!;
+  const available = document.querySelector<HTMLInputElement>('#available-only')!;
+  const sort = document.querySelector<HTMLSelectElement>('#sort')!;
+  const grid = document.querySelector<HTMLElement>('#listing-grid')!;
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-listing]')];
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('[data-category-filter]')];
+  const maxPrice = document.querySelector<HTMLInputElement>('#max-price')!;
+  const condition = document.querySelector<HTMLSelectElement>('#condition')!;
+  const freeButton = document.querySelector<HTMLButtonElement>('#free-only')!;
+  let freeOnly = false;
+  let category = 'all';
+  const normalize = (value: string) => value.toLocaleLowerCase('de-AT').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ß/g, 'ss');
+  function update() {
+    const terms = normalize(search.value.trim()).split(/\s+/).filter(Boolean);
+    const budget = maxPrice.value !== '' && Number.isFinite(maxPrice.valueAsNumber) && maxPrice.valueAsNumber >= 0 ? maxPrice.valueAsNumber : Infinity;
+    const filtered = !!(terms.length || category !== 'all' || available.checked || freeOnly || budget !== Infinity || condition.value !== 'all');
+    let count = 0;
+    cards.forEach(card => {
+      const matches = (!freeOnly || Number(card.dataset.price) === 0) && Number(card.dataset.price) <= budget && (condition.value === 'all' || card.dataset.condition === condition.value) && (category === 'all' || card.dataset.category === category) && (!available.checked || card.dataset.status === 'available') && terms.every(term => normalize(card.dataset.search || '').includes(term));
+      card.hidden = !matches;
+      if (matches) count++;
+    });
+    [...cards].sort((a, b) => sort.value === 'price-asc' ? Number(a.dataset.price) - Number(b.dataset.price) : sort.value === 'price-desc' ? Number(b.dataset.price) - Number(a.dataset.price) : (b.dataset.date || '').localeCompare(a.dataset.date || '')).forEach(card => grid.append(card));
+    document.querySelector('#result-count')!.textContent = `(${count})`;
+    document.querySelector<HTMLElement>('#empty-state')!.hidden = count > 0;
+    document.querySelector<HTMLElement>('#active-search')!.hidden = !filtered;
+    document.querySelector('#search-summary')!.textContent = [search.value.trim() ? `„${search.value.trim()}“` : '', category !== 'all' ? category : '', freeOnly ? 'Zu verschenken' : '', budget !== Infinity ? `Bis € ${budget.toLocaleString('de-AT')}` : '', condition.value !== 'all' ? condition.value : '', available.checked ? 'Nur verfügbar' : ''].filter(Boolean).join(' · ');
+    freeButton.setAttribute('aria-pressed', String(freeOnly));
+    const params = new URLSearchParams();
+    if (freeOnly) params.set('gratis', '1');
+    if (budget !== Infinity) params.set('budget', String(budget));
+    if (condition.value !== 'all') params.set('zustand', condition.value);
+    if (search.value.trim()) params.set('q', search.value.trim());
+    if (category !== 'all') params.set('kategorie', category);
+    if (available.checked) params.set('verfuegbar', '1');
+    if (sort.value !== 'newest') params.set('sortierung', sort.value);
+    history.replaceState(null, '', `${location.pathname}${params.size ? '?' + params.toString() : ''}${location.hash}`);
+  }
+  function setCategory(value: string) { category = value; chips.forEach(chip => { const active = chip.dataset.categoryFilter === category; chip.classList.toggle('active', active); chip.setAttribute('aria-pressed', String(active)); }); }
+  function restore() {
+    const params = new URLSearchParams(location.search);
+    search.value = params.get('q') || '';
+    freeOnly = params.get('gratis') === '1';
+    const budget = params.get('budget');
+    maxPrice.value = budget !== null && budget.trim() !== '' && Number.isFinite(Number(budget)) && Number(budget) >= 0 ? String(Number(budget)) : '';
+    condition.value = [...condition.options].some(option => option.value === params.get('zustand')) ? params.get('zustand')! : 'all';
+    const initialCategory = params.get('kategorie') || 'all';
+    setCategory(chips.some(chip => chip.dataset.categoryFilter === initialCategory) ? initialCategory : 'all');
+    available.checked = params.get('verfuegbar') === '1';
+    sort.value = ['price-asc', 'price-desc'].includes(params.get('sortierung') || '') ? params.get('sortierung')! : 'newest';
+    update();
+  }
+  function resetFilters() {
+    search.value = ''; setCategory('all'); available.checked = false; sort.value = 'newest';
+    freeOnly = false; maxPrice.value = ''; condition.value = 'all'; update();
+  }
+  freeButton.addEventListener('click', () => { freeOnly = !freeOnly; update(); });
+  maxPrice.addEventListener('input', update);
+  condition.addEventListener('change', update);
+  chips.forEach(chip => chip.addEventListener('click', () => { setCategory(chip.dataset.categoryFilter!); update(); document.querySelector<HTMLElement>('#listings-heading')!.focus({ preventScroll: true }); document.querySelector('#dinge')!.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
+  document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(button => button.addEventListener('click', () => {
+    const list = button.dataset.view === 'list';
+    grid.classList.toggle('list-view', list);
+    document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(control => control.setAttribute('aria-pressed', String(control === button)));
+  }));
+  search.addEventListener('input', update);
+  available.addEventListener('change', update);
+  sort.addEventListener('change', update);
+  document.querySelector('#search-form')!.addEventListener('submit', event => { event.preventDefault(); update(); document.querySelector('#dinge')!.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+  document.querySelector('#clear-search')!.addEventListener('click', resetFilters);
+  document.querySelector('#reset-filters')!.addEventListener('click', resetFilters);
+  window.addEventListener('pageshow', restore);
+  window.addEventListener('popstate', restore);
+  restore();
+</script>

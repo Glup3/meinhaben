@@ -13,20 +13,26 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
 - `src/content.config.ts`: public PocketBase loaders with explicit content schemas.
 - `src/data/listings.ts`: maps PocketBase records into the UI model, including
   category names, German condition labels, cents, paragraphs and ordered photos.
-- `src/pages/index.astro`: live search, category and availability filters, price
+- `src/pages/index.astro`: discovery homepage with category tiles and selected listings.
+- `src/pages/anzeigen.astro`: live search, category and availability filters, price
   sorting, and empty states. Filters are preserved in the URL.
 - `src/pages/inserat/[slug].astro`: prebuilt listing pages with accessible photo
   dialogs, item details, related listings, and the WhatsApp contact message.
 - `src/styles/global.css` and `src/styles/marketplace.css`: responsive marketplace styling.
-- `src/components/SaveButton.astro` and `src/scripts/favorites.ts`: shared favorites
-  controls, browser storage, accessible saved-state announcements, and tab sync.
 
-The homepage includes budget and condition filters, quick filters for free items
-and favorites, and a featured available listing. All filters are combined and
-preserved in the URL; reset clears them together. Favorites are stored locally
-in this browser, without an account or server synchronization. If storage is
-blocked, saving works for the current page and announces that limitation.
-Listing pages support native sharing where available, with clipboard and visible
+The interface closely follows willhaben’s marketplace: an original MEINHABEN
+speech-bubble logo, locally hosted Open Sans, a compact cyan search strip,
+inventory-derived photo category tiles, and a category directory. Search results
+use a filter sidebar and list rows, with a working grid toggle. Item pages place
+the title above the gallery and price/contact panel. Only inventory categories
+and working controls are shown; there are no unrelated marketplace verticals.
+
+The homepage has a compact search banner, category directory, and horizontal
+listing rails. Search, category tiles, and “Alle Anzeigen” open the
+dedicated `/anzeigen/` results page, which includes budget and condition filters
+and a quick filter for free items. Previously shared homepage
+filter URLs are forwarded to the results page with their query state intact. All filters are combined and
+preserved in the URL; reset clears them together. Listing pages support native sharing where available, with clipboard and visible
 link fallbacks. Existing availability, gallery and contact flows are preserved.
 
 The contact dialog links to the seller's WhatsApp username `glup3` through
@@ -42,7 +48,8 @@ Sample photos are downloaded from Unsplash into `public/images`; the chair detai
 is a crop of the same source photo. The images correspond to the photo IDs used
 in the approved mockups and additional sample items. They are illustrative and
 must be replaced with actual item photos and descriptions before sharing.
-Inter is hosted locally under the SIL Open Font License in `public/fonts/OFL.txt`.
+Open Sans is hosted locally under the SIL Open Font License in
+`public/fonts/OpenSans-OFL.txt`. The original Inter asset and license are retained.
 Search-engine indexing is disabled through page metadata; this is not access
 control or authentication.
 

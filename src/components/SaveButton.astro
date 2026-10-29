@@ -1,6 +1,0 @@
----
-import Icon from './Icon.astro';
-interface Props { slug: string; title: string; compact?: boolean; }
-const { slug, title, compact = false } = Astro.props;
----
-<button type="button" class:list={['save-button', { compact }]} data-save={slug} data-save-title={title} aria-label={`${title} merken`} aria-pressed="false" title="Auf die Merkliste"><Icon name="heart" size={20} /><span data-save-label>Merken</span></button>

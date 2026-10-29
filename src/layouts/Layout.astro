@@ -2,6 +2,10 @@
 import '../styles/global.css';
 import '../styles/marketplace.css';
 import Icon from '../components/Icon.astro';
+import Logo from '../components/Logo.astro';
+import { getListings, getCategories } from '../data/listings';
+const [headerListings, headerCategories] = await Promise.all([getListings(), getCategories()]);
+const populatedCategories = headerCategories.filter(category => headerListings.some(item => item.category === category.name));
 interface Props { title?: string; description?: string; image?: string; imageAlt?: string; }
 const {
   title = 'Meinhaben – Vielleicht bald deins.',
@@ -21,7 +25,7 @@ const imageURL = new URL(image, Astro.site!);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#225c42" />
+    <meta name="theme-color" content="#00a4e8" />
     <link rel="canonical" href={canonicalURL} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Meinhaben" />
@@ -41,17 +45,27 @@ const imageURL = new URL(image, Astro.site!);
   </head>
   <body>
     <a href="#main" class="skip-link">Zum Inhalt springen</a>
-    <header class="site-header"><div class="container header-inner">
-      <a class="logo" href="/" aria-label="Meinhaben – Startseite">mein<span>haben.</span></a>
-      <nav class="header-nav" aria-label="Hauptnavigation"><a href="/#dinge">Alle Dinge</a><a href="/#so-gehts">So funktioniert’s</a></nav>
-      <a class="saved-nav" href="/?gemerkt=1#dinge"><Icon name="heart" size={19} /><span>Merkliste</span><span data-saved-count>0</span></a>
-    </div></header>
+    <header class="site-header container">
+      <div class="header-inner">
+        <a class="logo" href="/" aria-label="Meinhaben – Startseite"><Logo /></a>
+        <nav class="header-tools" aria-label="Hauptnavigation">
+          <a class="header-search" href="/anzeigen/" aria-label="Anzeigen suchen"><Icon name="search" size={17} /><span>Suchen</span></a>
+          <a href="/#so-gehts" aria-label="Kontakt und Übergabe"><Icon name="chat" size={16} /><span>Kontakt & Übergabe</span></a>
+        </nav>
+        <nav class="market-nav" aria-label="Marktplatz">
+          <a href="/" class="market-nav-active">Marktplatz <small>{headerListings.length}</small></a>
+          {populatedCategories.map(category => <a href={`/anzeigen/?kategorie=${encodeURIComponent(category.name)}#dinge`}>{category.name}<small>{headerListings.filter(item => item.category === category.name).length}</small></a>)}
+        </nav>
+      </div>
+    </header>
     <slot />
-    <p id="saved-status" class="sr-only" role="status" aria-live="polite"></p>
-    <footer class="site-footer"><div class="container footer-inner"><div><a class="logo footer-logo" href="/">mein<span>haben.</span></a><p>Weniger bei mir. Mehr Freude bei dir.</p></div><div class="footer-note"><span>Ein kleiner, privater Marktplatz.</span><span>Von mir. Für euch. <Icon name="leaf" size={15} /></span></div></div></footer>
+    <footer class="site-footer container">
+      <div class="footer-columns">
+        <div><h2>Über meinhaben</h2><a href="/#so-gehts">Kontakt & Übergabe</a><p>Mein privater Marktplatz.<br />Von mir, für Freunde & Familie.</p></div>
+        <div><h2>Marktplatz</h2>{populatedCategories.map(category => <a href={`/anzeigen/?kategorie=${encodeURIComponent(category.name)}#dinge`}>{category.name}</a>)}</div>
+        <div><h2>Dein nächster Fund</h2><a href="/anzeigen/">Alle Anzeigen</a><a href="/anzeigen/?gratis=1#dinge">Zu verschenken</a></div>
+      </div>
+      <div class="footer-bottom"><a class="logo" href="/" aria-label="Meinhaben – Startseite"><Logo /></a><span>Heute noch meins. Vielleicht morgen schon deins.</span></div>
+    </footer>
   </body>
 </html>
-
-<script>
-  import "../scripts/favorites";
-</script>
