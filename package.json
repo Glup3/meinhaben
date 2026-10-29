@@ -15,16 +15,24 @@
     "astro": "astro",
     "pb:install": "node scripts/pocketbase.mjs install",
     "pb:dev": "node scripts/pocketbase.mjs serve --http=127.0.0.1:8090 --dev",
-    "pb": "node scripts/pocketbase.mjs"
+    "pb": "node scripts/pocketbase.mjs",
+    "test": "tsx --test src/components/react/*.test.tsx"
   },
   "dependencies": {
+    "@astrojs/react": "^7.1.2",
     "astro": "7.4.2",
-    "astro-loader-pocketbase": "4.0.8"
+    "astro-loader-pocketbase": "4.0.8",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
     "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "happy-dom": "^21.0.4",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5.9.3"
   }
 }

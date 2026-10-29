@@ -28,7 +28,7 @@ jobs:
             const end = '<!-- meinhaben-preview:end -->';
             const content = pr.state === 'closed'
               ? '### Preview environment\n\nThis PR is closed. Its preview environment is scheduled for removal.'
-              : `### Preview environment\n\n[Open preview](https://${pull_number}.meinhaben.ditto.glup3.dev)\n\nCoolify deploys this environment automatically. The link may be unavailable while deployment is running; it does not indicate deployment success.`;
+              : `### Preview environment\n\n[Open preview](https://${pull_number}.meinhaben.glup3.dev)\n\nCoolify deploys this environment automatically. The link may be unavailable while deployment is running; it does not indicate deployment success.`;
             const block = `${start}\n${content}\n${end}`;
             const body = pr.body || '';
             const blockPattern = /<!-- meinhaben-preview:start -->[\s\S]*?<!-- meinhaben-preview:end -->/g;
