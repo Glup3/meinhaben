@@ -209,7 +209,8 @@ persistent storage. Leave `POCKETBASE_INTERNAL_URL` unset for this independent
 resource. Nginx starts only after Astro successfully generates the complete
 site. A failed build cannot serve a partial site.
 
-Enable the HTTP readiness check on `/`, port 80, with a 60-second start period,
+Enable the HTTP readiness check on `/`, host `127.0.0.1`, port 80, with a
+60-second start period,
 5-second interval/timeout and 12 retries. Keep timestamped container names and
 no host port mappings so Coolify can run old and new containers together. Allow
 30 seconds for graceful shutdown; the Dockerfile uses Nginx's `SIGQUIT` signal.
