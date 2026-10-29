@@ -21,6 +21,8 @@
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+/* Contact links land directly at the section, including navigation from other pages. */
+html:has(#so-gehts:target) { scroll-behavior: auto; }
 body { margin: 0; }
 button, input, select, textarea { font: inherit; }
 button, a, input, select { -webkit-tap-highlight-color: transparent; }

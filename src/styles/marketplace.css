@@ -85,7 +85,7 @@
 .empty-state h3 { font-size: 18px; }
 .empty-state p { margin: 12px 0 20px; line-height: 1.6; }
 .how-section { border-top: 4px solid var(--brand); border-radius: 8px 8px 0 0; background: #eaf8ff; padding: 40px 32px; margin-block: 24px 0; }
-.how-section > h2 { text-align: center; margin-bottom: 32px; color: var(--navy); font-size: 28px; font-weight: 700; }
+.how-section > h2 { text-align: center; margin-bottom: 56px; color: var(--navy); font-size: 28px; font-weight: 700; }
 .how-intro { margin-bottom: 64px; }
 .how-intro h3 { font-size: 18px; margin-bottom: 8px; }
 .how-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
@@ -201,7 +201,7 @@
   .card-body h3 { font-size: 14px; }
   .free-price { font-size: 14px; }
   .how-section { padding: 28px 20px; margin-bottom: 0; }
-  .how-section > h2 { font-size: 25px; margin-bottom: 32px; }
+  .how-section > h2 { font-size: 25px; margin-bottom: 56px; }
   .how-columns { grid-template-columns: 1fr; gap: 28px; }
   .footer-columns { grid-template-columns: 1fr 1fr; gap: 24px; padding-inline: 0; }
   .footer-bottom { padding-inline: 0; gap: 16px; }
