@@ -8,12 +8,12 @@ export function getStaticPaths() {
 const { vertical } = Astro.props;
 ---
 <Layout title={`${vertical.name} – Meinhaben`} description={vertical.text}>
-  <main id="main" class="page-container vertical-main">
-    <section class={`vertical-hero vertical-${vertical.slug}`}>
-      <div class="vertical-copy"><p class="showcase-kicker">{vertical.name} · {vertical.kicker}</p><h1>{vertical.headline}</h1><p>{vertical.text}</p><a class="button" href={vertical.href}>{vertical.cta}<Icon name="right" size={18} /></a></div>
-      <div class="vertical-art" aria-hidden="true"><span>{vertical.symbol}</span><small>MEINHABEN<br />{vertical.name.toUpperCase()}</small></div>
+  <main id="main" class="w-[min(1440px,_calc(100%_-_2_*_var(--page-gutter)))] mx-auto pt-6 pb-12">
+    <section class="grid grid-cols-[1.6fr_1fr] bg-[#e9f7ff] text-[#083d84] mt-5.5 rounded-[6px] overflow-hidden [&[data-vertical=jobs]]:bg-[#f2ebff] [&[data-vertical=jobs]]:text-[#542695] [&[data-vertical=auto-motor]]:bg-[#e8f7ef] [&[data-vertical=auto-motor]]:text-[#225c43] max-[760px]:grid-cols-[1fr]" data-vertical={vertical.slug}>
+      <div data-ui="vertical-copy" class="py-11 px-9 [&_h1]:text-[clamp(30px,_4vw,_44px)] [&_h1]:font-extrabold [&_h1]:leading-[1.13] [&_h1]:tracking-[-1.4px] [&_h1]:mb-5.5 [&_>_p:not([data-ui~=showcase-kicker])]:text-[14px] [&_>_p:not([data-ui~=showcase-kicker])]:leading-[1.9] max-[760px]:py-7.5 max-[760px]:px-6"><p data-ui="showcase-kicker" class="text-[11px] font-bold uppercase tracking-[1.3px] mb-4.5 leading-[1.7]">{vertical.name} · {vertical.kicker}</p><h1>{vertical.headline}</h1><p>{vertical.text}</p><a class="inline-flex justify-center items-center gap-2 min-h-10 py-2.25 px-4 border border-transparent rounded-ui font-bold text-[14px] text-center [[data-ui~=vertical-copy]_&]:bg-[#093d96] [[data-ui~=vertical-copy]_&]:text-white [[data-ui~=vertical-copy]_&]:mt-7" href={vertical.href}>{vertical.cta}<Icon name="right" size={18} /></a></div>
+      <div class="flex flex-col items-center justify-center bg-[#19acf0] [transform:rotate(-6deg)_scale(1.12)] [&_>_span]:text-[140px] [&_>_span]:leading-[1.3] [&_small]:text-center [&_small]:font-extrabold [&_small]:tracking-[3px] [&_small]:text-[14px] [[data-vertical=jobs]_&]:bg-[#d0b1ff] [[data-vertical=auto-motor]_&]:bg-[#8bd4af] max-[760px]:min-h-45 max-[760px]:[transform:none] max-[760px]:[&_>_span]:text-[90px] max-[760px]:[&_small]:mb-5" aria-hidden="true"><span>{vertical.symbol}</span><small>MEINHABEN<br />{vertical.name.toUpperCase()}</small></div>
     </section>
-    <div class="vertical-facts">{vertical.facts.map((fact, index) => <div><span>0{index + 1}</span><p>{fact}</p></div>)}</div>
-    <div class="vertical-note"><Icon name={vertical.icon} size={28} /><div><h2>{vertical.stamp}</h2><p>Hier gibt’s nur einen kleinen Schmäh. Meine echten Sachen findest du am Marktplatz.</p></div></div>
+    <div class="grid grid-cols-[repeat(3,_1fr)] gap-6 py-7.5 px-0 [&_>_div]:border-b [&_>_div]:border-line [&_>_div]:pb-5.5 [&_span]:text-brand [&_span]:font-extrabold [&_span]:text-[24px] [&_p]:mt-2 [&_p]:leading-[1.6] max-[760px]:grid-cols-[1fr] max-[760px]:gap-4">{vertical.facts.map((fact, index) => <div><span>0{index + 1}</span><p>{fact}</p></div>)}</div>
+    <div class="flex items-center gap-4.5 bg-panel p-6 rounded-ui [&_svg]:text-brand [&_p]:mt-2 [&_p]:leading-[1.7] [&_p]:text-muted max-[760px]:items-start max-[760px]:p-5"><Icon name={vertical.icon} size={28} /><div><h2>{vertical.stamp}</h2><p>Hier gibt’s nur einen kleinen Schmäh. Meine echten Sachen findest du am Marktplatz.</p></div></div>
   </main>
 </Layout>
