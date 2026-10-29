@@ -13,27 +13,24 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
 - `src/content.config.ts`: public PocketBase loaders with explicit content schemas.
 - `src/data/listings.ts`: maps PocketBase records into the UI model, including
   category names, German condition labels, cents, paragraphs and ordered photos.
-- `src/pages/index.astro`: discovery homepage with category tiles and selected listings.
+- `src/pages/index.astro`: homepage with promotional carousel, vertical links, and selected listings.
 - `src/pages/anzeigen.astro`: live search, category and availability filters, price
   sorting, and empty states. Filters are preserved in the URL.
 - `src/pages/inserat/[slug].astro`: prebuilt listing pages with accessible photo
   dialogs, item details, related listings, and the WhatsApp contact message.
 - `src/styles/global.css` and `src/styles/marketplace.css`: responsive marketplace styling.
 
-The interface closely follows willhaben’s marketplace: an original MEINHABEN
-speech-bubble logo, locally hosted Open Sans, a compact cyan search strip,
-inventory-derived photo category tiles, and a category directory. Search results
-use a filter sidebar and list rows, with a working grid toggle. Item pages place
-the title above the gallery and price/contact panel. Only inventory categories
-and working controls are shown; there are no unrelated marketplace verticals.
+The interface follows willhaben’s marketplace with an original MEINHABEN
+speech-bubble logo, locally hosted Open Sans, linked vertical cards beneath the promotional banner. The homepage has a three-slide promotional carousel
+with arrows, automatic switching that pauses on hover or focus, and reduced-motion support.
+Immobilien, Auto & Motor, and Jobs link to individual humorous pages;
+these verticals contain no sale listings.
 
-The homepage has a compact search banner, category directory, and horizontal
-listing rails. Search, category tiles, and “Alle Anzeigen” open the
-dedicated `/anzeigen/` results page, which includes budget and condition filters
-and a quick filter for free items. Previously shared homepage
-filter URLs are forwarded to the results page with their query state intact. All filters are combined and
-preserved in the URL; reset clears them together. Listing pages support native sharing where available, with clipboard and visible
-link fallbacks. Existing availability, gallery and contact flows are preserved.
+The visible search bars have been removed. The Marktplatz card and “Alle Anzeigen”
+open `/anzeigen/`, which retains category, availability, budget and condition
+filters, sorting, and list/grid views. Previously shared search and homepage
+filter URLs still work, with their query state intact. Reset clears all filters.
+Listing pages support native sharing with clipboard and visible link fallbacks.
 
 The contact dialog links to the seller's WhatsApp username `glup3` through
 `https://wa.me/glup3` and provides a listing-specific message to copy into the chat.

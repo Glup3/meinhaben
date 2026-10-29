@@ -2,6 +2,9 @@
 interface Props { name: string; size?: number; class?: string; }
 const { name, size = 20, class: className } = Astro.props;
 const paths: Record<string, string> = {
+  market: 'M4 10h16v11H4zM8 10V6a4 4 0 0 1 8 0v4M9 17h6M1 14l3-4m16 0 3 4',
+  car: 'm4 9 2-5h12l2 5M3 9h18v10h-4v-3H7v3H3V9Zm0 6h18M6 12h2m8 0h2',
+  briefcase: 'M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 6h18v14H3V6Zm0 6c5 3 13 3 18 0M12 12v4',
   star: 'm12 3 2.8 5.7 6.3.9-4.5 4.4 1.1 6.2-5.7-3-5.7 3 1.1-6.2L2.9 9.6l6.3-.9L12 3Z',
   list: 'M8 5h13M8 12h13M8 19h13M3 5h1M3 12h1M3 19h1',
   menu: 'M3 6h18M3 12h18M3 18h18',

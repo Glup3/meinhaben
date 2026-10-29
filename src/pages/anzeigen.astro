@@ -10,14 +10,6 @@ const categories = categoryRecords.map(category => category.name).filter(categor
 <Layout title="Anzeigen suchen – Meinhaben">
   <main id="main" class="container home-main results-main">
     <div class="marketplace-title"><h1>Anzeigen suchen</h1><span>{listings.length} Anzeigen</span></div>
-    <section class="search-banner" aria-label="Anzeigen suchen">
-      <form role="search" class="search-form" id="search-form">
-        <label class="sr-only" for="search">Anzeigen durchsuchen</label>
-        <input id="search" type="search" name="q" placeholder="Was suchst du?" autocomplete="off" />
-        <button type="submit" aria-label="Suchen"><Icon name="search" size={22} /></button>
-      </form>
-      <div class="search-slogan"><strong>MEINHABEN</strong><span>EINFACH FINDEN UND<br />WEITERGEBEN</span></div>
-    </section>
     <section class="listings-section" id="dinge" aria-labelledby="listings-heading">
       <div class="listings-heading"><h2 id="listings-heading" tabindex="-1">Alle Anzeigen <span id="result-count" role="status" aria-live="polite">({listings.length})</span></h2><div class="view-switch" role="group" aria-label="Darstellung"><button data-view="list" aria-label="Listenansicht" aria-pressed="true"><Icon name="list" size={20} /></button><button data-view="grid" aria-label="Rasteransicht" aria-pressed="false"><Icon name="grid" size={18} /></button></div></div>
       <div class="results-layout">
@@ -38,7 +30,7 @@ const categories = categoryRecords.map(category => category.name).filter(categor
   </main>
 </Layout>
 <script>
-  const search = document.querySelector<HTMLInputElement>('#search')!;
+  const search = { value: '' };
   const available = document.querySelector<HTMLInputElement>('#available-only')!;
   const sort = document.querySelector<HTMLSelectElement>('#sort')!;
   const grid = document.querySelector<HTMLElement>('#listing-grid')!;
@@ -103,10 +95,9 @@ const categories = categoryRecords.map(category => category.name).filter(categor
     grid.classList.toggle('list-view', list);
     document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(control => control.setAttribute('aria-pressed', String(control === button)));
   }));
-  search.addEventListener('input', update);
   available.addEventListener('change', update);
   sort.addEventListener('change', update);
-  document.querySelector('#search-form')!.addEventListener('submit', event => { event.preventDefault(); update(); document.querySelector('#dinge')!.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+
   document.querySelector('#clear-search')!.addEventListener('click', resetFilters);
   document.querySelector('#reset-filters')!.addEventListener('click', resetFilters);
   window.addEventListener('pageshow', restore);

@@ -1,44 +1,19 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import AdCarousel from '../components/AdCarousel.astro';
+import VerticalBoxes from '../components/VerticalBoxes.astro';
 import Icon from '../components/Icon.astro';
 import ListingCard from '../components/ListingCard.astro';
-import { getListings, getCategories } from '../data/listings';
-const [listings, categoryRecords] = await Promise.all([getListings(), getCategories()]);
+import { getListings } from '../data/listings';
+const listings = await getListings();
 const latest = listings.filter(item => item.status === "available" && item.price > 0).slice(0, 4);
 const freeListings = listings.filter(item => item.status === "available" && item.price === 0).slice(0, 4);
-const categories = categoryRecords.map(category => category.name).filter(category => listings.some(item => item.category === category));
-const categoryPhotos = Object.fromEntries(categories.map(category => [category, listings.find(item => item.category === category && item.status === "available") || listings.find(item => item.category === category)!]));
-const freeItem = listings.find(item => item.price === 0 && item.status === "available");
-const categoryIcons = Object.fromEntries(categoryRecords.map(category => [category.name, category.icon]));
 ---
 <Layout>
   <main id="main" class="container home-main">
     <div class="marketplace-title"><h1>Der vermutlich kleinste Marktplatz Österreichs</h1><span>{listings.length} Anzeigen</span></div>
-    <section class="search-banner" aria-label="Anzeigen suchen">
-      <form role="search" class="search-form" id="search-form" action="/anzeigen/" method="get">
-        <label class="sr-only" for="search">Anzeigen durchsuchen</label>
-        <input id="search" type="search" name="q" placeholder="Was suchst du?" autocomplete="off" />
-        <button type="submit" aria-label="Suchen"><Icon name="search" size={22} /></button>
-      </form>
-      <div class="search-slogan"><strong>MEINHABEN</strong><span>EINFACH FINDEN UND<br />WEITERGEBEN</span></div>
-    </section>
-    <div id="category-discovery">
-      <section class="category-section" aria-labelledby="category-heading">
-        <h2 id="category-heading" class="section-label">Kategorien, die du hier findest</h2>
-        <div class="category-tiles">
-          {categories.map(category => <a class="category-tile" href={`/anzeigen/?kategorie=${encodeURIComponent(category)}`}><img src={categoryPhotos[category].image} alt="" width="200" height="170" loading="eager" /><span>{category}</span></a>)}
-          {freeItem && <a class="category-tile" href="/anzeigen/?gratis=1"><img src={freeItem.image} alt="" width="200" height="170" loading="eager" /><span>Zu verschenken</span></a>}
-        </div>
-      </section>
-      <section class="category-directory" aria-labelledby="all-categories-heading">
-        <div><h2 class="section-label" id="all-categories-heading">Alle Kategorien</h2><div class="category-links">
-          {categories.map(category => <a href={`/anzeigen/?kategorie=${encodeURIComponent(category)}`}><Icon name={categoryIcons[category]} size={22} /><span>{category}</span><small>{listings.filter(item => item.category === category).length}</small></a>)}
-          <a href="/anzeigen/?gratis=1"><Icon name="box" size={22} /><span>Zu verschenken</span><small>{listings.filter(item => item.price === 0).length}</small></a>
-          <a href="/anzeigen/"><Icon name="grid" size={22} /><span>Alle Anzeigen</span><small>{listings.length}</small></a>
-        </div></div>
-        <aside class="private-market-card"><h2>Meine Sachen auf meinhaben</h2><div><p>Gute Dinge suchen ein neues Zuhause. Einfach stöbern und mir schreiben.</p><a class="button outline" href="#so-gehts">So funktioniert’s</a></div><a class="private-card-footer" href="/anzeigen/"><Icon name="home" size={20} />Zu meinen Anzeigen<Icon name="right" size={15} /></a></aside>
-      </section>
-    </div>
+    <AdCarousel />
+    <VerticalBoxes />
     <section class="home-picks" id="dinge" aria-labelledby="new-heading">
       <div class="home-section-heading"><h2 id="new-heading" class="section-label">Frisch auf meinhaben</h2><a href="/anzeigen/">Alle Anzeigen <Icon name="right" size={15} /></a></div>
       <div class="home-listing-rail">{latest.map(listing => <ListingCard listing={listing} />)}</div>

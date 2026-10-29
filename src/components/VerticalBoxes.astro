@@ -1,0 +1,15 @@
+---
+import Icon from './Icon.astro';
+const boxes = [
+  { name: 'Marktplatz', href: '/anzeigen/', icon: 'market', text: 'Gute Dinge finden – am vermutlich kleinsten Marktplatz Österreichs.' },
+  { name: 'Immobilien', href: '/immobilien/', icon: 'home', text: 'Dein neues Zuhause? Ich hätte erst mal einen Sessel.' },
+  { name: 'Auto & Motor', href: '/auto-motor/', icon: 'car', text: 'Große Gefühle. Kleiner Fuhrpark. Bitte anschnallen.' },
+  { name: 'Jobs', href: '/jobs/', icon: 'briefcase', text: 'Du suchst einen neuen Job? Ich suche jemanden zum Abholen.' },
+];
+---
+<nav class="vertical-boxes" aria-label="Unsere Bereiche">
+  {boxes.map(box => <a class="vertical-box" href={box.href}>
+    <div class="vertical-box-heading"><Icon name={box.icon} size={32} /><h2>{box.name}</h2></div>
+    <p>{box.text}</p>
+  </a>)}
+</nav>
