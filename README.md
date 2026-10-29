@@ -13,7 +13,7 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
 - `src/content.config.ts`: public PocketBase loaders with explicit content schemas.
 - `src/data/listings.ts`: maps PocketBase records into the UI model, including
   category names, German condition labels, cents, paragraphs and ordered photos.
-- `src/pages/index.astro`: homepage with promotional carousel, vertical links, and selected listings.
+- `src/pages/index.astro`: homepage with featured carousel, vertical links, and selected listings.
 - `src/pages/anzeigen.astro`: live search, category and availability filters, price
   sorting, and empty states. Filters are preserved in the URL.
 - `src/pages/inserat/[slug].astro`: prebuilt listing pages with accessible photo
@@ -21,7 +21,7 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
 - `src/styles/global.css` and `src/styles/marketplace.css`: responsive marketplace styling.
 
 The interface follows willhaben’s marketplace with an original MEINHABEN
-speech-bubble logo, locally hosted Open Sans, linked vertical cards beneath the promotional banner. The homepage has a three-slide promotional carousel
+speech-bubble logo, locally hosted Open Sans, linked vertical cards beneath the featured carousel. The homepage has a three-slide featured carousel
 with arrows, automatic switching that pauses on hover or focus, and reduced-motion support.
 Immobilien, Auto & Motor, and Jobs link to individual humorous pages;
 these verticals contain no sale listings.

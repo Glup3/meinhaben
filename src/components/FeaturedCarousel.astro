@@ -6,14 +6,14 @@ const slides = [
   { label: 'Exklusiv für Menschen mit Humor', title: 'Traumimmobilie?\nFast. Ein Sessel.', cta: 'Immobilien entdecken', href: '/immobilien/', photos: ['sessel.jpg', 'lampe.jpg', 'pflanze.jpg', 'buecher.jpg'], theme: 'orange', tag: 'LAGE, LAGE, SITZLAGE.' },
 ];
 ---
-<section class="ad-carousel" aria-label="Meinhaben Empfehlungen" aria-roledescription="Karussell" data-carousel>
-  <div class="promo-slides">
-    {slides.map((slide, index) => <article class={`promo-slide promo-${slide.theme}`} hidden={index !== 0} aria-roledescription="Folie" aria-label={`${index + 1} von ${slides.length}`} data-slide>
-      <div class="promo-collage" aria-hidden="true">{slide.photos.map((photo, i) => <img class={`promo-object object-${i}`} src={`/images/${photo}`} alt="" width="220" height="220" loading="eager" />)}<span class="promo-sticker">{slide.tag}</span></div>
-      <div class="promo-copy"><p class="promo-kicker">{slide.label}</p><h2>{slide.title}</h2><a href={slide.href}>{slide.cta}<Icon name="arrow" size={24} /></a><small>Eine kleine Eigenwerbung. Mit großen Gefühlen.</small></div>
+<section class="featured-carousel" aria-label="Meinhaben Empfehlungen" aria-roledescription="Karussell" data-carousel>
+  <div class="showcase-slides">
+    {slides.map((slide, index) => <article class={`showcase-slide showcase-${slide.theme}`} hidden={index !== 0} aria-roledescription="Folie" aria-label={`${index + 1} von ${slides.length}`} data-slide>
+      <div class="showcase-collage" aria-hidden="true">{slide.photos.map((photo, i) => <img class={`showcase-object object-${i}`} src={`/images/${photo}`} alt="" width="220" height="220" loading="eager" />)}<span class="showcase-sticker">{slide.tag}</span></div>
+      <div class="showcase-copy"><p class="showcase-kicker">{slide.label}</p><h2>{slide.title}</h2><a href={slide.href}>{slide.cta}<Icon name="arrow" size={24} /></a><small>Gute Dinge. Kleine Geschichten. Große Gefühle.</small></div>
     </article>)}
-    <button class="promo-arrow promo-prev" aria-label="Vorherige Empfehlung" data-prev><Icon name="left" size={30} /></button>
-    <button class="promo-arrow promo-next" aria-label="Nächste Empfehlung" data-next><Icon name="right" size={30} /></button>
+    <button class="showcase-arrow showcase-prev" aria-label="Vorherige Empfehlung" data-prev><Icon name="left" size={30} /></button>
+    <button class="showcase-arrow showcase-next" aria-label="Nächste Empfehlung" data-next><Icon name="right" size={30} /></button>
   </div>
   <p class="sr-only" aria-live="polite" data-status></p>
 </section>
