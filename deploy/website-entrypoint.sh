@@ -9,5 +9,5 @@ if [ -n "${SERVICE_NAME_POCKETBASE:-}" ]; then
   export POCKETBASE_INTERNAL_URL="http://${SERVICE_NAME_POCKETBASE}:8090"
 fi
 
-npm run build
+pnpm run build
 exec nginx -g 'daemon off;'

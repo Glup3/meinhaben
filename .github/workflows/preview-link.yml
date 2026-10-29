@@ -1,0 +1,40 @@
+name: Preview environment link
+
+on:
+  pull_request_target:
+    types: [opened, reopened, synchronize, closed]
+
+permissions:
+  pull-requests: write
+
+concurrency:
+  group: preview-link-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+jobs:
+  update-description:
+    # Match Coolify's repository-members-only preview policy.
+    if: contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      # No checkout: this privileged workflow never executes pull-request code.
+      - uses: actions/github-script@v8
+        with:
+          script: |
+            const { owner, repo } = context.repo;
+            const pull_number = context.payload.pull_request.number;
+            const { data: pr } = await github.rest.pulls.get({ owner, repo, pull_number });
+            const start = '<!-- meinhaben-preview:start -->';
+            const end = '<!-- meinhaben-preview:end -->';
+            const content = pr.state === 'closed'
+              ? '### Preview environment\n\nThis PR is closed. Its preview environment is scheduled for removal.'
+              : `### Preview environment\n\n[Open preview](https://${pull_number}.meinhaben.ditto.glup3.dev)\n\nCoolify deploys this environment automatically. The link may be unavailable while deployment is running; it does not indicate deployment success.`;
+            const block = `${start}\n${content}\n${end}`;
+            const body = pr.body || '';
+            const blockPattern = /<!-- meinhaben-preview:start -->[\s\S]*?<!-- meinhaben-preview:end -->/g;
+            const updated = blockPattern.test(body)
+              ? body.replace(blockPattern, () => block)
+              : `${body}${body ? '\n\n' : ''}${block}`;
+            if (updated !== body) {
+              await github.rest.pulls.update({ owner, repo, pull_number, body: updated });
+            }
