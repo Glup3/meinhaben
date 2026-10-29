@@ -11,7 +11,7 @@ const freeListings = listings.filter(item => item.status === "available" && item
 ---
 <Layout>
   <main id="main" class="w-[min(1440px,_calc(100%_-_2_*_var(--page-gutter)))] mx-auto pt-4.25 max-[760px]:pt-0">
-    <div class="flex items-baseline gap-1.5 mb-2.5 [&_h1]:text-brand [&_h1]:text-[16px] [&_h1]:font-bold [&_>_span]:text-[14px] [&_>_span]:border-l [&_>_span]:border-muted [&_>_span]:pl-1.5 max-[760px]:absolute max-[760px]:w-0.25 max-[760px]:h-0.25 max-[760px]:overflow-hidden max-[760px]:whitespace-nowrap max-[760px]:[clip-path:inset(100%)]"><h1>Der vermutlich kleinste Marktplatz Österreichs</h1><span>{listings.length} Anzeigen</span></div>
+    <div class="flex items-baseline gap-1.5 mb-2.5 [&_h1]:text-brand [&_h1]:text-[16px] [&_h1]:font-bold [&_>_span]:text-[14px] [&_>_span]:pl-1.5 max-[760px]:absolute max-[760px]:w-0.25 max-[760px]:h-0.25 max-[760px]:overflow-hidden max-[760px]:whitespace-nowrap max-[760px]:[clip-path:inset(100%)]"><h1>Der vermutlich kleinste Marktplatz Österreichs</h1><span>{listings.length} Anzeigen</span></div>
     <FeaturedCarousel />
     <VerticalBoxes />
     <section class="py-6 px-4 max-[760px]:py-6 max-[760px]:px-0" id="dinge" aria-labelledby="new-heading">
