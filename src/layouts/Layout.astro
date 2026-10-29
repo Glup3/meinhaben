@@ -47,7 +47,7 @@ const imageURL = new URL(image, Astro.site!);
   </head>
   <body>
     <a href="#main" class="skip-link">Zum Inhalt springen</a>
-    <header class="site-header container">
+    <header class="site-header page-container">
       <div class="header-inner">
         <span class="nav-hover-oval" aria-hidden="true"></span>
         <a class="logo" href="/" aria-label="Meinhaben – Startseite"><Logo /></a>
@@ -58,14 +58,14 @@ const imageURL = new URL(image, Astro.site!);
       </div>
     </header>
     <slot />
-    <footer class="site-footer container">
+    <footer class="site-footer page-container">
       <div class="footer-columns">
         <div><h2>Über meinhaben</h2><a href="/#so-gehts">Kontakt & Übergabe</a></div>
         <div><h2>Marktplatz</h2>{populatedCategories.map(category => <a href={`/anzeigen/?kategorie=${encodeURIComponent(category.name)}#dinge`}>{category.name}</a>)}</div>
         <div><h2>Auch noch da</h2>{verticals.map(vertical => <a href={`/${vertical.slug}/`}>{vertical.name}</a>)}</div>
         <div><h2>Dein nächster Fund</h2><a href="/anzeigen/">Alle Anzeigen</a><a href="/anzeigen/?gratis=1#dinge">Zu verschenken</a></div>
       </div>
-      <div class="footer-bottom"><div class="footer-message"><p class="footer-motto">Meine Sachen = Dein nächstes Lieblingsstück!</p><p class="footer-about">Mein privater Marktplatz.<br />Von mir, für Freunde & Familie.</p></div><a class="logo footer-logo" href="/" aria-label="Meinhaben – Startseite"><DittoOutline /><Logo /></a><span>Heute noch meins. Vielleicht morgen schon deins.</span></div>
+      <div class="footer-bottom"><div class="footer-message basis-full shrink-0 grow-0 mb-4 text-center"><p class="footer-motto">Meine Sachen = Dein nächstes Lieblingsstück!</p><p class="footer-about">Mein privater Marktplatz.<br />Von mir, für Freunde & Familie.</p></div><a class="logo footer-logo" href="/" aria-label="Meinhaben – Startseite"><DittoOutline /><Logo /></a><span>Heute noch meins. Vielleicht morgen schon deins.</span></div>
     </footer>
   </body>
 </html>

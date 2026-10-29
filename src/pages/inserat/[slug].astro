@@ -16,7 +16,7 @@ const related = listings.filter(item => item.slug !== listing.slug && item.statu
 const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Meinhaben. Ist das noch zu haben?`;
 ---
 <Layout title={`${listing.title} – Meinhaben`} description={listing.description[0]} image={listing.image} imageAlt={listing.imageAlt}>
-  <main id="main" class="container detail-main">
+  <main id="main" class="page-container detail-main">
     <nav class="breadcrumb" aria-label="Brotkrümelnavigation"><a href="/">Startseite</a><Icon name="right" /><a href={`/anzeigen/?kategorie=${encodeURIComponent(listing.category)}#dinge`}>{listing.category}</a><Icon name="right" /><span aria-current="page">{listing.title}</span></nav>
     <div class="detail-heading"><h1 id="listing-title">{listing.title}</h1><div class="detail-actions"><button type="button" class="share-button" id="share-listing" aria-label="Anzeige teilen"><Icon name="share" size={19} /><span class="share-label">Teilen</span></button></div></div>
     {listing.subtitle && listing.subtitle !== listing.title && <p class="detail-subtitle">{listing.subtitle}</p>}
@@ -30,7 +30,7 @@ const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Mein
       </section>
       <section class="detail-info" aria-label="Preis und Kontakt">
         <div class="detail-price"><strong>{formatPrice(listing.price)}</strong><small>{listing.price === 0 ? 'Zu verschenken' : listing.negotiable ? 'Verhandlungsbasis' : 'Verkaufspreis'}</small></div>
-        <span class:list={['availability-badge', listing.status]}><span class="status-dot"></span>{statusLabels[listing.status]}</span>
+        <span class:list={['availability-badge', listing.status]}><span class="status-dot size-1.5 rounded-full bg-current"></span>{statusLabels[listing.status]}</span>
         {listing.status === 'reserved' && <p class="reserved-note">Schon reserviert. Du kannst mir trotzdem schreiben, falls es doch wieder frei wird.</p>}
         {listing.status === 'sold' && <p class="sold-note">Dieses Stück ist schon vergeben. Schau dir gerne meine anderen Anzeigen an.</p>}
         <button class="button primary contact-button" id="contact-button" aria-haspopup="dialog" aria-controls="contact-dialog" disabled={listing.status === 'sold'}><Icon name={listing.status === 'sold' ? 'check' : 'chat'} size={19} />{listing.status === 'sold' ? 'Bereits vergeben' : 'Nachricht'}</button>
@@ -46,7 +46,7 @@ const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Mein
     <section class="related-section" aria-labelledby="related-heading"><div class="related-heading"><h2 id="related-heading">Weitere Anzeigen von mir</h2><a href="/anzeigen/" class="text-link all-listings-link">Alle Anzeigen <Icon name="arrow" size={17} /></a></div><div class="listing-grid">{related.map(item => <ListingCard listing={item} />)}</div></section>
   </main>
   <dialog id="contact-dialog" class="dialog" aria-labelledby="contact-heading" aria-describedby="contact-description">
-    <button class="dialog-close" data-close-dialog aria-label="Kontaktfenster schließen"><Icon name="close" size={18} /></button><div class="dialog-icon"><Icon name="chat" size={27} /></div><div class="section-kicker">Ganz persönlich</div><h2 id="contact-heading">Schreib mir einfach auf WhatsApp.</h2><p id="contact-description">Du findest mich als @glup3 auf WhatsApp. Sag mir, welches Stück dich interessiert, und wir besprechen alles Weitere.</p>
+    <button class="dialog-close" data-close-dialog aria-label="Kontaktfenster schließen"><Icon name="close" size={18} /></button><div class="dialog-icon text-brand mb-3.5"><Icon name="chat" size={27} /></div><div class="section-kicker">Ganz persönlich</div><h2 id="contact-heading">Schreib mir einfach auf WhatsApp.</h2><p id="contact-description">Du findest mich als @glup3 auf WhatsApp. Sag mir, welches Stück dich interessiert, und wir besprechen alles Weitere.</p>
     <div class="message-preview"><label for="contact-message">Deine Nachricht könnte so aussehen</label><textarea id="contact-message" readonly rows="3">{message}</textarea></div><a class="button primary dialog-whatsapp" href="https://wa.me/glup3"><Icon name="chat" size={17} />WhatsApp öffnen<Icon name="arrow" size={17} /></a><button class="button secondary dialog-copy" id="copy-message"><Icon name="copy" size={17} /><span>Nachricht kopieren</span></button><p class="copy-status" id="copy-status" role="status" aria-live="polite"></p>
   </dialog>
   <dialog id="lightbox" class="dialog lightbox" aria-label="Artikelfoto in Großansicht"><button class="dialog-close" data-close-dialog aria-label="Großansicht schließen"><Icon name="close" size={18} /></button><img id="lightbox-image" class="lightbox-image" src={photos[0].src} alt={photos[0].alt} width="1200" height="1200" /><div class="lightbox-caption"><span id="lightbox-count" aria-live="polite">Foto 1 von {photos.length}</span>{photos.length > 1 && <div class="lightbox-nav"><button id="previous-photo" aria-label="Vorheriges Foto"><Icon name="left" size={17} /></button><button id="next-photo" aria-label="Nächstes Foto"><Icon name="right" size={17} /></button></div>}</div></dialog>
@@ -102,9 +102,13 @@ const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Mein
 </script>
 
 <style>
-  .detail-info .availability-badge { margin-top: 12px; }
-  .detail-subtitle { color: var(--muted); margin: 4px 0 12px; font-size: 16px; line-height: 1.5; }
-  .seller-profile { margin: 16px 0 0; padding-top: 12px; }
-  .seller-avatar { width: 40px; height: 40px; }
-  .handover-note { font-size: 14px; }
+  @reference "../../styles/global.css";
+
+  @layer components {
+    .detail-info .availability-badge { @apply mt-3; }
+    .detail-subtitle { @apply text-muted mt-1 mx-0 mb-3 text-[16px] leading-[1.5]; }
+    .seller-profile { @apply mt-4 mx-0 mb-0 pt-3; }
+    .seller-avatar { @apply w-10 h-10; }
+    .handover-note { @apply text-[14px]; }
+  }
 </style>

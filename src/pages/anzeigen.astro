@@ -8,7 +8,7 @@ const conditions = [...new Set(listings.map(item => item.condition))];
 const categories = categoryRecords.map(category => category.name).filter(category => listings.some(item => item.category === category));
 ---
 <Layout title="Anzeigen suchen – Meinhaben">
-  <main id="main" class="container home-main results-main">
+  <main id="main" class="page-container home-main results-main">
     <div class="marketplace-title"><h1>Anzeigen suchen</h1><span>{listings.length} Anzeigen</span></div>
     <section class="listings-section" id="dinge" aria-labelledby="listings-heading">
       <form class="results-search" role="search" id="listing-search-form">
@@ -114,30 +114,34 @@ const categories = categoryRecords.map(category => category.name).filter(categor
 </script>
 
 <style>
-  .results-search { margin: 20px 0 16px; }
-  .results-search > label { display: block; font-weight: 600; margin-bottom: 8px; }
-  .search-entry { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: var(--radius); padding: 6px 6px 6px 14px; background: white; }
-  .search-entry input { flex: 1; width: 100%; min-width: 0; border: 0; background: transparent; font: inherit; min-height: 44px; }
-  .search-entry .button { min-height: 44px; }
-  .browse-filters { margin-bottom: 20px; }
-  .category-filters { display: flex; flex-wrap: wrap; gap: 8px; padding: 0; }
-  .filter-chip { width: auto; min-height: 44px; padding: 8px 12px; border: 1px solid var(--line); border-radius: var(--radius); }
-  .filter-chip.active { background: var(--panel); border-color: var(--brand); }
-  .additional-filters { margin-top: 12px; }
-  .additional-filters summary { cursor: pointer; width: fit-content; padding: 10px 0; font-size: 14px; font-weight: 600; }
-  .filter-options { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 20px; padding: 12px 0; }
-  .condition-control, .price-control { display: grid; gap: 6px; font-size: 13px; }
-  .filter-options select, .price-control input { min-height: 44px; max-width: 220px; border: 1px solid var(--line); border-radius: var(--radius); padding: 8px; background: white; font: inherit; }
-  .availability-toggle { padding: 0; font-size: 13px; }
-  .quick-filter { width: auto; min-height: 44px; border: 1px solid var(--line); border-radius: var(--radius); }
-  .results-toolbar { flex-wrap: wrap; padding: 0 0 12px; }
-  .results-toolbar h2 { font-size: 20px; }
-  .result-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
-  #clear-search { background: transparent; color: var(--brand-dark); min-height: 44px; font-size: 13px; }
-  .sort-label select { min-height: 44px; font-size: 13px; }
-  .view-switch button { width: 44px; height: 44px; border: 1px solid var(--line); border-radius: var(--radius); }
-  .view-switch button[aria-pressed=true] { background: var(--panel); }
-  .active-search { padding-left: 0; }
-  .listing-end { margin-top: 24px; }
-  @media (max-width: 480px) { .search-entry { gap: 6px; } .search-entry .button { padding-inline: 12px; } .result-controls { gap: 8px; width: 100%; } .sort-label { margin-left: auto; } }
+  @reference "../styles/global.css";
+
+  @layer components {
+    .results-search { @apply mt-5 mx-0 mb-4; }
+    .results-search > label { @apply block font-semibold mb-2; }
+    .search-entry { @apply flex items-center gap-3 border border-line rounded-ui pt-1.5 pr-1.5 pb-1.5 pl-3.5 bg-white; }
+    .search-entry input { @apply flex-1 w-full min-w-0 border-0 bg-transparent min-h-11; font: inherit; }
+    .search-entry .button { @apply min-h-11; }
+    .browse-filters { @apply mb-5; }
+    .category-filters { @apply flex flex-wrap gap-2 p-0; }
+    .filter-chip { @apply w-auto min-h-11 py-2 px-3 border border-line rounded-ui; }
+    .filter-chip.active { @apply bg-panel border-brand; }
+    .additional-filters { @apply mt-3; }
+    .additional-filters summary { @apply cursor-pointer w-fit py-2.5 px-0 text-[14px] font-semibold; }
+    .filter-options { @apply flex flex-wrap items-end gap-y-3 gap-x-5 py-3 px-0; }
+    .condition-control, .price-control { @apply grid gap-1.5 text-[13px]; }
+    .filter-options select, .price-control input { @apply min-h-11 max-w-55 border border-line rounded-ui p-2 bg-white; font: inherit; }
+    .availability-toggle { @apply p-0 text-[13px]; }
+    .quick-filter { @apply w-auto min-h-11 border border-line rounded-ui; }
+    .results-toolbar { @apply flex-wrap pt-0 px-0 pb-3; }
+    .results-toolbar h2 { @apply text-[20px]; }
+    .result-controls { @apply flex flex-wrap items-center gap-3; }
+    #clear-search { @apply bg-transparent text-brand-dark min-h-11 text-[13px]; }
+    .sort-label select { @apply min-h-11 text-[13px]; }
+    .view-switch button { @apply w-11 h-11 border border-line rounded-ui; }
+    .view-switch button[aria-pressed=true] { @apply bg-panel; }
+    .active-search { @apply pl-0; }
+    .listing-end { @apply mt-6; }
+    @media (max-width: 480px) { .search-entry { @apply gap-1.5; } .search-entry .button { @apply px-3; } .result-controls { @apply gap-2 w-full; } .sort-label { @apply ml-auto; } }
+  }
 </style>
