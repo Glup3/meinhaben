@@ -15,7 +15,7 @@ const slides = [
     label: "Unbezahlbar günstig",
     title: "Die besten Dinge\nkosten manchmal nichts.",
     cta: "Zu verschenken entdecken",
-    href: "/anzeigen/?gratis=1",
+    href: "/anzeigen/",
     photos: ["buecher.jpg", "pflanze.jpg", "kaffee.jpg", "sessel.jpg"],
     theme: "purple",
     tag: "0 EURO. VIEL FREUDE.",

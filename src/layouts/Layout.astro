@@ -60,9 +60,9 @@ const imageURL = new URL(image, Astro.site!);
     <footer class="w-[min(1440px,_calc(100%_-_2_*_var(--page-gutter)))] mx-auto">
       <div class="[&_a:hover]:underline grid grid-cols-[repeat(4,_max-content)] justify-center gap-8 py-5 px-4 text-center [&_h2]:text-[14px] [&_h2]:mb-2.5 [&_a]:block [&_a]:text-[13px] [&_a]:leading-[2] max-[760px]:grid-cols-[1fr_1fr] max-[760px]:gap-6 max-[760px]:px-0">
         <div><h2>Über meinhaben</h2><a href="/#so-gehts">Kontakt & Übergabe</a></div>
-        <div><h2>Marktplatz</h2>{populatedCategories.map(category => <a href={`/anzeigen/?kategorie=${encodeURIComponent(category.name)}#dinge`}>{category.name}</a>)}</div>
+        <div><h2>Marktplatz</h2>{populatedCategories.map(category => <a href="/anzeigen/#dinge">{category.name}</a>)}</div>
         <div><h2>Auch noch da</h2>{verticals.map(vertical => <a href={`/${vertical.slug}/`}>{vertical.name}</a>)}</div>
-        <div><h2>Dein nächster Fund</h2><a href="/anzeigen/">Alle Anzeigen</a><a href="/anzeigen/?gratis=1#dinge">Zu verschenken</a></div>
+        <div><h2>Dein nächster Fund</h2><a href="/anzeigen/">Alle Anzeigen</a><a href="/anzeigen/#dinge">Zu verschenken</a></div>
       </div>
       <div data-ui="footer-bottom" class="flex flex-wrap items-center justify-between gap-5 pt-6 px-4 pb-4 text-[11px] text-muted max-[760px]:px-0 max-[760px]:gap-4 max-[760px]:[&_>_span]:max-w-42.5 max-[760px]:[&_>_span]:text-right"><div class="basis-full shrink-0 grow-0 mb-4 text-center"><p class="mt-0 mx-0 mb-3 text-center text-navy text-[18px] font-semibold leading-[1.6]">Meine Sachen = Dein nächstes Lieblingsstück!</p><p class="text-[12px] leading-[1.7] text-muted">Mein privater Marktplatz.<br />Von mir, für Freunde & Familie.</p></div><a data-ui="footer-logo" class="block w-33 relative isolate [[data-ui~=header-inner]_>_&]:relative [[data-ui~=header-inner]_>_&]:z-1 [[data-ui~=header-inner]_>_&]:self-center [[data-ui~=header-inner]_>_&]:[grid-row:1] [[data-ui~=header-inner]_>_&]:[transform:translateY(10.294%)] [[data-ui~=footer-bottom]_&]:w-27.5 max-[760px]:[[data-ui~=header-inner]_>_&]:w-30 max-[760px]:[[data-ui~=header-inner]_>_&]:m-0 max-[760px]:[[data-ui~=header-inner]_>_&]:[grid-row:1]" href="/" aria-label="Meinhaben – Startseite"><DittoOutline /><Logo /></a><span>Heute noch meins. Vielleicht morgen schon deins.</span></div>
     </footer>
