@@ -6,7 +6,7 @@ const marketActive = pathname === '/anzeigen' || pathname.startsWith('/inserat/'
 ---
 <header class="w-[min(1440px,_calc(100%_-_2_*_var(--page-gutter)))] mx-auto">
   <div data-ui="header-inner" class="relative isolate grid grid-cols-[132px_minmax(0,_1fr)] grid-rows-[90px] gap-y-0 gap-x-10 max-[760px]:grid-cols-[120px_minmax(0,_1fr)] max-[760px]:grid-rows-[64px_46px] max-[760px]:gap-y-0 max-[760px]:gap-x-3">
-    <span data-nav-oval class="absolute top-0 left-0 z-0 rounded-[999px] border-2 border-brand bg-panel pointer-events-none opacity-0 [transition:transform_150ms_ease-out,_opacity_100ms_ease-out]" aria-hidden="true"></span>
+    <span data-nav-oval class="absolute top-0 left-0 z-0 rounded-[999px] bg-panel pointer-events-none opacity-0 [transition:transform_150ms_ease-out,_opacity_100ms_ease-out]" aria-hidden="true"></span>
     <a data-header-logo class="block w-33 [[data-ui~=header-inner]_>_&]:relative [[data-ui~=header-inner]_>_&]:z-1 [[data-ui~=header-inner]_>_&]:self-center [[data-ui~=header-inner]_>_&]:[grid-row:1] [[data-ui~=header-inner]_>_&]:[transform:translateY(10.294%)] max-[760px]:[[data-ui~=header-inner]_>_&]:w-30 max-[760px]:[[data-ui~=header-inner]_>_&]:m-0 max-[760px]:[[data-ui~=header-inner]_>_&]:[grid-row:1]" href="/" aria-label="Meinhaben – Startseite"><Logo /></a>
     <nav data-market-nav class="grid grid-cols-[repeat(4,_max-content)] justify-self-end [grid-column:2] [&_a]:relative [&_a]:z-1 [&_a]:flex [&_a]:items-center [&_a]:justify-center [&_a]:gap-2 [&_a]:py-3.5 [&_a]:uppercase [&_a]:border-b-4 [&_a]:border-transparent [&_a]:whitespace-nowrap [&_a]:font-semibold [&_a]:px-3 [&_a]:text-[13px] [&_small]:text-muted [&_small]:text-[11px] [&_small]:font-normal [&_[aria-current=page]]:text-brand [&_a:hover]:text-navy [&_a:focus-visible]:text-navy [&_[aria-current=page]_small]:text-inherit max-[760px]:col-span-full max-[760px]:justify-self-stretch max-[760px]:grid-cols-[repeat(4,_minmax(120px,_1fr))] max-[760px]:-mx-4 max-[760px]:px-4 max-[760px]:overflow-x-auto max-[760px]:[&_a]:py-2.5 max-[760px]:[&_small]:hidden max-[360px]:[&_a]:px-3 max-[360px]:[&_a]:text-[13px]" aria-label="Marktplatz">
       <a href="/anzeigen/" aria-current={marketActive ? 'page' : undefined}>Marktplatz</a>
@@ -33,7 +33,8 @@ const marketActive = pathname === '/anzeigen' || pathname.startsWith('/inserat/'
     const width = bounds.width - 8;
     const height = Math.min(50, bounds.height - 8);
     const centerX = bounds.left + bounds.width / 2;
-    const centerY = bounds.top + bounds.height / 2;
+    // The rounded logo body is centered at y=27 in its 68-unit viewBox.
+    const centerY = start.top + start.height * (27 / 68);
     oval.style.width = `${width}px`;
     oval.style.height = `${height}px`;
     if (!visible) {
