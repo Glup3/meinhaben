@@ -213,10 +213,20 @@ Enable the HTTP readiness check on `/`, host `127.0.0.1`, port 80, with a
 60-second start period,
 5-second interval/timeout and 12 retries. Keep timestamped container names and
 no host port mappings so Coolify can run old and new containers together. Allow
-30 seconds for graceful shutdown; the Dockerfile uses Nginx's `SIGQUIT` signal.
+30 seconds for graceful shutdown; the Dockerfile uses `SIGQUIT`, and the
+entrypoint forwards it to Nginx. After Nginx finishes requests, the entrypoint
+keeps its network endpoint alive for 10 seconds so stale proxy connections fail
+immediately while Traefik removes the old container.
 Coolify waits for the replacement to become healthy before retiring the old
 website. Restarting/deploying the website rebuilds pages from current content.
 Content edits do not automatically trigger a deployment.
+
+The website's Traefik HTTPS router also uses a `meinhaben-retry` middleware with
+3 attempts and a 100 ms initial interval. This retries connection failures during
+container removal against the healthy replacement; the website serves static
+GET requests. These labels are managed under the website resource's custom
+labels, alongside its standard HTTPS routing labels. Keep the retry middleware
+in the HTTPS router's middleware list when changing domains or proxy settings.
 
 The signed GitHub push webhook deploys the website for frontend/build changes.
 Its watch paths cover `src/**`, `public/**`, `deploy/**`, `Dockerfile`,
