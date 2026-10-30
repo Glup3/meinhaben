@@ -1,17 +1,98 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import ListingCard from '../components/ListingCard.astro';
+import DittoOutline from '../components/DittoOutline.astro';
+import Icon from '../components/Icon.astro';
 import { getListings } from '../data/listings';
 const listings = await getListings();
 ---
 <Layout title="Alle Anzeigen – Meinhaben">
-  <main id="main" class="w-[min(1440px,_calc(100%_-_2_*_var(--page-gutter)))] mx-auto pt-4.25 max-[760px]:pt-0">
+  <main id="main" data-marketplace-page class="w-[min(1440px,_calc(100%_-_2_*_var(--page-gutter)))] mx-auto pt-4.25 max-[760px]:pt-0">
+    <section class="welcome" aria-labelledby="welcome-heading">
+      <div class="welcome-copy">
+        <p class="welcome-label"><span></span>Privater Marktplatz von @glup3</p>
+        <h1 id="welcome-heading">Meine Sachen.<br />Vielleicht bald deine.</h1>
+        <p class="welcome-description">Gute Dinge aus meinem Alltag suchen ein neues Zuhause.</p>
+      </div>
+      <div class="welcome-art" aria-hidden="true">
+        <div class="mascot-circle"><DittoOutline /></div>
+        <span class="mascot-note">Bereit für die nächste Runde.</span>
+        <Icon name="star" size={22} class="welcome-star" />
+        <Icon name="heart" size={18} class="welcome-heart" />
+      </div>
+    </section>
     <section class="scroll-mt-4 pt-4 max-[760px]:pt-6" id="dinge" aria-labelledby="listings-heading">
-      <h1 id="listings-heading" class="mb-5 text-[24px] font-bold text-[#16324f]">Alle Anzeigen <span class="ml-1 text-[14px] font-normal text-muted">({listings.length})</span></h1>
+      <h2 id="listings-heading" class="mb-5 text-[24px] font-bold text-[#16324f]">Alle Anzeigen <span class="ml-1 text-[14px] font-normal text-muted">({listings.length})</span></h2>
       <div data-ui="listing-grid" class="grid grid-cols-[repeat(auto-fill,_minmax(min(100%,_230px),_260px))] gap-5 justify-start max-[760px]:grid-cols-2 max-[760px]:gap-3 max-[760px]:[[data-ui~=related-section]_&]:grid-cols-2" id="listing-grid">{listings.map((listing, index) => <ListingCard listing={listing} eager={index < 3} />)}</div>
-      {listings.length === 0
-        ? <p class="py-10 text-center text-muted">Gerade gibt es keine Anzeigen. Schau bald wieder vorbei.</p>
-        : <p class="text-center text-muted text-[12px] mx-0 mb-8 mt-6">Alle Anzeigen gesehen. Was dabei? Dann meld dich.</p>}
+      {listings.length === 0 && <p class="py-10 text-center text-muted">Gerade gibt es keine Anzeigen. Schau bald wieder vorbei.</p>}
+    </section>
+    <section class="contact-invitation" aria-labelledby="contact-heading">
+      <div class="contact-symbol"><Icon name="chat" size={26} /></div>
+      <div class="contact-copy">
+        <h2 id="contact-heading">Was Schönes entdeckt?</h2>
+        <p>Schreib mir einfach. Alles Weitere besprechen wir persönlich.</p>
+      </div>
+      <a class="contact-link" href="/#so-gehts">So erreichst du mich<Icon name="right" size={18} /></a>
     </section>
   </main>
 </Layout>
+
+<style>
+  :global(body:has([data-marketplace-page])) { background: #f8fafc; }
+  .welcome {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 32px 40px;
+    margin: 12px 0 20px;
+    border: 1px solid #dcecf4;
+    border-radius: 20px;
+    background: linear-gradient(110deg, #edf8ff, #f1f8fb 65%, #e6f3fc);
+    overflow: hidden;
+  }
+  .welcome-copy { position: relative; z-index: 1; }
+  .welcome-label { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: var(--color-brand-dark); font-size: 12px; font-weight: 600; }
+  .welcome-label span { width: 6px; height: 6px; border-radius: 50%; background: var(--color-brand); }
+  .welcome h1 { color: #16324f; font-size: clamp(28px, 3vw, 40px); font-weight: 700; line-height: 1.18; letter-spacing: -.035em; }
+  .welcome-description { margin-top: 14px; color: #526b80; font-size: 14px; line-height: 1.7; }
+  .welcome-art { position: relative; display: grid; justify-items: center; gap: 10px; flex: 0 0 220px; padding: 8px 18px; }
+  .mascot-circle { display: grid; place-items: center; width: 136px; height: 136px; border: 1px solid #ffffffb3; border-radius: 50%; background: #ffffff70; }
+  .mascot-circle :global(svg) { position: static; width: 102px; height: 86px; color: var(--color-brand); transform: rotate(-8deg); }
+  .mascot-note { padding: 7px 12px; border: 1px solid #d5e9f3; border-radius: 8px; background: white; color: #496780; font-size: 11px; transform: rotate(-4deg); }
+  .welcome-art :global(.welcome-star) { position: absolute; top: 20px; left: 18px; color: #ddaa3f; transform: rotate(-15deg); }
+  .welcome-art :global(.welcome-heart) { position: absolute; top: 88px; right: 14px; color: #739cb8; transform: rotate(15deg); }
+  .contact-invitation { display: flex; align-items: center; gap: 20px; padding: 28px 32px; margin: 36px 0; border: 1px solid var(--color-line); border-radius: 16px; background: white; }
+  .contact-symbol { display: grid; place-items: center; flex-shrink: 0; width: 54px; height: 54px; border-radius: 16px; background: #edf8ff; color: var(--color-brand-dark); }
+  .contact-copy { flex: 1; }
+  .contact-copy h2 { margin-bottom: 6px; color: #16324f; font-size: 20px; font-weight: 700; letter-spacing: -.02em; }
+  .contact-copy p { color: var(--color-muted); font-size: 13px; line-height: 1.7; }
+  .contact-link { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; gap: 12px; min-height: 46px; padding: 10px 18px; border-radius: 10px; background: var(--color-brand-dark); color: white; font-size: 13px; font-weight: 600; transition: background 150ms ease; }
+  .contact-link:hover { background: var(--color-navy); }
+  @media (max-width: 760px) {
+    .welcome { padding: 24px; margin-top: 20px; gap: 12px; }
+    .welcome-label { font-size: 11px; }
+    .welcome-art { flex-basis: 144px; padding: 8px 0; }
+    .mascot-circle { width: 100px; height: 100px; }
+    .mascot-circle :global(svg) { width: 76px; height: 64px; }
+    .mascot-note { max-width: 140px; font-size: 10px; text-align: center; line-height: 1.5; }
+    .welcome-art :global(.welcome-star) { left: 0; top: 10px; }
+    .welcome-art :global(.welcome-heart) { right: 0; top: 60px; }
+    .contact-invitation { flex-wrap: wrap; padding: 24px; gap: 16px; margin: 28px 0; }
+    .contact-copy { flex-basis: calc(100% - 70px); }
+    .contact-link { margin-left: 70px; }
+  }
+  @media (max-width: 480px) {
+    .welcome { position: relative; padding: 24px 20px; border-radius: 16px; }
+    .welcome-copy { max-width: 100%; }
+    .welcome h1 { font-size: 29px; }
+    .welcome-description { max-width: 26ch; padding-right: 12px; font-size: 13px; }
+    .welcome-art { position: absolute; right: -28px; bottom: -24px; opacity: .15; transform: rotate(12deg); pointer-events: none; }
+    .mascot-note, .welcome-art :global(.welcome-star), .welcome-art :global(.welcome-heart) { display: none; }
+    .contact-invitation { padding: 20px; }
+    .contact-symbol { width: 44px; height: 44px; border-radius: 12px; }
+    .contact-copy { flex-basis: calc(100% - 60px); }
+    .contact-copy h2 { font-size: 18px; }
+    .contact-link { width: 100%; margin-left: 0; }
+  }
+</style>
