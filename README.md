@@ -230,10 +230,12 @@ These labels are managed under the website resource's custom
 labels, alongside its standard HTTPS routing labels. Keep the retry middleware
 in the HTTPS router's middleware list when changing domains or proxy settings.
 
-The signed GitHub push webhook deploys the website for frontend/build changes.
-Its watch paths cover `src/**`, `public/**`, `deploy/**`, `Dockerfile`,
-`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `astro.config.mjs`,
-`tsconfig.json`, and `.dockerignore` (one pattern per line in Coolify).
+The signed GitHub push webhook deploys the website on pushes to `main`.
+Keep the website application’s Watch Paths empty: Coolify 4.5.3 treats changed
+files from manual GitHub PR webhooks as an empty list, so any watch-path filter
+silently skips automatic PR preview creation and updates. Website deployments
+therefore run for all changed paths. PocketBase automatic deployments remain
+disabled independently.
 
 ### PocketBase and persistent data
 
@@ -269,7 +271,9 @@ Actions preview workflow.
 
 Enable member-only Preview Deployments, keep public fork deployments disabled,
 and use the URL template `{{pr_id}}.{{domain}}`. Wildcard DNS and the signed
-repository webhook (`push` and `pull_request` events) provide website URLs such
+repository webhook (`push` and `pull_request` events) automatically create previews
+on PR open/reopen and redeploy them on subsequent pushes (`synchronize`). Keep
+Watch Paths empty as described above. They provide website URLs such
 as `https://42.meinhaben.glup3.dev`. Closing a PR removes its website preview.
 
 Set these **preview** runtime environment variables in the website application,
