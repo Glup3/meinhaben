@@ -261,28 +261,37 @@ rollout. Verify health at `/api/health`.
 
 ### Pull-request preview environments
 
-`meinhaben previews` is a separate, preview-only Coolify application using the
-full `/docker-compose.yaml`. Its production auto-deployment is disabled; do not
-manually deploy its main environment. Enable member-only Preview Deployments,
-keep public fork deployments disabled, and use `{{pr_id}}.{{domain}}` with the
-same website/backend base domains. Wildcard DNS and the signed repository
-webhook (`push` and `pull_request` events) provide URLs such as
-`https://42.meinhaben.glup3.dev` and
-`https://42.meinhaben-admin.ditto.glup3.dev`.
+PR previews use native Coolify Preview Deployments on `meinhaben website`
+(`d3avyblhxxysp27wc4di52uh`), using the same Dockerfile as production. Manage them
+in the website's [Preview Deployments dashboard](https://dashboard.coolify.glup3.dev/project/jrha8ret63grhiljvtpgryhc/environment/iqxg8hbhreflwv5yc6gppewm/application/d3avyblhxxysp27wc4di52uh/preview-deployments).
+There is no separate preview application, Compose preview stack, or GitHub
+Actions preview workflow.
 
-The preview resource has preview-only `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`,
-and `PB_ENCRYPTION_KEY` values; it never receives production credentials or
-storage. Each PR gets its own generated volume, network and seeded database.
-Updating a PR retains that preview's data. Closing it removes its containers,
-network and generated volumes. Never make preview storage external or assign a
-fixed shared volume name. Preview deployments may briefly interrupt their own
-preview environment; production rolling updates are independent.
+Enable member-only Preview Deployments, keep public fork deployments disabled,
+and use the URL template `{{pr_id}}.{{domain}}`. Wildcard DNS and the signed
+repository webhook (`push` and `pull_request` events) provide website URLs such
+as `https://42.meinhaben.glup3.dev`. Closing a PR removes its website preview.
 
-`deploy/website-entrypoint.sh` uses Coolify's `SERVICE_URL_WEBSITE`,
-`SERVICE_URL_POCKETBASE`, and `SERVICE_NAME_POCKETBASE` in Compose previews so
-site URLs, uploaded image URLs, and content reads stay scoped to that PR.
-`.github/workflows/preview-link.yml` maintains the preview link in PR descriptions
-without checking out or executing PR code. The link does not report readiness.
+Set these **preview** runtime environment variables in the website application,
+separately from its production variables:
+
+| Variable | Preview value |
+| --- | --- |
+| `SITE_URL` | `$COOLIFY_URL` |
+| `POCKETBASE_URL` | `https://meinhaben-admin.ditto.glup3.dev` |
+
+Keep `SITE_URL` non-literal so Coolify resolves `$COOLIFY_URL` to the current
+preview's HTTPS URL. Do not set `POCKETBASE_INTERNAL_URL` or any `PB_ADMIN_*` or
+`PB_ENCRYPTION_KEY` variables on the website application. Each preview generates
+its static pages from the production PocketBase API at startup and uses the
+production origin for uploaded images. Production remains the only deployed
+PocketBase instance; previews have no database containers or persistent volumes.
+Changes to production content appear in a preview after redeploying it. Any
+authenticated writes made through preview code affect production data too.
+
+`docker-compose.yaml` is only the complete local development stack; it is not
+used for Coolify previews. Production rolling updates remain independent of PR
+preview deployments.
 
 ### Migration and recovery
 

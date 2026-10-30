@@ -1,7 +1,7 @@
 # Production backend only. Deploy in the ORIGINAL Coolify resource so the
 # generated pocketbase_data volume name remains unchanged. Never delete its
 # volume or run a second PocketBase instance against it.
-# docker-compose.yaml remains the complete, isolated PR preview stack.
+# docker-compose.yaml remains the complete local development stack.
 services:
   pocketbase:
     build:
