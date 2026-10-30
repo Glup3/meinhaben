@@ -25,10 +25,9 @@ const categories = categoryRecords.map(category => category.name).filter(categor
       </div>
       <div class="flex justify-between items-center gap-3 py-2 mb-3 flex-wrap pt-0 px-0 pb-3 [&_>_button]:text-brand-dark [&_>_button]:bg-none [&_>_button]:bg-transparent [&_>_button]:text-[12px] [&_>_button]:font-bold [&_>_button]:py-2 [&_>_button]:px-0 [&_>_button]:min-h-9 max-[760px]:mb-0 [&_h2]:text-[20px]">
         <h2 id="listings-heading" tabindex="-1">Anzeigen <span id="result-count" role="status" aria-live="polite">({listings.length})</span></h2>
-        <div class="flex flex-wrap items-center gap-3 max-[480px]:gap-2 max-[480px]:w-full"><button id="clear-search" class="bg-transparent text-brand-dark min-h-11 text-[13px]">Zurücksetzen</button><label class="[&_select]:border [&_select]:border-line [&_select]:bg-white [&_select]:rounded-ui [&_select]:text-ink [&_select]:py-1.5 [&_select]:px-2.5 [&_select]:max-w-45 [&_select]:min-h-11 [&_select]:text-[13px] max-[480px]:ml-auto"><span class="sr-only">Sortieren nach</span><select id="sort"><option value="newest">Neueste zuerst</option><option value="price-asc">Preis aufsteigend</option><option value="price-desc">Preis absteigend</option></select></label><div class="flex gap-1 [&_button]:grid [&_button]:place-items-center [&_button]:bg-none [&_button]:bg-transparent [&_button]:text-[#9aa9c2] [&_button]:w-11 [&_button]:h-11 [&_button]:border [&_button]:border-line [&_button]:rounded-ui [&_button[aria-pressed=true]]:text-brand [&_button[aria-pressed=true]]:bg-panel" role="group" aria-label="Darstellung"><button data-view="grid" aria-label="Rasteransicht" aria-pressed="true"><Icon name="grid" size={18} /></button><button data-view="list" aria-label="Listenansicht" aria-pressed="false"><Icon name="list" size={20} /></button></div></div>
       </div>
       <div class="pt-1.25 px-2 pb-3 text-muted text-[12px] wrap-anywhere pl-0" id="active-search" hidden><span id="search-summary"></span></div>
-      <div data-ui="listing-grid" class="grid grid-cols-[repeat(auto-fill,_minmax(min(100%,_230px),_260px))] gap-5 justify-start [&[data-view=list]]:grid-cols-[minmax(0,_1fr)] [&[data-view=list]]:gap-0 max-[760px]:grid-cols-2 max-[760px]:gap-3 max-[760px]:[&[data-view=list]]:-mx-4 max-[760px]:[[data-ui~=related-section]_&]:grid-cols-2" id="listing-grid">{listings.map((listing, index) => <ListingCard listing={listing} eager={index < 3} />)}</div>
+      <div data-ui="listing-grid" class="grid grid-cols-[repeat(auto-fill,_minmax(min(100%,_230px),_260px))] gap-5 justify-start max-[760px]:grid-cols-2 max-[760px]:gap-3 max-[760px]:[[data-ui~=related-section]_&]:grid-cols-2" id="listing-grid">{listings.map((listing, index) => <ListingCard listing={listing} eager={index < 3} />)}</div>
       <div class="py-10 px-5 text-center bg-panel [&_>_svg]:text-muted [&_>_svg]:mb-3 [&_h3]:text-[18px] [&_p]:mt-3 [&_p]:mx-0 [&_p]:mb-5 [&_p]:leading-[1.6]" id="empty-state" hidden><Icon name="search" size={30} /><h3>Keine Anzeigen gefunden</h3><p>Versuche einen anderen Suchbegriff oder passe deine Filter an.</p><button class="inline-flex justify-center items-center gap-2 min-h-10 py-2.25 px-4 border border-transparent rounded-ui font-bold text-[14px] text-center bg-brand text-white [&:hover]:bg-brand-dark [[data-ui~=vertical-copy]_&]:bg-[#093d96] [[data-ui~=vertical-copy]_&]:text-white [[data-ui~=vertical-copy]_&]:mt-7 [[data-ui~=search-entry]_&]:min-h-11 max-[480px]:[[data-ui~=search-entry]_&]:px-3" id="reset-filters">Alle Anzeigen</button></div>
       <p class="text-center text-muted text-[12px] mx-0 mb-8 mt-6">Alle Anzeigen gesehen. Was dabei? Dann meld dich.</p>
     </section>
@@ -37,7 +36,6 @@ const categories = categoryRecords.map(category => category.name).filter(categor
 <script>
   const search = document.querySelector<HTMLInputElement>('#listing-search')!;
   const available = document.querySelector<HTMLInputElement>('#available-only')!;
-  const sort = document.querySelector<HTMLSelectElement>('#sort')!;
   const grid = document.querySelector<HTMLElement>('#listing-grid')!;
   const cards = [...document.querySelectorAll<HTMLElement>('[data-listing]')];
   const chips = [...document.querySelectorAll<HTMLButtonElement>('[data-category-filter]')];
@@ -57,7 +55,7 @@ const categories = categoryRecords.map(category => category.name).filter(categor
       card.hidden = !matches;
       if (matches) count++;
     });
-    [...cards].sort((a, b) => sort.value === 'price-asc' ? Number(a.dataset.price) - Number(b.dataset.price) : sort.value === 'price-desc' ? Number(b.dataset.price) - Number(a.dataset.price) : (b.dataset.date || '').localeCompare(a.dataset.date || '')).forEach(card => grid.append(card));
+    [...cards].sort((a, b) => (b.dataset.date || '').localeCompare(a.dataset.date || '')).forEach(card => grid.append(card));
     document.querySelector('#result-count')!.textContent = `(${count})`;
     document.querySelector<HTMLElement>('#empty-state')!.hidden = count > 0;
     document.querySelector<HTMLElement>('#active-search')!.hidden = !filtered;
@@ -70,7 +68,6 @@ const categories = categoryRecords.map(category => category.name).filter(categor
     if (search.value.trim()) params.set('q', search.value.trim());
     if (category !== 'all') params.set('kategorie', category);
     if (available.checked) params.set('verfuegbar', '1');
-    if (sort.value !== 'newest') params.set('sortierung', sort.value);
     history.replaceState(null, '', `${location.pathname}${params.size ? '?' + params.toString() : ''}${location.hash}`);
   }
   function setCategory(value: string) { category = value; chips.forEach(chip => { const active = chip.dataset.categoryFilter === category; chip.setAttribute('aria-pressed', String(active)); }); }
@@ -84,12 +81,11 @@ const categories = categoryRecords.map(category => category.name).filter(categor
     const initialCategory = params.get('kategorie') || 'all';
     setCategory(chips.some(chip => chip.dataset.categoryFilter === initialCategory) ? initialCategory : 'all');
     available.checked = params.get('verfuegbar') === '1';
-    sort.value = ['price-asc', 'price-desc'].includes(params.get('sortierung') || '') ? params.get('sortierung')! : 'newest';
     document.querySelector<HTMLDetailsElement>('[data-additional-filters]')!.open = freeOnly || maxPrice.value !== '' || condition.value !== 'all' || available.checked;
     update();
   }
   function resetFilters() {
-    search.value = ''; setCategory('all'); available.checked = false; sort.value = 'newest';
+    search.value = ''; setCategory('all'); available.checked = false;
     freeOnly = false; maxPrice.value = ''; condition.value = 'all'; update();
   }
   search.addEventListener('input', update);
@@ -98,15 +94,8 @@ const categories = categoryRecords.map(category => category.name).filter(categor
   maxPrice.addEventListener('input', update);
   condition.addEventListener('change', update);
   chips.forEach(chip => chip.addEventListener('click', () => { setCategory(chip.dataset.categoryFilter!); update(); document.querySelector<HTMLElement>('#listings-heading')!.focus({ preventScroll: true }); document.querySelector('#dinge')!.scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
-  document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(button => button.addEventListener('click', () => {
-    const list = button.dataset.view === 'list';
-    grid.dataset.view = list ? 'list' : 'grid';
-    document.querySelectorAll<HTMLButtonElement>('[data-view]').forEach(control => control.setAttribute('aria-pressed', String(control === button)));
-  }));
   available.addEventListener('change', update);
-  sort.addEventListener('change', update);
 
-  document.querySelector('#clear-search')!.addEventListener('click', resetFilters);
   document.querySelector('#reset-filters')!.addEventListener('click', resetFilters);
   window.addEventListener('pageshow', restore);
   window.addEventListener('popstate', restore);
