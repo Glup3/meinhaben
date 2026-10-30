@@ -224,7 +224,9 @@ Content edits do not automatically trigger a deployment.
 The website's Traefik HTTPS router also uses a `meinhaben-retry` middleware with
 3 attempts and a 100 ms initial interval. This retries connection failures during
 container removal against the healthy replacement; the website serves static
-GET requests. These labels are managed under the website resource's custom
+GET requests. Its Traefik services actively check `/` every second with a 500 ms
+timeout, removing the stopped server during the ten-second network linger.
+These labels are managed under the website resource's custom
 labels, alongside its standard HTTPS routing labels. Keep the retry middleware
 in the HTTPS router's middleware list when changing domains or proxy settings.
 
