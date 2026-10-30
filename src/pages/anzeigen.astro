@@ -10,7 +10,6 @@ const listings = await getListings();
   <main id="main" data-marketplace-page class="w-[min(1440px,_calc(100%_-_2_*_var(--page-gutter)))] mx-auto pt-4.25 max-[760px]:pt-0">
     <section class="welcome" aria-labelledby="welcome-heading">
       <div class="welcome-copy">
-        <p class="welcome-label"><span></span>Privater Marktplatz von @glup3</p>
         <h1 id="welcome-heading">Meine Sachen.<br />Vielleicht bald deine.</h1>
         <p class="welcome-description">Gute Dinge aus meinem Alltag suchen ein neues Zuhause.</p>
       </div>
@@ -23,7 +22,7 @@ const listings = await getListings();
     </section>
     <section class="scroll-mt-4 pt-4 max-[760px]:pt-6" id="dinge" aria-labelledby="listings-heading">
       <h2 id="listings-heading" class="mb-5 text-[24px] font-bold text-[#16324f]">Alle Anzeigen <span class="ml-1 text-[14px] font-normal text-muted">({listings.length})</span></h2>
-      <div data-ui="listing-grid" class="grid grid-cols-[repeat(auto-fill,_minmax(min(100%,_230px),_260px))] gap-5 justify-start max-[760px]:grid-cols-2 max-[760px]:gap-3 max-[760px]:[[data-ui~=related-section]_&]:grid-cols-2" id="listing-grid">{listings.map((listing, index) => <ListingCard listing={listing} eager={index < 3} />)}</div>
+      <div data-ui="listing-grid" class="grid grid-cols-[repeat(auto-fill,_minmax(min(100%,_230px),_1fr))] gap-5 max-[760px]:grid-cols-2 max-[760px]:gap-3 max-[760px]:[[data-ui~=related-section]_&]:grid-cols-2" id="listing-grid">{listings.map((listing, index) => <ListingCard listing={listing} eager={index < 3} />)}</div>
       {listings.length === 0 && <p class="py-10 text-center text-muted">Gerade gibt es keine Anzeigen. Schau bald wieder vorbei.</p>}
     </section>
     <section class="contact-invitation" aria-labelledby="contact-heading">
@@ -52,8 +51,6 @@ const listings = await getListings();
     overflow: hidden;
   }
   .welcome-copy { position: relative; z-index: 1; }
-  .welcome-label { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; color: var(--color-brand-dark); font-size: 12px; font-weight: 600; }
-  .welcome-label span { width: 6px; height: 6px; border-radius: 50%; background: var(--color-brand); }
   .welcome h1 { color: #16324f; font-size: clamp(28px, 3vw, 40px); font-weight: 700; line-height: 1.18; letter-spacing: -.035em; }
   .welcome-description { margin-top: 14px; color: #526b80; font-size: 14px; line-height: 1.7; }
   .welcome-art { position: relative; display: grid; justify-items: center; gap: 10px; flex: 0 0 220px; padding: 8px 18px; }
@@ -71,7 +68,6 @@ const listings = await getListings();
   .contact-link:hover { background: var(--color-navy); }
   @media (max-width: 760px) {
     .welcome { padding: 24px; margin-top: 20px; gap: 12px; }
-    .welcome-label { font-size: 11px; }
     .welcome-art { flex-basis: 144px; padding: 8px 0; }
     .mascot-circle { width: 100px; height: 100px; }
     .mascot-circle :global(svg) { width: 76px; height: 64px; }
