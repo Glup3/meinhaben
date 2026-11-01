@@ -26,7 +26,6 @@ const listings = defineCollection({
     price_cents: z.number().int().nonnegative(),
     condition: z.enum(['new', 'like_new', 'very_good', 'good', 'fair']),
     status: z.enum(['available', 'reserved', 'sold']),
-    handover: z.string().min(1),
     details: z.array(z.object({ label: z.string().min(1), value: z.string().min(1) })),
     published: z.literal(true),
     published_at: z.string().min(1),

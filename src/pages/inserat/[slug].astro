@@ -12,7 +12,6 @@ interface Props { listing: Listing; }
 const { listing } = Astro.props;
 const listings = await getListings();
 const photos = [{ src: listing.image, alt: listing.imageAlt }, ...(listing.extraImages || [])];
-const handover = listing.details.find(([label]) => label === 'Übergabe')?.[1] ?? 'Nach Absprache';
 const related = listings.filter(item => item.slug !== listing.slug && item.status !== 'sold').sort((a, b) => Number(b.category === listing.category) - Number(a.category === listing.category)).slice(0, 3);
 const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Meinhaben. Ist das noch zu haben?`;
 ---
@@ -32,7 +31,6 @@ const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Mein
         <button class="inline-flex justify-center items-center gap-2 py-2.25 px-4 border border-transparent rounded-ui font-bold text-[14px] text-center bg-brand text-white w-full min-h-12 [&:hover]:bg-brand-dark [&:disabled]:bg-[#dce3ee] [&:disabled]:text-[#65758f] [[data-ui~=vertical-copy]_&]:bg-[#093d96] [[data-ui~=vertical-copy]_&]:text-white [[data-ui~=vertical-copy]_&]:mt-7" id="contact-button" aria-haspopup="dialog" aria-controls="contact-dialog" disabled={listing.status === 'sold'}><Icon name={listing.status === 'sold' ? 'check' : 'chat'} size={19} />{listing.status === 'sold' ? 'Bereits vergeben' : 'Nachricht'}</button>
         <p class="text-[11px] text-muted mt-2">Kontakt über WhatsApp · Ohne Anmeldung</p>
         <div class="flex gap-3 items-center my-3.5 mt-4 mx-0 mb-0 pt-3 [&_strong]:block [&_strong]:text-[16px] [&_strong]:font-semibold [&_small]:block [&_small]:text-[11px] [&_small]:text-muted [&_small]:mt-0.75"><span class="rounded-full bg-[#e8edf6] grid place-items-center text-[#94a2bc] w-10 h-10"><Icon name="user" size={36} /></span><div><strong>@glup3</strong><small>Privat · Meine Sachen. Für euch.</small></div></div>
-        <p class="my-3.5 mx-0 text-[14px] leading-[1.6]">{handover}</p>
         {listing.price > 0 && listing.status !== 'sold' && <div class="text-[12px] mt-4 [&_button]:py-2 [&_button]:px-0 [&_p]:mt-1"><button type="button" class="text-brand-dark inline-flex items-center gap-1.5 text-[13px] bg-none bg-transparent [&:hover]:underline" id="last-price-button" aria-expanded="false" aria-controls="last-price-reply">Was letzte Preis?</button><p id="last-price-reply" role="status" hidden>Für dich? {formatPrice(listing.price)}. 😉</p></div>}
       </section>
       <section class="[grid-column:1] mt-6 [&_h2]:text-[20px] [&_h2]:font-normal [&_h2]:mb-4" aria-labelledby="specs-heading"><h2 id="specs-heading">Artikeldetails</h2><dl class="grid grid-cols-[1fr_1fr] gap-y-3 gap-x-6 p-0 m-0 [&_>_div]:flex [&_>_div]:flex-col [&_>_div]:gap-1.25 [&_>_div]:py-2 [&_>_div]:px-0 [&_dt]:text-[12px] [&_dt]:text-muted [&_dd]:text-[14px] [&_dd]:m-0"><div><dt>Zustand</dt><dd>{listing.condition}</dd></div>{listing.details.map(([label, value]) => <div><dt>{label}</dt><dd>{value}</dd></div>)}</dl></section>
