@@ -4,10 +4,8 @@ export type ListingStatus = 'available' | 'reserved' | 'sold';
 export interface Listing {
   slug: string;
   title: string;
-  subtitle: string;
   category: string;
   price: number;
-  negotiable: boolean;
   condition: string;
   status: ListingStatus;
   image: string;
@@ -50,20 +48,15 @@ export async function getListings(): Promise<Listing[]> {
     return {
       slug: listing.slug,
       title: listing.title,
-      subtitle: listing.subtitle,
       category: category.name,
       price: listing.price_cents / 100,
-      negotiable: listing.negotiable,
       condition: conditionLabels[listing.condition],
       status: listing.status,
       image: photos[0].src,
       imageAlt: photos[0].alt,
       extraImages: photos.slice(1),
       description: listing.description.split(/\r?\n\s*\r?\n/).map(paragraph => paragraph.trim()).filter(Boolean),
-      details: [
-        ...listing.details.map(({ label, value }): [string, string] => [label, value]),
-        ['Übergabe', listing.handover] as [string, string],
-      ],
+      details: listing.details.map(({ label, value }): [string, string] => [label, value]),
       date: listing.published_at,
     };
   }).sort((first, second) => second.date.localeCompare(first.date) || first.slug.localeCompare(second.slug));

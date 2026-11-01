@@ -128,9 +128,9 @@ current database. Image builds themselves do not contact PocketBase.
 
 - `categories`: name, unique slug, existing icon key (`home`, `tech`, `sun`),
   and numeric filter order.
-- `listings`: unique slug, title, subtitle, plain-text description (blank lines
-  separate paragraphs), category, integer `price_cents`, negotiable flag,
-  condition, availability status, handover, JSON details, publication flag/date.
+- `listings`: unique slug, title, plain-text description (blank lines
+  separate paragraphs), category, integer `price_cents`,
+  condition, availability status, JSON details, publication flag/date.
   `price_cents = 0` means free. Conditions use `new`, `like_new`, `very_good`,
   `good`, `fair`; status uses `available`, `reserved`, `sold`.
 - `listing_images`: listing relation, one uploaded image, alt text and unique
@@ -142,8 +142,7 @@ Hooks validate details and require a date and existing photo before publishing.
 Deleting or reassigning the last photo of a published listing is rejected in a
 transaction; unpublish first or add another photo. Deleting the whole listing
 still cascades normally.
-Details use `[{"label":"Marke","value":"Patagonia"}]`; handover is a separate
-field and is appended to the displayed details. Keep published slugs stable to
+Details use `[{"label":"Marke","value":"Patagonia"}]`. Keep published slugs stable to
 avoid breaking shared links. Deleting a listing deletes its photo records too.
 
 All create/update/delete API rules are locked to superusers. Public list/view
