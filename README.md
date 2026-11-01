@@ -117,12 +117,34 @@ PocketBase content changes need a new Astro build/deployment. There is no
 automatic content-change rebuild webhook in this starter. PocketBase must be
 reachable when Astro builds.
 
-In Docker Compose, page generation runs when the website container starts,
-after PocketBase is healthy and has applied its migrations. The server-only
-`POCKETBASE_INTERNAL_URL=http://pocketbase:8090` is used for API reads;
-`POCKETBASE_URL` remains the public origin for browser image URLs and previews.
-Restarting the website container also regenerates its static pages from the
-current database. Image builds themselves do not contact PocketBase.
+The Dockerfile uses a Node build stage to generate the site, then copies only
+`dist/` into the official `nginx:alpine` runtime image. Supply `SITE_URL` and
+`POCKETBASE_URL` as Docker build arguments. Optional `POCKETBASE_INTERNAL_URL`
+selects a separate API address for the builder; generated image URLs still use
+`POCKETBASE_URL`. These values are baked into the generated pages, so runtime
+environment changes and container restarts do not update the site.
+
+Docker cannot detect content changes in PocketBase. For content-only builds,
+change `CONTENT_VERSION` (for example, `--build-arg CONTENT_VERSION="$(date +%s)"`)
+or use `docker build --no-cache`. Coolify disables the build cache for the website
+to fetch fresh content on every deployment, including redeploys of the same commit.
+This also reruns dependency installation. Reusing an existing image intentionally
+serves its original generated pages; uploaded images still come from PocketBase.
+
+For the complete local Docker stack, start PocketBase first, then build the website:
+
+```sh
+docker compose up -d --build --wait pocketbase
+docker compose build --build-arg CONTENT_VERSION="$(date +%s)" website
+docker compose up -d --no-build website
+```
+
+The website is at `http://localhost:8080`, PocketBase at `http://localhost:8090`.
+The website builder uses host networking to reach the backend's localhost-only
+port. This workflow requires Linux Docker Engine or Docker Desktop with host
+networking enabled. Configure the backend's `PB_ADMIN_*` and `PB_ENCRYPTION_KEY`
+variables first. For the portable development workflow, use `compose.local.yaml`
+and `pnpm run dev` as described above.
 
 ## Editing marketplace content
 
@@ -198,33 +220,40 @@ repository:
 
 ### Website
 
-Set runtime `SITE_URL=https://meinhaben.glup3.dev` and
+Set **build-time** `SITE_URL=https://meinhaben.glup3.dev` and
 `POCKETBASE_URL=https://meinhaben-admin.ditto.glup3.dev`. The website reads the
-public PocketBase API during startup; it needs no database credentials or
+public PocketBase API during `docker build`; it needs no database credentials or
 persistent storage. Leave `POCKETBASE_INTERNAL_URL` unset for this independent
-resource. Nginx starts only after Astro successfully generates the complete
-site. A failed build cannot serve a partial site.
+resource. Keep Docker build-argument injection enabled and Docker Build Secrets
+disabled: the Dockerfile declares public URL arguments explicitly.
+
+Enable **Disable Build Cache** on the website application so every deployment
+fetches current PocketBase content. The Docker image is complete before it starts;
+a failed Astro build fails the deployment before replacing the running website.
+Restarting an existing container serves the same content. Content edits require a
+new image build/deployment and do not automatically trigger one.
 
 Enable the HTTP readiness check on `/`, host `127.0.0.1`, port 80, with a
-60-second start period,
-5-second interval/timeout and 12 retries. Keep timestamped container names and
-no host port mappings so Coolify can run old and new containers together. Allow
-30 seconds for graceful shutdown; the Dockerfile uses `SIGQUIT`, and the
-entrypoint forwards it to Nginx. After Nginx finishes requests, the entrypoint
-keeps its network endpoint alive for 10 seconds so stale proxy connections fail
-immediately while Traefik removes the old container.
-Coolify waits for the replacement to become healthy before retiring the old
-website. Restarting/deploying the website rebuilds pages from current content.
-Content edits do not automatically trigger a deployment.
+60-second start period, 5-second interval/timeout and 12 retries. Keep timestamped
+container names and no host port mappings so Coolify can run old and new
+containers together. Allow 30 seconds for graceful shutdown. The official Nginx
+image runs Nginx in the foreground and uses `SIGQUIT`; there is no custom website
+entrypoint or shutdown delay.
 
-The website's Traefik HTTPS router also uses a `meinhaben-retry` middleware with
-3 attempts and a 100 ms initial interval. This retries connection failures during
-container removal against the healthy replacement; the website serves static
-GET requests. Its Traefik services actively check `/` every second with a 500 ms
-timeout, removing the stopped server during the ten-second network linger.
-These labels are managed under the website resource's custom
-labels, alongside its standard HTTPS routing labels. Keep the retry middleware
-in the HTTPS router's middleware list when changing domains or proxy settings.
+Let Coolify manage the container labels using its standard domain, HTTPS and
+compression settings. Remove the custom `meinhaben-retry` middleware, its router
+reference, and the custom Traefik service health-check and router-priority labels.
+Keep the container HTTP readiness check enabled. Nginx also enables gzip for
+direct access and keeps one-year immutable caching scoped to fingerprinted
+`/_astro/` assets. Other requests use normal static routing and the generated 404.
+
+The old ten-second network linger was a local workaround without linked rollout
+test evidence. It is not an Astro or Traefik deployment requirement. Upstream
+[retry middleware](https://doc.traefik.io/traefik/reference/routing-configuration/http/middlewares/retry/)
+and [backend health checks](https://doc.traefik.io/traefik/reference/routing-configuration/http/load-balancing/service/#health-check)
+document those individual features, not that workaround. Verify rolling updates
+under traffic when deploying this change; readiness alone does not establish that
+every request survives a rollout.
 
 The signed GitHub push webhook deploys the website for frontend/build changes.
 Its watch paths cover `src/**`, `public/**`, `deploy/**`, `Dockerfile`,
@@ -268,7 +297,7 @@ and use the URL template `{{pr_id}}.{{domain}}`. Wildcard DNS and the signed
 repository webhook (`push` and `pull_request` events) provide website URLs such
 as `https://42.meinhaben.glup3.dev`. Closing a PR removes its website preview.
 
-Set these **preview** runtime environment variables in the website application,
+Set these **preview build-time** environment variables in the website application,
 separately from its production variables:
 
 | Variable | Preview value |
@@ -279,7 +308,7 @@ separately from its production variables:
 Keep `SITE_URL` non-literal so Coolify resolves `$COOLIFY_URL` to the current
 preview's HTTPS URL. Do not set `POCKETBASE_INTERNAL_URL` or any `PB_ADMIN_*` or
 `PB_ENCRYPTION_KEY` variables on the website application. Each preview generates
-its static pages from the production PocketBase API at startup and uses the
+its static pages from the production PocketBase API during the image build and uses the
 production origin for uploaded images. Production remains the only deployed
 PocketBase instance; previews have no database containers or persistent volumes.
 Changes to production content appear in a preview after redeploying it. Any
