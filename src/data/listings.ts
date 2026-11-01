@@ -4,10 +4,8 @@ export type ListingStatus = 'available' | 'reserved' | 'sold';
 export interface Listing {
   slug: string;
   title: string;
-  subtitle: string;
   category: string;
   price: number;
-  negotiable: boolean;
   condition: string;
   status: ListingStatus;
   image: string;
@@ -50,10 +48,8 @@ export async function getListings(): Promise<Listing[]> {
     return {
       slug: listing.slug,
       title: listing.title,
-      subtitle: listing.subtitle,
       category: category.name,
       price: listing.price_cents / 100,
-      negotiable: listing.negotiable,
       condition: conditionLabels[listing.condition],
       status: listing.status,
       image: photos[0].src,
