@@ -7,7 +7,6 @@ const slides = [
     title: "Heute noch meins.\nMorgen dein Lieblingsstück.",
     cta: "Jetzt stöbern",
     href: "/anzeigen/",
-    photos: ["sessel.jpg", "lampe.jpg", "kopfhoerer.jpg", "pflanze.jpg"],
     theme: "blue",
     tag: "ZWEITE RUNDE. ERSTE WAHL.",
   },
@@ -16,7 +15,6 @@ const slides = [
     title: "Die besten Dinge\nkosten manchmal nichts.",
     cta: "Zu verschenken entdecken",
     href: "/anzeigen/",
-    photos: ["buecher.jpg", "pflanze.jpg", "kaffee.jpg", "sessel.jpg"],
     theme: "purple",
     tag: "0 EURO. VIEL FREUDE.",
   },
@@ -25,13 +23,12 @@ const slides = [
     title: "Traumimmobilie?\nFast. Ein Sessel.",
     cta: "Immobilien entdecken",
     href: "/immobilien/",
-    photos: ["sessel.jpg", "lampe.jpg", "pflanze.jpg", "buecher.jpg"],
     theme: "orange",
     tag: "LAGE, LAGE, SITZLAGE.",
   },
 ];
 
-export default function FeaturedCarousel() {
+export default function FeaturedCarousel({ photos = [] }: { photos?: string[] }) {
   const id = useId();
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -79,12 +76,12 @@ export default function FeaturedCarousel() {
               className="relative bg-[#16acf0] overflow-hidden min-h-65 [[data-theme=purple]_&]:bg-[#d8c3ff] [[data-theme=orange]_&]:bg-[#ffbd78] max-[760px]:min-h-50 max-[760px]:hidden"
               aria-hidden="true"
             >
-              {slide.photos.map((photo, i) => (
+              {photos.slice(0, 4).map((photo, i) => (
                 <img
                   className="absolute w-[39%] h-[47%] object-cover rounded-[12px] [box-shadow:0_12px_24px_#003e8926] [&[data-object='0']]:left-[9%] [&[data-object='0']]:top-[-7%] [&[data-object='0']]:[transform:rotate(-14deg)] [&[data-object='1']]:right-[4%] [&[data-object='1']]:top-[-1%] [&[data-object='1']]:[transform:rotate(16deg)] [&[data-object='2']]:left-[5%] [&[data-object='2']]:bottom-[-5%] [&[data-object='2']]:[transform:rotate(10deg)] [&[data-object='3']]:right-[8%] [&[data-object='3']]:bottom-[-8%] [&[data-object='3']]:[transform:rotate(-12deg)] max-[760px]:w-[32%] max-[760px]:h-[70%] max-[760px]:[&[data-object='1']]:right-[14%] max-[760px]:[&[data-object='3']]:right-[24%]"
                   key={photo}
                   data-object={i}
-                  src={`/images/${photo}`}
+                  src={photo}
                   alt=""
                   width="220"
                   height="220"

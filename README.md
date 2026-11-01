@@ -2,7 +2,7 @@
 
 A static Astro marketplace for sharing used goods with friends and family.
 The German UI loads listings, categories and photo galleries from PocketBase at
-build time. Migrations seed the original ten example listings and their photos.
+build time. Migrations create the collections; content is managed in PocketBase.
 
 ## UI development
 
@@ -55,10 +55,8 @@ load and on the 404 page. Paid, unsold listings also have a “Was letzte Preis?
 button that reveals the asking price with a wink, without changing it or sending
 a message. Free and sold listings omit the button.
 
-Sample photos are downloaded from Unsplash into `public/images`; the chair detail
-is a crop of the same source photo. The images correspond to the photo IDs used
-in the approved mockups and additional sample items. They are illustrative and
-must be replaced with actual item photos and descriptions before sharing.
+Upload item photos through the PocketBase dashboard. The homepage carousel uses
+photos from available listings; sample listing photos are no longer bundled.
 Open Sans is hosted locally under the SIL Open Font License in
 `public/fonts/OpenSans-OFL.txt`. The original Inter asset and license are retained.
 Search-engine indexing is disabled through page metadata; this is not access
@@ -153,13 +151,11 @@ rules hide draft listings and their photo records. Uploaded files are ordinary
 public files: knowing a draft photo URL still permits access. Use protected files
 and authorized delivery if draft images must be confidential.
 
-The one-time seed migration imports 3 categories, 10 listings and 12 actual
-uploads from the repository's `public/images` directory; no remote photo download
-is needed. Docker copies these into `/pb/seed_images`; `PB_SEED_IMAGES_DIR` can
-override the seed source directory. Subsequent restarts/migrations do not reset
-edits or recreate deleted examples. These are illustrative examples, not real
-inventory. The seed rollback intentionally refuses to delete possibly edited
-content; use a backup or remove example records manually instead.
+New databases start with empty collections. Create categories, listings and
+photos manually in PocketBase. The former example seed migration has been
+removed; this does not delete examples already stored in an existing database.
+Delete those listings through the dashboard; related photo records are deleted
+automatically. Existing categories can be kept for real listings.
 
 ## Schema migrations and hooks
 
@@ -249,7 +245,7 @@ Keep the existing runtime `PB_ADMIN_EMAIL`, `PB_ADMIN_PASSWORD`, and
 `PB_ENCRYPTION_KEY` values in this resource. Never rotate the encryption key as
 part of a deployment or store credentials in Git. The entrypoint applies pending
 migrations and updates the bootstrap superuser before starting PocketBase.
-Existing content is not reset by the seed migrations.
+Startup does not seed or reset content.
 
 Backend auto-deployment is disabled deliberately. After reviewing and backing up
 changes to `pocketbase/**` or `docker-compose.production.yaml`, deploy PocketBase

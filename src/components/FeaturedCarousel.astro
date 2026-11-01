@@ -1,4 +1,8 @@
 ---
 import FeaturedCarousel from './react/FeaturedCarousel';
+interface Props {
+  photos: string[];
+}
+const { photos } = Astro.props;
 ---
-<FeaturedCarousel client:load />
+<FeaturedCarousel photos={photos} client:load />
