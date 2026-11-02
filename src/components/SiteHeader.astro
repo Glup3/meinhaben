@@ -1,16 +1,34 @@
 ---
-import Logo from './Logo.astro';
-import { verticals } from '../data/verticals';
-const pathname = Astro.url.pathname.replace(/\/$/, '');
-const marketActive = pathname === '/anzeigen' || pathname.startsWith('/inserat/');
+import Logo from "./Logo.astro";
+import { verticals } from "../data/verticals";
+const pathname = Astro.url.pathname.replace(/\/$/, "");
+const marketActive =
+  pathname === "/anzeigen" || pathname.startsWith("/inserat/");
 ---
-<header class="bg-white">
-  <div data-ui="header-inner" class="w-[min(1440px,_calc(100%_-_2_*_var(--page-gutter)))] mx-auto relative isolate grid grid-cols-[132px_minmax(0,_1fr)] grid-rows-[90px] gap-y-0 gap-x-10 max-[760px]:grid-cols-[120px_minmax(0,_1fr)] max-[760px]:grid-rows-[64px_46px] max-[760px]:gap-y-0 max-[760px]:gap-x-3">
-    <span data-nav-oval class="absolute top-0 left-0 z-0 rounded-[999px] bg-panel pointer-events-none opacity-0 [transition:transform_150ms_ease-out,_opacity_100ms_ease-out]" aria-hidden="true"></span>
-    <a data-header-logo class="block w-33 [[data-ui~=header-inner]_>_&]:relative [[data-ui~=header-inner]_>_&]:z-1 [[data-ui~=header-inner]_>_&]:self-center [[data-ui~=header-inner]_>_&]:[grid-row:1] [[data-ui~=header-inner]_>_&]:[transform:translateY(10.294%)] max-[760px]:[[data-ui~=header-inner]_>_&]:w-30 max-[760px]:[[data-ui~=header-inner]_>_&]:m-0 max-[760px]:[[data-ui~=header-inner]_>_&]:[grid-row:1]" href="/" aria-label="Meinhaben – Startseite"><Logo /></a>
-    <nav data-market-nav class="grid grid-cols-[repeat(4,_max-content)] justify-self-end [grid-column:2] [&_a]:relative [&_a]:z-1 [&_a]:flex [&_a]:items-center [&_a]:justify-center [&_a]:gap-2 [&_a]:py-3.5 [&_a]:uppercase [&_a]:border-b-4 [&_a]:border-transparent [&_a]:whitespace-nowrap [&_a]:font-semibold [&_a]:px-3 [&_a]:text-[13px] [&_small]:text-muted [&_small]:text-[11px] [&_small]:font-normal [&_[aria-current=page]]:text-brand [&_a:hover]:text-navy [&_a:focus-visible]:text-navy [&_[aria-current=page]_small]:text-inherit max-[760px]:col-span-full max-[760px]:justify-self-stretch max-[760px]:grid-cols-[repeat(4,_minmax(120px,_1fr))] max-[760px]:-mx-4 max-[760px]:px-4 max-[760px]:overflow-x-auto max-[760px]:[&_a]:py-2.5 max-[760px]:[&_small]:hidden max-[360px]:[&_a]:px-3 max-[360px]:[&_a]:text-[13px]" aria-label="Marktplatz">
-      <a href="/anzeigen/" aria-current={marketActive ? 'page' : undefined}>Marktplatz</a>
-      {verticals.map(vertical => <a href={`/${vertical.slug}/`} aria-current={pathname === `/${vertical.slug}` ? 'page' : undefined}>{vertical.name}</a>)}
+
+<header class="site-header">
+  <div data-ui="header-inner" class="header-inner">
+    <span data-nav-oval class="nav-oval" aria-hidden="true"></span>
+    <a
+      data-header-logo
+      class="header-logo"
+      href="/"
+      aria-label="Meinhaben – Startseite"
+    >
+      <Logo />
+    </a>
+    <nav data-market-nav class="market-nav" aria-label="Marktplatz">
+      <a href="/anzeigen/" aria-current={marketActive ? "page" : undefined}>
+        Marktplatz
+      </a>
+      {verticals.map((vertical) => (
+        <a
+          href={`/${vertical.slug}/`}
+          aria-current={pathname === `/${vertical.slug}` ? "page" : undefined}
+        >
+          {vertical.name}
+        </a>
+      ))}
     </nav>
   </div>
 </header>
@@ -78,3 +96,117 @@ const marketActive = pathname === '/anzeigen' || pathname.startsWith('/inserat/'
   window.addEventListener('resize', realign);
   restore(true);
 </script>
+
+<style>
+  .site-header {
+    background-color: white;
+  }
+  .header-inner {
+    position: relative;
+    isolation: isolate;
+    margin-inline: auto;
+    display: grid;
+    width: min(1440px, calc(100% - 2 * var(--page-gutter)));
+    grid-template-columns: 132px minmax(0, 1fr);
+    grid-template-rows: 90px;
+    column-gap: 40px;
+    row-gap: 0;
+    @media (width < 760px) {
+      grid-template-columns: 120px minmax(0, 1fr);
+      grid-template-rows: 64px 46px;
+      column-gap: 12px;
+      row-gap: 0;
+    }
+  }
+  .nav-oval {
+    pointer-events: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    border-radius: 999px;
+    background-color: var(--color-panel);
+    opacity: 0%;
+    transition:
+      transform 150ms ease-out,
+      opacity 100ms ease-out;
+  }
+  .header-logo {
+    display: block;
+    width: 132px;
+    position: relative;
+    z-index: 1;
+    grid-row: 1;
+    transform: translateY(10.294%);
+    align-self: center;
+    @media (width < 760px) {
+      grid-row: 1;
+      margin: 0;
+      width: 120px;
+    }
+  }
+  .market-nav {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: repeat(4, max-content);
+    justify-self: flex-end;
+    @media (width < 760px) {
+      grid-column: 1 / -1;
+      margin-inline: -16px;
+      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      justify-self: stretch;
+      overflow-x: auto;
+      padding-inline: 16px;
+    }
+    & [aria-current="page"] {
+      color: var(--color-brand);
+    }
+    & [aria-current="page"] small {
+      color: inherit;
+    }
+    & a {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-bottom-style: solid;
+      border-bottom-width: 4px;
+      border-color: transparent;
+      padding-inline: 12px;
+      padding-block: 14px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      text-transform: uppercase;
+    }
+    @media (width < 760px) {
+      & a {
+        padding-block: 10px;
+      }
+    }
+    @media (width < 360px) {
+      & a {
+        padding-inline: 12px;
+        font-size: 13px;
+      }
+    }
+    & a:focus-visible {
+      color: var(--color-navy);
+    }
+    & a:hover {
+      color: var(--color-navy);
+    }
+    & small {
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--color-muted);
+    }
+    @media (width < 760px) {
+      & small {
+        display: none;
+      }
+    }
+  }
+</style>

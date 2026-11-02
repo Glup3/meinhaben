@@ -1,3 +1,4 @@
+import styles from "./FeaturedCarousel.module.css";
 import { useId, useState } from "react";
 import Icon from "./Icon";
 
@@ -28,7 +29,11 @@ const slides = [
   },
 ];
 
-export default function FeaturedCarousel({ photos = [] }: { photos?: string[] }) {
+export default function FeaturedCarousel({
+  photos = [],
+}: {
+  photos?: string[];
+}) {
   const id = useId();
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
@@ -38,7 +43,7 @@ export default function FeaturedCarousel({ photos = [] }: { photos?: string[] })
   }
   return (
     <section
-      className="mt-3 mx-0 mb-2 max-[760px]:mt-2.5"
+      className={styles.carousel}
       aria-label="Meinhaben Empfehlungen"
       aria-roledescription="Karussell"
       data-carousel
@@ -49,13 +54,10 @@ export default function FeaturedCarousel({ photos = [] }: { photos?: string[] })
         }
       }}
     >
-      <div
-        className="relative overflow-hidden rounded-[16px] grid isolate"
-        id={id}
-      >
+      <div className={styles.viewport} id={id}>
         {slides.map((slide, index) => (
           <article
-            className="grid bg-[#093d96] text-white min-w-0 invisible [grid-area:1_/_1] grid-cols-[42%_58%] min-h-65 [&[data-theme=purple]]:bg-[#542695] [&[data-theme=orange]]:bg-[#8b321b] max-[760px]:grid-cols-[1fr] max-[760px]:min-h-0 [&[data-active=true]]:visible"
+            className={styles.slide}
             key={slide.theme}
             data-theme={slide.theme}
             data-active={index === current}
@@ -72,13 +74,10 @@ export default function FeaturedCarousel({ photos = [] }: { photos?: string[] })
                 : undefined
             }
           >
-            <div
-              className="relative bg-[#16acf0] overflow-hidden min-h-65 [[data-theme=purple]_&]:bg-[#d8c3ff] [[data-theme=orange]_&]:bg-[#ffbd78] max-[760px]:min-h-50 max-[760px]:hidden"
-              aria-hidden="true"
-            >
+            <div className={styles.artwork} aria-hidden="true">
               {photos.slice(0, 4).map((photo, i) => (
                 <img
-                  className="absolute w-[39%] h-[47%] object-cover rounded-[12px] [box-shadow:0_12px_24px_#003e8926] [&[data-object='0']]:left-[9%] [&[data-object='0']]:top-[-7%] [&[data-object='0']]:[transform:rotate(-14deg)] [&[data-object='1']]:right-[4%] [&[data-object='1']]:top-[-1%] [&[data-object='1']]:[transform:rotate(16deg)] [&[data-object='2']]:left-[5%] [&[data-object='2']]:bottom-[-5%] [&[data-object='2']]:[transform:rotate(10deg)] [&[data-object='3']]:right-[8%] [&[data-object='3']]:bottom-[-8%] [&[data-object='3']]:[transform:rotate(-12deg)] max-[760px]:w-[32%] max-[760px]:h-[70%] max-[760px]:[&[data-object='1']]:right-[14%] max-[760px]:[&[data-object='3']]:right-[24%]"
+                  className={styles.photo}
                   key={photo}
                   data-object={i}
                   src={photo}
@@ -88,15 +87,10 @@ export default function FeaturedCarousel({ photos = [] }: { photos?: string[] })
                   loading="eager"
                 />
               ))}
-              <span className="absolute right-[3%] bottom-[19%] rounded-[40px] text-white bg-[#7b47c6] font-extrabold [transform:rotate(-10deg)] [box-shadow:0_5px_0_#0001] py-2 px-3 text-[10px] [[data-theme=purple]_&]:bg-[#093d96] max-[760px]:text-[10px] max-[760px]:bottom-[20%]">
-                {slide.tag}
-              </span>
+              <span className={styles.sticker}>{slide.tag}</span>
             </div>
-            <div className="p-[clamp(32px,_4vw,_56px)] flex flex-col justify-center items-start min-h-0 pt-6 pr-16 pb-6 pl-8 [&_h2]:max-w-[20ch] [&_h2]:font-extrabold [&_h2]:leading-[1.16] [&_h2]:whitespace-pre-line [&_h2]:tracking-[-.8px] [&_h2]:text-[clamp(26px,_2.6vw,_36px)] [&_>_a]:inline-flex [&_>_a]:gap-2.5 [&_>_a]:items-center [&_>_a]:text-[15px] [&_>_a]:font-bold [&_>_a]:mt-4 [&_>_a:hover]:underline [&_>_small]:text-[9px] [&_>_small]:opacity-80 [&_>_small]:mt-3 max-[760px]:min-h-49 max-[760px]:py-5 max-[760px]:px-15 max-[760px]:[&_h2]:text-[clamp(23px,_5.6vw,_30px)] max-[760px]:[&_>_a]:mt-3 max-[760px]:[&_>_a]:text-[14px] max-[760px]:[&_>_small]:hidden">
-              <p
-                data-ui="showcase-kicker"
-                className="font-bold uppercase tracking-[1.3px] leading-[1.7] mb-2.5 text-[10px] max-[760px]:mb-1.5 max-[760px]:tracking-[.6px]"
-              >
+            <div className={styles.copy}>
+              <p data-ui="showcase-kicker" className={styles.kicker}>
                 {slide.label}
               </p>
               <h2>{slide.title}</h2>
@@ -108,10 +102,10 @@ export default function FeaturedCarousel({ photos = [] }: { photos?: string[] })
             </div>
           </article>
         ))}
-        <div className="absolute inset-0 z-2 pointer-events-none">
+        <div className={styles.controls}>
           <button
             type="button"
-            className="grid place-items-center left-2 absolute top-[50%] pointer-events-auto w-11 h-11 border border-line rounded-full text-navy bg-white [transform:translateY(-50%)] [&:hover]:bg-[#e8f7ff]"
+            className={styles.previous}
             aria-label="Vorherige Empfehlung"
             aria-controls={id}
             onClick={() => show(-1)}
@@ -120,7 +114,7 @@ export default function FeaturedCarousel({ photos = [] }: { photos?: string[] })
             <Icon name="left" size={18} />
           </button>
           <p
-            className="min-w-9 text-center text-[12px] text-navy sr-only"
+            className={styles.status}
             aria-live="polite"
             aria-atomic="true"
             data-status
@@ -129,7 +123,7 @@ export default function FeaturedCarousel({ photos = [] }: { photos?: string[] })
           </p>
           <button
             type="button"
-            className="grid place-items-center right-2 absolute top-[50%] pointer-events-auto w-11 h-11 border border-line rounded-full text-navy bg-white [transform:translateY(-50%)] [&:hover]:bg-[#e8f7ff]"
+            className={styles.next}
             aria-label="Nächste Empfehlung"
             aria-controls={id}
             onClick={() => show(1)}

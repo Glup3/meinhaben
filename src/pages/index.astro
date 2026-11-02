@@ -1,53 +1,130 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import FeaturedCarousel from '../components/FeaturedCarousel.astro';
-import VerticalBoxes from '../components/VerticalBoxes.astro';
-import Icon from '../components/Icon.astro';
-import ListingCard from '../components/ListingCard.astro';
-import { getListings } from '../data/listings';
+import Layout from "../layouts/Layout.astro";
+import FeaturedCarousel from "../components/FeaturedCarousel.astro";
+import VerticalBoxes from "../components/VerticalBoxes.astro";
+import Icon from "../components/Icon.astro";
+import ListingCard from "../components/ListingCard.astro";
+import { getListings } from "../data/listings";
 const listings = await getListings();
-const latest = listings.filter(item => item.status === "available" && item.price > 0).slice(0, 8);
-const freeListings = listings.filter(item => item.status === "available" && item.price === 0).slice(0, 8);
+const latest = listings
+  .filter((item) => item.status === "available" && item.price > 0)
+  .slice(0, 8);
+const freeListings = listings
+  .filter((item) => item.status === "available" && item.price === 0)
+  .slice(0, 8);
 ---
+
 <Layout>
-  <main id="main" class="w-[min(1440px,_calc(100%_-_2_*_var(--page-gutter)))] mx-auto pt-4.25 max-[760px]:pt-0">
-    <div class="flex items-baseline gap-1.5 mb-2.5 [&_h1]:text-brand [&_h1]:text-[16px] [&_h1]:font-bold [&_>_span]:text-[14px] [&_>_span]:pl-1.5 max-[760px]:absolute max-[760px]:w-0.25 max-[760px]:h-0.25 max-[760px]:overflow-hidden max-[760px]:whitespace-nowrap max-[760px]:[clip-path:inset(100%)]"><h1>Der vermutlich kleinste Marktplatz Österreichs</h1><span>{listings.length} Anzeigen</span></div>
-    <FeaturedCarousel photos={listings.filter(item => item.status === 'available').slice(0, 4).map(item => item.image)} />
+  <main id="main" class="home-page">
+    <div class="marketplace-intro">
+      <h1>Der vermutlich kleinste Marktplatz Österreichs</h1>
+      <span>{listings.length} Anzeigen</span>
+    </div>
+    <FeaturedCarousel
+      photos={listings
+        .filter((item) => item.status === "available")
+        .slice(0, 4)
+        .map((item) => item.image)}
+    />
     <VerticalBoxes />
-    <section class="py-6 px-4 max-[760px]:py-6 max-[760px]:px-0" id="dinge" aria-labelledby="new-heading">
-      <div data-ui="home-section-heading" class="flex justify-between items-baseline gap-4 mb-3.5 [&_>_a]:inline-flex [&_>_a]:items-center [&_>_a]:gap-1 [&_>_a]:text-brand-dark [&_>_a]:text-[12px] [&_>_a]:whitespace-nowrap"><h2 id="new-heading" class="text-[14px] leading-[1.4] uppercase text-muted font-bold mb-3 [[data-ui~=home-section-heading]_&]:mb-0 flex items-center gap-2 [&_svg]:text-brand"><Icon name="sprout" size={24} />Frisch auf meinhaben</h2><a class="[transition:transform_150ms_ease-out] [transform-origin:right_center] [@media(hover:hover)]:[&:hover]:[transform:scale(1.06)]" href="/anzeigen/">Alle Anzeigen <Icon name="right" size={15} /></a></div>
-      <div data-ui="home-listing-rail" class="grid grid-flow-col auto-cols-[clamp(230px,_calc((100%_-_80px)_/_5),_260px)] gap-5 overflow-x-auto p-2 -mx-2 grid-rows-[repeat(3,_auto)] max-[760px]:auto-cols-[160px] max-[760px]:gap-3 max-[760px]:-mr-4 max-[760px]:pr-4">{latest.map(listing => <ListingCard listing={listing} />)}</div>
-    </section>
-    {freeListings.length > 0 && <section class="py-6 px-4 max-[760px]:py-6 max-[760px]:px-0" aria-labelledby="free-heading"><div data-ui="home-section-heading" class="flex justify-between items-baseline gap-4 mb-3.5 [&_>_a]:inline-flex [&_>_a]:items-center [&_>_a]:gap-1 [&_>_a]:text-brand-dark [&_>_a]:text-[12px] [&_>_a]:whitespace-nowrap"><h2 id="free-heading" class="text-[14px] leading-[1.4] uppercase text-muted font-bold mb-3 [[data-ui~=home-section-heading]_&]:mb-0 flex items-center gap-2 [&_svg]:text-brand"><Icon name="gift" size={24} />ZU VERSCHENKEN</h2><a class="[transition:transform_150ms_ease-out] [transform-origin:right_center] [@media(hover:hover)]:[&:hover]:[transform:scale(1.06)]" href="/anzeigen/">Alle Anzeigen <Icon name="right" size={15} /></a></div><div data-ui="home-listing-rail" class="grid grid-flow-col auto-cols-[clamp(230px,_calc((100%_-_80px)_/_5),_260px)] gap-5 overflow-x-auto p-2 -mx-2 grid-rows-[repeat(3,_auto)] max-[760px]:auto-cols-[160px] max-[760px]:gap-3 max-[760px]:-mr-4 max-[760px]:pr-4">{freeListings.map(listing => <ListingCard listing={listing} />)}</div></section>}
-    <section id="so-gehts" aria-labelledby="how-heading" class="px-4 py-6 max-[760px]:px-0">
-      <h2 id="how-heading" class="mb-3 flex items-center gap-2 text-[14px] font-bold uppercase leading-[1.4] text-muted">
-        <Icon name="chat" size={24} class="text-brand" />Kontakt & Übergabe
-      </h2>
-      <div class="mb-5 max-w-[75ch]">
-        <p class="text-[18px] font-semibold leading-[1.5] text-navy">Gefunden wonach du gesucht hast?</p>
-        <p class="mt-1 text-[13px] leading-[1.7] text-muted">Oder vielleicht sogar was gefunden, was du eigentlich nicht gesucht hast? Dann meld dich bei mir!</p>
+    <section class="listing-section" id="dinge" aria-labelledby="new-heading">
+      <div data-ui="home-section-heading" class="section-heading">
+        <h2 id="new-heading" class="section-title">
+          <Icon name="sprout" size={24} />
+          Frisch auf meinhaben
+        </h2>
+        <a class="all-listings-link" href="/anzeigen/">
+          Alle Anzeigen <Icon name="right" size={15} />
+        </a>
       </div>
-      <ol class="m-0 grid list-none grid-cols-3 gap-3 p-0 max-[760px]:grid-cols-1">
-        <li class="rounded-ui border border-line bg-panel p-4">
-          <div class="mb-3 flex items-center gap-3">
-            <span class="grid size-9 shrink-0 place-items-center rounded-ui bg-[#eaf8ff] text-brand-dark"><Icon name="search" size={20} /></span>
-            <div><p class="mb-0.5 text-[11px] text-muted">Schritt 1</p><h3 class="text-[14px] font-semibold text-navy">Lieblingsstück finden</h3></div>
+      <div data-ui="home-listing-rail" class="listing-rail">
+        {latest.map((listing) => (
+          <ListingCard listing={listing} />
+        ))}
+      </div>
+    </section>
+    {freeListings.length > 0 && (
+      <section class="listing-section" aria-labelledby="free-heading">
+        <div data-ui="home-section-heading" class="section-heading">
+          <h2 id="free-heading" class="section-title">
+            <Icon name="gift" size={24} />
+            ZU VERSCHENKEN
+          </h2>
+          <a class="all-listings-link" href="/anzeigen/">
+            Alle Anzeigen <Icon name="right" size={15} />
+          </a>
+        </div>
+        <div data-ui="home-listing-rail" class="listing-rail">
+          {freeListings.map((listing) => (
+            <ListingCard listing={listing} />
+          ))}
+        </div>
+      </section>
+    )}
+    <section
+      id="so-gehts"
+      aria-labelledby="how-heading"
+      class="contact-section"
+    >
+      <h2 id="how-heading" class="contact-heading">
+        <Icon name="chat" size={24} />
+        Kontakt & Übergabe
+      </h2>
+      <div class="contact-intro">
+        <p class="contact-lead">Gefunden wonach du gesucht hast?</p>
+        <p class="contact-description">
+          Oder vielleicht sogar was gefunden, was du eigentlich nicht gesucht
+          hast? Dann meld dich bei mir!
+        </p>
+      </div>
+      <ol class="contact-steps">
+        <li class="contact-step">
+          <div class="step-heading">
+            <span class="step-icon">
+              <Icon name="search" size={20} />
+            </span>
+            <div>
+              <p class="step-number">Schritt 1</p>
+              <h3 class="step-title">Lieblingsstück finden</h3>
+            </div>
           </div>
-          <p class="text-[13px] leading-[1.7] text-muted">Alle Anzeigen sind aus meinem eigenen Haushalt. Schau dir Fotos, Zustand und Beschreibung an.</p>
+          <p class="step-description">
+            Alle Anzeigen sind aus meinem eigenen Haushalt. Schau dir Fotos,
+            Zustand und Beschreibung an.
+          </p>
         </li>
-        <li class="rounded-ui border border-line bg-panel p-4">
-          <div class="mb-3 flex items-center gap-3">
-            <span class="grid size-9 shrink-0 place-items-center rounded-ui bg-[#eaf8ff] text-brand-dark"><Icon name="chat" size={20} /></span>
-            <div><p class="mb-0.5 text-[11px] text-muted">Schritt 2</p><h3 class="text-[14px] font-semibold text-navy">Nachricht schreiben</h3></div>
+        <li class="contact-step">
+          <div class="step-heading">
+            <span class="step-icon">
+              <Icon name="chat" size={20} />
+            </span>
+            <div>
+              <p class="step-number">Schritt 2</p>
+              <h3 class="step-title">Nachricht schreiben</h3>
+            </div>
           </div>
-          <p class="text-[13px] leading-[1.7] text-muted">Schreib mir auf WhatsApp als <a href="https://wa.me/glup3" class="font-semibold text-brand-dark hover:underline">@glup3</a>. Den passenden Nachrichtentext findest du beim Artikel.</p>
+          <p class="step-description">
+            Schreib mir auf WhatsApp als{" "}
+            <a href="https://wa.me/glup3" class="whatsapp-link">
+              @glup3
+            </a>
+            . Den passenden Nachrichtentext findest du beim Artikel.
+          </p>
         </li>
-        <li class="rounded-ui border border-line bg-panel p-4">
-          <div class="mb-3 flex items-center gap-3">
-            <span class="grid size-9 shrink-0 place-items-center rounded-ui bg-[#eaf8ff] text-brand-dark"><Icon name="box" size={20} /></span>
-            <div><p class="mb-0.5 text-[11px] text-muted">Schritt 3</p><h3 class="text-[14px] font-semibold text-navy">Übergabe ausmachen</h3></div>
+        <li class="contact-step">
+          <div class="step-heading">
+            <span class="step-icon">
+              <Icon name="box" size={20} />
+            </span>
+            <div>
+              <p class="step-number">Schritt 3</p>
+              <h3 class="step-title">Übergabe ausmachen</h3>
+            </div>
           </div>
-          <p class="text-[13px] leading-[1.7] text-muted">Alles Weitere besprechen wir persönlich. Ohne Anmeldung und ohne Gebühren.</p>
+          <p class="step-description">
+            Alles Weitere besprechen wir persönlich. Ohne Anmeldung und ohne
+            Gebühren.
+          </p>
         </li>
       </ol>
     </section>
@@ -59,3 +136,193 @@ const freeListings = listings.filter(item => item.status === "available" && item
   const params = new URLSearchParams(location.search);
   if (filters.some(key => params.has(key))) location.replace(`/anzeigen/${location.hash}`);
 </script>
+
+<style>
+  .home-page {
+    margin-inline: auto;
+    width: min(1440px, calc(100% - 2 * var(--page-gutter)));
+    padding-top: 17px;
+    @media (width < 760px) {
+      padding-top: 0;
+    }
+  }
+  .marketplace-intro {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    @media (width < 760px) {
+      position: absolute;
+      height: 1px;
+      width: 1px;
+      overflow: hidden;
+      white-space: nowrap;
+      clip-path: inset(100%);
+    }
+    & > span {
+      padding-left: 6px;
+      font-size: 14px;
+    }
+    & h1 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-brand);
+    }
+  }
+  .listing-section {
+    padding-inline: 16px;
+    padding-block: 24px;
+    @media (width < 760px) {
+      padding-inline: 0;
+      padding-block: 24px;
+    }
+  }
+  .section-heading {
+    margin-bottom: 14px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    & > a {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      white-space: nowrap;
+      color: var(--color-brand-dark);
+    }
+  }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    & :global(svg) {
+      color: var(--color-brand);
+    }
+    margin-bottom: 0;
+  }
+  .all-listings-link {
+    transform-origin: right center;
+    transition: transform 150ms ease-out;
+    @media (hover: hover) {
+      &:hover {
+        transform: scale(1.06);
+      }
+    }
+  }
+  .listing-rail {
+    margin-inline: -8px;
+    display: grid;
+    grid-auto-columns: clamp(230px, calc((100% - 80px) / 5), 260px);
+    grid-auto-flow: column;
+    grid-template-rows: repeat(3, auto);
+    gap: 20px;
+    overflow-x: auto;
+    padding: 8px;
+    @media (width < 760px) {
+      margin-right: -16px;
+      grid-auto-columns: 160px;
+      gap: 12px;
+      padding-right: 16px;
+    }
+  }
+  .contact-section {
+    padding-inline: 16px;
+    padding-block: 24px;
+    @media (width < 760px) {
+      padding-inline: 0;
+    }
+  }
+  .contact-heading {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    line-height: 1.4;
+    font-weight: 700;
+    color: var(--color-muted);
+    text-transform: uppercase;
+  }
+  .contact-heading :global(svg) {
+    color: var(--color-brand);
+  }
+  .contact-intro {
+    margin-bottom: 20px;
+    max-width: 75ch;
+  }
+  .contact-lead {
+    font-size: 18px;
+    line-height: 1.5;
+    font-weight: 600;
+    color: var(--color-navy);
+  }
+  .contact-description {
+    margin-top: 4px;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+  .contact-steps {
+    margin: 0;
+    display: grid;
+    list-style-type: none;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    padding: 0;
+    @media (width < 760px) {
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+  }
+  .contact-step {
+    border-radius: var(--radius-ui);
+    border: 1px solid var(--color-line);
+    background-color: var(--color-panel);
+    padding: 16px;
+  }
+  .step-heading {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .step-icon {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    place-items: center;
+    border-radius: var(--radius-ui);
+    background-color: #eaf8ff;
+    color: var(--color-brand-dark);
+  }
+  .step-number {
+    margin-bottom: 2px;
+    font-size: 11px;
+    color: var(--color-muted);
+  }
+  .step-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-navy);
+  }
+  .step-description {
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--color-muted);
+  }
+  .whatsapp-link {
+    font-weight: 600;
+    color: var(--color-brand-dark);
+    &:hover {
+      @media (hover: hover) {
+        text-decoration-line: underline;
+      }
+    }
+  }
+</style>

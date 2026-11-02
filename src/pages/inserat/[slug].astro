@@ -1,49 +1,240 @@
 ---
-import PhotoGallery from '../../components/react/PhotoGallery';
-import Layout from '../../layouts/Layout.astro';
-import Icon from '../../components/Icon.astro';
-import ListingCard from '../../components/ListingCard.astro';
-import { getListings, formatPrice, statusLabels, type Listing } from '../../data/listings';
+import PhotoGallery from "../../components/react/PhotoGallery";
+import Layout from "../../layouts/Layout.astro";
+import Icon from "../../components/Icon.astro";
+import ListingCard from "../../components/ListingCard.astro";
+import {
+  getListings,
+  formatPrice,
+  statusLabels,
+  type Listing,
+} from "../../data/listings";
 export async function getStaticPaths() {
   const listings = await getListings();
-  return listings.map(listing => ({ params: { slug: listing.slug }, props: { listing } }));
+  return listings.map((listing) => ({
+    params: { slug: listing.slug },
+    props: { listing },
+  }));
 }
-interface Props { listing: Listing; }
+interface Props {
+  listing: Listing;
+}
 const { listing } = Astro.props;
 const listings = await getListings();
-const photos = [{ src: listing.image, alt: listing.imageAlt }, ...(listing.extraImages || [])];
-const related = listings.filter(item => item.slug !== listing.slug && item.status !== 'sold').sort((a, b) => Number(b.category === listing.category) - Number(a.category === listing.category)).slice(0, 3);
+const photos = [
+  { src: listing.image, alt: listing.imageAlt },
+  ...(listing.extraImages || []),
+];
+const related = listings
+  .filter((item) => item.slug !== listing.slug && item.status !== "sold")
+  .sort(
+    (a, b) =>
+      Number(b.category === listing.category) -
+      Number(a.category === listing.category),
+  )
+  .slice(0, 3);
 const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Meinhaben. Ist das noch zu haben?`;
 ---
-<Layout title={`${listing.title} – Meinhaben`} description={listing.description[0]} image={listing.image} imageAlt={listing.imageAlt}>
-  <main id="main" class="w-[min(1440px,_calc(100%_-_2_*_var(--page-gutter)))] mx-auto max-w-295 pt-6 max-[760px]:pt-3.5">
-    <nav class="flex flex-wrap items-center gap-1.25 text-[12px] mb-4.5 [&_svg]:w-2.5 [&_svg]:text-muted [&_a:hover]:text-brand-dark max-[760px]:text-[11px] max-[760px]:mb-3" aria-label="Brotkrümelnavigation"><a href="/">Startseite</a><Icon name="right" /><a href="/anzeigen/#dinge">{listing.category}</a><Icon name="right" /><span aria-current="page">{listing.title}</span></nav>
-    <div class="flex justify-between items-start gap-4 mb-1 [&_h1]:min-w-0 [&_h1]:wrap-anywhere max-[760px]:flex-wrap max-[760px]:gap-2 max-[760px]:[&_h1]:w-full max-[760px]:[&_h1]:text-[23px]"><h1 id="listing-title">{listing.title}</h1><div data-ui="detail-actions" class="flex gap-2 shrink-0 max-[760px]:mb-1.5"><button type="button" class="inline-flex items-center justify-center gap-1.75 min-h-8.5 py-1.5 px-2.5 bg-white border border-brand rounded-ui text-brand-dark text-[12px] [&:hover]:bg-[#eaf8ff] [[data-ui~=detail-actions]_&]:w-8.5 [[data-ui~=detail-actions]_&]:h-8.5 [[data-ui~=detail-actions]_&]:p-1.25" id="share-listing" aria-label="Anzeige teilen"><Icon name="share" size={19} /><span class="[[data-ui~=detail-actions]_&]:hidden">Teilen</span></button></div></div>
-    <div class="flex justify-between gap-3 text-[12px] text-muted mb-4 flex-wrap max-[760px]:text-[11px]"><span>{listing.category} · {listing.condition}</span><span>Veröffentlicht: {new Date(listing.date).toLocaleDateString('de-AT', { timeZone: 'Europe/Vienna' })} | meinhaben-Code: {listing.slug}</span></div>
-    <p id="share-status" role="status" class="text-[12px] text-brand-dark wrap-anywhere [&:not(:empty)]:my-2.5"></p>
-    <div class="grid grid-cols-[minmax(0,_1fr)_300px] items-start gap-y-0 gap-x-4 max-[760px]:grid-cols-[minmax(0,_1fr)] max-[760px]:gap-0">
-      <PhotoGallery photos={photos} client:load />
-      <section data-ui="detail-info" class="self-start bg-panel border border-line p-4 rounded-ui [grid-column:2] [grid-row:1_/_span_4] max-[760px]:row-auto max-[760px]:mt-5 max-[760px]:min-h-0 max-[760px]:[grid-column:1]" aria-label="Preis und Kontakt">
-        <div class="[&_strong]:block [&_strong]:text-brand [&_strong]:text-[28px] [&_strong]:leading-[1.2] [&_small]:block [&_small]:text-[12px] [&_small]:text-muted [&_small]:mt-1"><strong>{formatPrice(listing.price)}</strong><small>{listing.price === 0 ? 'Zu verschenken' : 'Verkaufspreis'}</small></div>
-        <span class="inline-flex items-center gap-1.5 text-[12px] text-[#3b7660] mb-4 [&[data-status=reserved]]:text-[#97651c] [&[data-status=sold]]:text-muted [[data-ui~=detail-info]_&]:mt-3" data-status={listing.status}><span class="size-1.5 rounded-full bg-current"></span>{statusLabels[listing.status]}</span>
-        {listing.status === 'reserved' && <p class="p-2.5 bg-[#fff4df] my-3 mx-0 text-[12px]">Schon reserviert. Du kannst mir trotzdem schreiben, falls es doch wieder frei wird.</p>}
-        {listing.status === 'sold' && <p class="p-2.5 my-3 mx-0 text-[12px] bg-[#e9edf5]">Dieses Stück ist schon vergeben. Schau dir gerne meine anderen Anzeigen an.</p>}
-        <button class="inline-flex justify-center items-center gap-2 py-2.25 px-4 border border-transparent rounded-ui font-bold text-[14px] text-center bg-brand text-white w-full min-h-12 [&:hover]:bg-brand-dark [&:disabled]:bg-[#dce3ee] [&:disabled]:text-[#65758f] [[data-ui~=vertical-copy]_&]:bg-[#093d96] [[data-ui~=vertical-copy]_&]:text-white [[data-ui~=vertical-copy]_&]:mt-7" id="contact-button" aria-haspopup="dialog" aria-controls="contact-dialog" disabled={listing.status === 'sold'}><Icon name={listing.status === 'sold' ? 'check' : 'chat'} size={19} />{listing.status === 'sold' ? 'Bereits vergeben' : 'Nachricht'}</button>
-        <p class="text-[11px] text-muted mt-2">Kontakt über WhatsApp · Ohne Anmeldung</p>
-        <div class="flex gap-3 items-center my-3.5 mt-4 mx-0 mb-0 pt-3 [&_strong]:block [&_strong]:text-[16px] [&_strong]:font-semibold [&_small]:block [&_small]:text-[11px] [&_small]:text-muted [&_small]:mt-0.75"><span class="rounded-full bg-[#e8edf6] grid place-items-center text-[#94a2bc] w-10 h-10"><Icon name="user" size={36} /></span><div><strong>@glup3</strong><small>Privat · Meine Sachen. Für euch.</small></div></div>
-        {listing.price > 0 && listing.status !== 'sold' && <div class="text-[12px] mt-4 [&_button]:py-2 [&_button]:px-0 [&_p]:mt-1"><button type="button" class="text-brand-dark inline-flex items-center gap-1.5 text-[13px] bg-none bg-transparent [&:hover]:underline" id="last-price-button" aria-expanded="false" aria-controls="last-price-reply">Was letzte Preis?</button><p id="last-price-reply" role="status" hidden>Für dich? {formatPrice(listing.price)}. 😉</p></div>}
-      </section>
-      <section class="[grid-column:1] mt-6 [&_h2]:text-[20px] [&_h2]:font-normal [&_h2]:mb-4" aria-labelledby="specs-heading"><h2 id="specs-heading">Artikeldetails</h2><dl class="grid grid-cols-[1fr_1fr] gap-y-3 gap-x-6 p-0 m-0 [&_>_div]:flex [&_>_div]:flex-col [&_>_div]:gap-1.25 [&_>_div]:py-2 [&_>_div]:px-0 [&_dt]:text-[12px] [&_dt]:text-muted [&_dd]:text-[14px] [&_dd]:m-0"><div><dt>Zustand</dt><dd>{listing.condition}</dd></div>{listing.details.map(([label, value]) => <div><dt>{label}</dt><dd>{value}</dd></div>)}</dl></section>
-        <section class="[grid-column:1] mt-7 [&_h2]:text-[20px] [&_h2]:font-normal [&_h2]:mb-4 [&_p]:max-w-[70ch] [&_p]:text-[14px] [&_p]:leading-[1.8] [&_p]:mb-3.5" aria-labelledby="description-heading"><h2 id="description-heading">Beschreibung</h2>{listing.description.map(text => <p>{text}</p>)}</section>
-        <div class="[grid-column:1] p-3.5 flex gap-3 bg-panel border border-line mt-4 text-[12px] leading-[1.7] [&_svg]:text-muted"><Icon name="leaf" size={20} /><p>Von mir persönlich, aus meinem eigenen Haushalt. Wenn du Fragen hast oder dir etwas genauer ansehen möchtest, melde dich einfach.</p></div>
-    </div>
-    <section data-ui="related-section" class="my-8 pt-6" aria-labelledby="related-heading"><div class="flex justify-between items-center gap-4 mb-4 [&_h2]:text-[18px] [&_h2]:font-normal max-[760px]:flex-wrap"><h2 id="related-heading">Weitere Anzeigen von mir</h2><a href="/anzeigen/" class="text-brand-dark inline-flex items-center gap-1.5 text-[13px] bg-none bg-transparent [transition:transform_150ms_ease-out] [transform-origin:right_center] [&:hover]:underline [@media(hover:hover)]:[&:hover]:[transform:scale(1.06)]">Alle Anzeigen <Icon name="arrow" size={17} /></a></div><div data-ui="listing-grid" class="grid grid-cols-[repeat(auto-fill,_minmax(min(100%,_230px),_260px))] gap-5 justify-start [&[data-view=list]]:grid-cols-[minmax(0,_1fr)] [&[data-view=list]]:gap-0 max-[760px]:grid-cols-2 max-[760px]:gap-3 max-[760px]:[&[data-view=list]]:-mx-4 max-[760px]:[[data-ui~=related-section]_&]:grid-cols-2">{related.map(item => <ListingCard listing={item} />)}</div></section>
-  </main>
-  <dialog id="contact-dialog" class="fixed m-auto w-[min(460px,_calc(100%_-_32px))] max-h-[calc(100dvh_-_40px)] overflow-auto border border-line rounded-ui bg-white text-ink p-7.5 [box-shadow:0_12px_50px_#0003] [&::backdrop]:bg-[#17233b99] [&_h2]:text-[23px] [&_h2]:mb-3.5 [&_>_p]:text-[13px] [&_>_p]:leading-[1.7]" aria-labelledby="contact-heading" aria-describedby="contact-description">
-    <button class="absolute top-2 right-2 w-9 h-9 grid place-items-center text-muted bg-panel rounded-ui" data-close-dialog aria-label="Kontaktfenster schließen"><Icon name="close" size={18} /></button><div class="dialog-icon text-brand mb-3.5"><Icon name="chat" size={27} /></div><div class="text-muted text-[12px] mb-2.5">Ganz persönlich</div><h2 id="contact-heading">Schreib mir einfach auf WhatsApp.</h2><p id="contact-description">Du findest mich als @glup3 auf WhatsApp. Sag mir, welches Stück dich interessiert, und wir besprechen alles Weitere.</p>
-    <div class="p-3.5 bg-panel border border-line rounded-ui mt-5 mx-0 mb-4 [&_label]:block [&_label]:text-[11px] [&_label]:uppercase [&_label]:text-muted [&_label]:mb-2 [&_textarea]:block [&_textarea]:w-full [&_textarea]:min-h-23.75 [&_textarea]:bg-transparent [&_textarea]:border-0 [&_textarea]:resize-y [&_textarea]:text-ink [&_textarea]:text-[13px] [&_textarea]:leading-[1.7]"><label for="contact-message">Deine Nachricht könnte so aussehen</label><textarea id="contact-message" readonly rows="3">{message}</textarea></div><a class="inline-flex justify-center items-center gap-2 min-h-10 py-2.25 px-4 border border-transparent rounded-ui font-bold text-[14px] text-center bg-brand text-white w-full mb-2.5 [&:hover]:bg-brand-dark [[data-ui~=vertical-copy]_&]:bg-[#093d96] [[data-ui~=vertical-copy]_&]:text-white [[data-ui~=vertical-copy]_&]:mt-7" href="https://wa.me/glup3"><Icon name="chat" size={17} />WhatsApp öffnen<Icon name="arrow" size={17} /></a><button class="inline-flex justify-center items-center gap-2 min-h-10 py-2.25 px-4 border rounded-ui font-bold text-[14px] text-center text-brand-dark border-brand bg-white w-full mb-2.5 [&:hover]:bg-[#eaf8ff] [[data-ui~=vertical-copy]_&]:bg-[#093d96] [[data-ui~=vertical-copy]_&]:text-white [[data-ui~=vertical-copy]_&]:mt-7" id="copy-message"><Icon name="copy" size={17} /><span>Nachricht kopieren</span></button><p class="text-[12px] min-h-5" id="copy-status" role="status" aria-live="polite"></p>
-  </dialog>
 
+<Layout
+  title={`${listing.title} – Meinhaben`}
+  description={listing.description[0]}
+  image={listing.image}
+  imageAlt={listing.imageAlt}
+>
+  <main id="main" class="listing-page">
+    <nav class="breadcrumbs" aria-label="Brotkrümelnavigation">
+      <a href="/">Startseite</a>
+      <Icon name="right" />
+      <a href="/anzeigen/#dinge">{listing.category}</a>
+      <Icon name="right" />
+      <span aria-current="page">{listing.title}</span>
+    </nav>
+    <div class="title-row">
+      <h1 id="listing-title">{listing.title}</h1>
+      <div data-ui="detail-actions" class="detail-actions">
+        <button
+          type="button"
+          class="share-button"
+          id="share-listing"
+          aria-label="Anzeige teilen"
+        >
+          <Icon name="share" size={19} />
+          <span class="share-label">Teilen</span>
+        </button>
+      </div>
+    </div>
+    <div class="listing-meta">
+      <span>
+        {listing.category} · {listing.condition}
+      </span>
+      <span>
+        Veröffentlicht:{" "}
+        {new Date(listing.date).toLocaleDateString("de-AT", {
+          timeZone: "Europe/Vienna",
+        })}{" "}
+        | meinhaben-Code: {listing.slug}
+      </span>
+    </div>
+    <p id="share-status" role="status" class="share-status"></p>
+    <div class="detail-layout">
+      <PhotoGallery photos={photos} client:load />
+      <section
+        data-ui="detail-info"
+        class="detail-info"
+        aria-label="Preis und Kontakt"
+      >
+        <div class="detail-price">
+          <strong>{formatPrice(listing.price)}</strong>
+          <small>
+            {listing.price === 0 ? "Zu verschenken" : "Verkaufspreis"}
+          </small>
+        </div>
+        <span class="availability" data-status={listing.status}>
+          <span class="status-dot"></span>
+          {statusLabels[listing.status]}
+        </span>
+        {listing.status === "reserved" && (
+          <p class="reserved-notice">
+            Schon reserviert. Du kannst mir trotzdem schreiben, falls es doch
+            wieder frei wird.
+          </p>
+        )}
+        {listing.status === "sold" && (
+          <p class="sold-notice">
+            Dieses Stück ist schon vergeben. Schau dir gerne meine anderen
+            Anzeigen an.
+          </p>
+        )}
+        <button
+          class="contact-button"
+          id="contact-button"
+          aria-haspopup="dialog"
+          aria-controls="contact-dialog"
+          disabled={listing.status === "sold"}
+        >
+          <Icon name={listing.status === "sold" ? "check" : "chat"} size={19} />
+          {listing.status === "sold" ? "Bereits vergeben" : "Nachricht"}
+        </button>
+        <p class="contact-hint">Kontakt über WhatsApp · Ohne Anmeldung</p>
+        <div class="seller">
+          <span class="seller-avatar">
+            <Icon name="user" size={36} />
+          </span>
+          <div>
+            <strong>@glup3</strong>
+            <small>Privat · Meine Sachen. Für euch.</small>
+          </div>
+        </div>
+        {listing.price > 0 && listing.status !== "sold" && (
+          <div class="last-price">
+            <button
+              type="button"
+              class="last-price-button"
+              id="last-price-button"
+              aria-expanded="false"
+              aria-controls="last-price-reply"
+            >
+              Was letzte Preis?
+            </button>
+            <p id="last-price-reply" role="status" hidden>
+              Für dich? {formatPrice(listing.price)}. 😉
+            </p>
+          </div>
+        )}
+      </section>
+      <section class="specs-section" aria-labelledby="specs-heading">
+        <h2 id="specs-heading">Artikeldetails</h2>
+        <dl class="specs">
+          <div>
+            <dt>Zustand</dt>
+            <dd>{listing.condition}</dd>
+          </div>
+          {listing.details.map(([label, value]) => (
+            <div>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+      <section
+        class="description-section"
+        aria-labelledby="description-heading"
+      >
+        <h2 id="description-heading">Beschreibung</h2>
+        {listing.description.map((text) => (
+          <p>{text}</p>
+        ))}
+      </section>
+      <div class="personal-note">
+        <Icon name="leaf" size={20} />
+        <p>
+          Von mir persönlich, aus meinem eigenen Haushalt. Wenn du Fragen hast
+          oder dir etwas genauer ansehen möchtest, melde dich einfach.
+        </p>
+      </div>
+    </div>
+    <section
+      data-ui="related-section"
+      class="related-section"
+      aria-labelledby="related-heading"
+    >
+      <div class="related-heading">
+        <h2 id="related-heading">Weitere Anzeigen von mir</h2>
+        <a href="/anzeigen/" class="all-listings-link">
+          Alle Anzeigen <Icon name="arrow" size={17} />
+        </a>
+      </div>
+      <div data-ui="listing-grid" class="related-grid">
+        {related.map((item) => (
+          <ListingCard listing={item} />
+        ))}
+      </div>
+    </section>
+  </main>
+  <dialog
+    id="contact-dialog"
+    class="contact-dialog"
+    aria-labelledby="contact-heading"
+    aria-describedby="contact-description"
+  >
+    <button
+      class="close-dialog"
+      data-close-dialog
+      aria-label="Kontaktfenster schließen"
+    >
+      <Icon name="close" size={18} />
+    </button>
+    <div class="dialog-icon">
+      <Icon name="chat" size={27} />
+    </div>
+    <div class="dialog-eyebrow">Ganz persönlich</div>
+    <h2 id="contact-heading">Schreib mir einfach auf WhatsApp.</h2>
+    <p id="contact-description">
+      Du findest mich als @glup3 auf WhatsApp. Sag mir, welches Stück dich
+      interessiert, und wir besprechen alles Weitere.
+    </p>
+    <div class="message-preview">
+      <label for="contact-message">Deine Nachricht könnte so aussehen</label>
+      <textarea id="contact-message" readonly rows="3">{message}</textarea>
+    </div>
+    <a class="whatsapp-button" href="https://wa.me/glup3">
+      <Icon name="chat" size={17} />
+      WhatsApp öffnen
+      <Icon name="arrow" size={17} />
+    </a>
+    <button class="copy-button" id="copy-message">
+      <Icon name="copy" size={17} />
+      <span>Nachricht kopieren</span>
+    </button>
+    <p
+      class="copy-status"
+      id="copy-status"
+      role="status"
+      aria-live="polite"
+    ></p>
+  </dialog>
 </Layout>
 <script>
   document.querySelector('#share-listing')?.addEventListener('click', async () => {
@@ -76,3 +267,478 @@ const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Mein
     catch { textarea.focus(); textarea.select(); status.textContent = 'Markiert – kopiere den Text und füge ihn in WhatsApp ein.'; }
   });
 </script>
+
+<style>
+  .listing-page {
+    margin-inline: auto;
+    width: min(1440px, calc(100% - 2 * var(--page-gutter)));
+    max-width: 1180px;
+    padding-top: 24px;
+    @media (width < 760px) {
+      padding-top: 14px;
+    }
+  }
+  .breadcrumbs {
+    margin-bottom: 18px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    @media (width < 760px) {
+      margin-bottom: 12px;
+      font-size: 11px;
+    }
+    & a:hover {
+      color: var(--color-brand-dark);
+    }
+    & :global(svg) {
+      width: 10px;
+      color: var(--color-muted);
+    }
+  }
+  .title-row {
+    margin-bottom: 4px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    @media (width < 760px) {
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    & h1 {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    @media (width < 760px) {
+      & h1 {
+        width: 100%;
+        font-size: 23px;
+      }
+    }
+  }
+  .detail-actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 8px;
+    @media (width < 760px) {
+      margin-bottom: 6px;
+    }
+  }
+  .share-button {
+    display: inline-flex;
+    min-height: 34px;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    border-radius: var(--radius-ui);
+    border: 1px solid var(--color-brand);
+    background-color: white;
+    padding-inline: 10px;
+    padding-block: 6px;
+    font-size: 12px;
+    color: var(--color-brand-dark);
+    &:hover {
+      background-color: #eaf8ff;
+    }
+    height: 34px;
+    width: 34px;
+    padding: 5px;
+  }
+  .share-label {
+    display: none;
+  }
+  .listing-meta {
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 12px;
+    color: var(--color-muted);
+    @media (width < 760px) {
+      font-size: 11px;
+    }
+  }
+  .share-status {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+    color: var(--color-brand-dark);
+    &:not(:empty) {
+      margin-block: 10px;
+    }
+  }
+  .detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    align-items: flex-start;
+    column-gap: 16px;
+    row-gap: 0;
+    @media (width < 760px) {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+  }
+  .detail-info {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    align-self: flex-start;
+    border-radius: var(--radius-ui);
+    border: 1px solid var(--color-line);
+    background-color: var(--color-panel);
+    padding: 16px;
+    @media (width < 760px) {
+      grid-column: 1;
+      grid-row: auto;
+      margin-top: 20px;
+      min-height: 0;
+    }
+  }
+  .detail-price small {
+    margin-top: 4px;
+    display: block;
+    font-size: 12px;
+    color: var(--color-muted);
+  }
+  .detail-price strong {
+    display: block;
+    font-size: 28px;
+    line-height: 1.2;
+    color: var(--color-brand);
+  }
+  .availability {
+    margin-bottom: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #3b7660;
+    &[data-status="reserved"] {
+      color: #97651c;
+    }
+    &[data-status="sold"] {
+      color: var(--color-muted);
+    }
+    margin-top: 12px;
+  }
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background-color: currentcolor;
+  }
+  .reserved-notice {
+    margin-inline: 0;
+    margin-block: 12px;
+    background-color: #fff4df;
+    padding: 10px;
+    font-size: 12px;
+  }
+  .sold-notice {
+    margin-inline: 0;
+    margin-block: 12px;
+    background-color: #e9edf5;
+    padding: 10px;
+    font-size: 12px;
+  }
+  .contact-button,
+  .whatsapp-button,
+  .copy-button {
+    display: inline-flex;
+    min-height: 40px;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: var(--radius-ui);
+    border: 1px solid transparent;
+    padding-inline: 16px;
+    padding-block: 9px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .contact-button {
+    min-height: 48px;
+    &:disabled {
+      background-color: #dce3ee;
+      color: #65758f;
+    }
+  }
+  .contact-button,
+  .whatsapp-button {
+    background-color: var(--color-brand);
+    color: white;
+    &:hover {
+      background-color: var(--color-brand-dark);
+    }
+  }
+  .contact-hint {
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--color-muted);
+  }
+  .seller {
+    margin-inline: 0;
+    margin-block: 14px;
+    margin-top: 16px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    & small {
+      margin-top: 3px;
+      display: block;
+      font-size: 11px;
+      color: var(--color-muted);
+    }
+    & strong {
+      display: block;
+      font-size: 16px;
+      font-weight: 600;
+    }
+  }
+  .seller-avatar {
+    display: grid;
+    height: 40px;
+    width: 40px;
+    place-items: center;
+    border-radius: 9999px;
+    background-color: #e8edf6;
+    color: #94a2bc;
+  }
+  .last-price {
+    margin-top: 16px;
+    font-size: 12px;
+    & button {
+      padding-inline: 0;
+      padding-block: 8px;
+    }
+    & p {
+      margin-top: 4px;
+    }
+  }
+  .last-price-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: transparent;
+    background-image: none;
+    font-size: 13px;
+    color: var(--color-brand-dark);
+    &:hover {
+      text-decoration-line: underline;
+    }
+  }
+  .specs-section {
+    grid-column: 1;
+    margin-top: 24px;
+    & h2 {
+      margin-bottom: 16px;
+      font-size: 20px;
+      font-weight: 400;
+    }
+  }
+  .specs {
+    margin: 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 24px;
+    row-gap: 12px;
+    padding: 0;
+    & > div {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding-inline: 0;
+      padding-block: 8px;
+    }
+    & dd {
+      margin: 0;
+      font-size: 14px;
+    }
+    & dt {
+      font-size: 12px;
+      color: var(--color-muted);
+    }
+  }
+  .description-section {
+    grid-column: 1;
+    margin-top: 28px;
+    & h2 {
+      margin-bottom: 16px;
+      font-size: 20px;
+      font-weight: 400;
+    }
+    & p {
+      margin-bottom: 14px;
+      max-width: 70ch;
+      font-size: 14px;
+      line-height: 1.8;
+    }
+  }
+  .personal-note {
+    grid-column: 1;
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+    border: 1px solid var(--color-line);
+    background-color: var(--color-panel);
+    padding: 14px;
+    font-size: 12px;
+    line-height: 1.7;
+    & :global(svg) {
+      color: var(--color-muted);
+    }
+  }
+  .related-section {
+    margin-block: 32px;
+    padding-top: 24px;
+  }
+  .related-heading {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    @media (width < 760px) {
+      flex-wrap: wrap;
+    }
+    & h2 {
+      font-size: 18px;
+      font-weight: 400;
+    }
+  }
+  .all-listings-link {
+    display: inline-flex;
+    transform-origin: right center;
+    align-items: center;
+    gap: 6px;
+    background-color: transparent;
+    background-image: none;
+    font-size: 13px;
+    color: var(--color-brand-dark);
+    transition: transform 150ms ease-out;
+    &:hover {
+      text-decoration-line: underline;
+    }
+    @media (hover: hover) {
+      &:hover {
+        transform: scale(1.06);
+      }
+    }
+  }
+  .related-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 260px));
+    justify-content: flex-start;
+    gap: 20px;
+    @media (width < 760px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    &[data-view="list"] {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+    }
+    @media (width < 760px) {
+      &[data-view="list"] {
+        margin-inline: -16px;
+      }
+      :global([data-ui~="related-section"]) & {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+  }
+  .contact-dialog {
+    position: fixed;
+    margin: auto;
+    max-height: calc(100dvh - 40px);
+    width: min(460px, calc(100% - 32px));
+    overflow: auto;
+    border-radius: var(--radius-ui);
+    border: 1px solid var(--color-line);
+    background-color: white;
+    padding: 30px;
+    color: var(--color-ink);
+    box-shadow: 0 12px 50px #0003;
+    & > p {
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    & h2 {
+      margin-bottom: 14px;
+      font-size: 23px;
+    }
+    &::backdrop {
+      background-color: #17233b99;
+    }
+  }
+  .close-dialog {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    height: 36px;
+    width: 36px;
+    place-items: center;
+    border-radius: var(--radius-ui);
+    background-color: var(--color-panel);
+    color: var(--color-muted);
+  }
+  .dialog-icon {
+    margin-bottom: 14px;
+    color: var(--color-brand);
+  }
+  .dialog-eyebrow {
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--color-muted);
+  }
+  .message-preview {
+    margin-inline: 0;
+    margin-top: 20px;
+    margin-bottom: 16px;
+    border-radius: var(--radius-ui);
+    border: 1px solid var(--color-line);
+    background-color: var(--color-panel);
+    padding: 14px;
+    & label {
+      margin-bottom: 8px;
+      display: block;
+      font-size: 11px;
+      color: var(--color-muted);
+      text-transform: uppercase;
+    }
+    & textarea {
+      display: block;
+      min-height: 95px;
+      width: 100%;
+      resize: vertical;
+      border-style: solid;
+      border-width: 0;
+      background-color: transparent;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--color-ink);
+    }
+  }
+  .whatsapp-button,
+  .copy-button {
+    margin-bottom: 10px;
+  }
+  .copy-button {
+    border-color: var(--color-brand);
+    background-color: white;
+    color: var(--color-brand-dark);
+    &:hover {
+      background-color: #eaf8ff;
+    }
+  }
+  .copy-status {
+    min-height: 20px;
+    font-size: 12px;
+  }
+</style>
