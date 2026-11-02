@@ -1,3 +1,4 @@
+import styles from "./PhotoGallery.module.css";
 import { useRef, useState } from "react";
 import Icon from "./Icon";
 
@@ -11,9 +12,9 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
   if (!photos.length) return null;
   return (
     <>
-      <section className="min-w-0 [grid-column:1]" aria-label="Artikelfotos">
+      <section className={styles.gallery} aria-label="Artikelfotos">
         <button
-          className="block w-full p-0 border-0 relative bg-[#f3f5fa] aspect-[4/3] cursor-zoom-in [&_>_img]:w-full [&_>_img]:h-full [&_>_img]:object-contain max-[760px]:aspect-[4/3]"
+          className={styles.openGallery}
           onClick={() => dialog.current?.showModal()}
           id="open-gallery"
           aria-haspopup="dialog"
@@ -28,24 +29,21 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
             height="1200"
             fetchPriority="high"
           />
-          <span
-            className="absolute top-0 left-0 py-0.5 px-2 text-[12px] bg-[#8e9bb5aa] text-white"
-            id="gallery-position"
-          >
+          <span className={styles.position} id="gallery-position">
             {index + 1} / {photos.length}
           </span>
-          <span className="grid place-items-center absolute top-2.5 right-2.5 w-7.5 h-7.5 bg-[#fffe] rounded-ui">
+          <span className={styles.expand}>
             <Icon name="expand" size={20} />
           </span>
         </button>
         <div
-          className="flex gap-2 mt-2 overflow-x-auto p-0.5"
+          className={styles.thumbnails}
           role="group"
           aria-label="Foto auswählen"
         >
           {photos.map((photo, photoIndex) => (
             <button
-              className="flex-none border-2 border-transparent p-0 bg-panel [&[aria-pressed=true]]:border-brand [&_img]:w-19 [&_img]:h-13.75 [&_img]:object-cover"
+              className={styles.thumbnail}
               key={photoIndex}
               onClick={() => setIndex(photoIndex)}
               data-photo-index={photoIndex}
@@ -58,7 +56,7 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
             </button>
           ))}
         </div>
-        <p className="text-[11px] text-muted mt-2 max-[760px]:text-[10px]">
+        <p className={styles.hint}>
           <span id="photo-count">
             Foto {index + 1} von {photos.length}
           </span>{" "}
@@ -85,11 +83,11 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
           }
         }}
         id="lightbox"
-        className="fixed m-auto max-h-[calc(100dvh_-_40px)] overflow-auto border border-line rounded-ui bg-white text-ink [box-shadow:0_12px_50px_#0003] max-w-237.5 w-[calc(100%_-_32px)] p-3 [&::backdrop]:bg-[#17233b99] [&_h2]:text-[23px] [&_h2]:mb-3.5 [&_>_p]:text-[13px] [&_>_p]:leading-[1.7]"
+        className={styles.lightbox}
         aria-label="Artikelfoto in Großansicht"
       >
         <button
-          className="absolute top-2 right-2 w-9 h-9 grid place-items-center text-muted bg-panel rounded-ui"
+          className={styles.closeDialog}
           onClick={() => dialog.current?.close()}
           data-close-dialog
           aria-label="Großansicht schließen"
@@ -98,18 +96,18 @@ export default function PhotoGallery({ photos }: { photos: Photo[] }) {
         </button>
         <img
           id="lightbox-image"
-          className="w-full max-h-[75dvh] object-contain"
+          className={styles.lightboxImage}
           src={photos[index].src}
           alt={photos[index].alt}
           width="1200"
           height="1200"
         />
-        <div className="flex justify-between items-center pt-3 text-[12px] text-muted">
+        <div className={styles.lightboxFooter}>
           <span id="lightbox-count" aria-live="polite">
             Foto {index + 1} von {photos.length}
           </span>
           {photos.length > 1 && (
-            <div className="flex gap-1.5 [&_button]:w-10 [&_button]:h-10 [&_button]:grid [&_button]:place-items-center [&_button]:bg-panel">
+            <div className={styles.photoControls}>
               <button
                 onClick={() => select(-1)}
                 id="previous-photo"

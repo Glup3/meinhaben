@@ -1,0 +1,134 @@
+.gallery {
+  grid-column: 1;
+  min-width: 0;
+}
+.openGallery {
+  position: relative;
+  display: block;
+  aspect-ratio: 4/3;
+  width: 100%;
+  cursor: zoom-in;
+  border-style: solid;
+  border-width: 0;
+  background-color: #f3f5fa;
+  padding: 0;
+  @media (width < 760px) {
+    aspect-ratio: 4/3;
+  }
+  & > img {
+    height: 100%;
+    width: 100%;
+    object-fit: contain;
+  }
+}
+.position {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #8e9bb5aa;
+  padding-inline: 8px;
+  padding-block: 2px;
+  font-size: 12px;
+  color: white;
+}
+.expand {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  height: 30px;
+  width: 30px;
+  place-items: center;
+  border-radius: var(--radius-ui);
+  background-color: #fffe;
+}
+.thumbnails {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px;
+}
+.thumbnail {
+  flex: none;
+  border: 2px solid transparent;
+  background-color: var(--color-panel);
+  padding: 0;
+  & img {
+    height: 55px;
+    width: 76px;
+    object-fit: cover;
+  }
+  &[aria-pressed="true"] {
+    border-color: var(--color-brand);
+  }
+}
+.hint {
+  margin-top: 8px;
+  font-size: 11px;
+  color: var(--color-muted);
+  @media (width < 760px) {
+    font-size: 10px;
+  }
+}
+.lightbox {
+  position: fixed;
+  margin: auto;
+  max-height: calc(100dvh - 40px);
+  width: calc(100% - 32px);
+  max-width: 950px;
+  overflow: auto;
+  border-radius: var(--radius-ui);
+  border: 1px solid var(--color-line);
+  background-color: white;
+  padding: 12px;
+  color: var(--color-ink);
+  box-shadow: 0 12px 50px #0003;
+  & > p {
+    font-size: 13px;
+    line-height: 1.7;
+  }
+  & h2 {
+    margin-bottom: 14px;
+    font-size: 23px;
+  }
+  &::backdrop {
+    background-color: #17233b99;
+  }
+}
+.closeDialog {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  height: 36px;
+  width: 36px;
+  place-items: center;
+  border-radius: var(--radius-ui);
+  background-color: var(--color-panel);
+  color: var(--color-muted);
+}
+.lightboxImage {
+  max-height: 75dvh;
+  width: 100%;
+  object-fit: contain;
+}
+.lightboxFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 12px;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+.photoControls {
+  display: flex;
+  gap: 6px;
+  & button {
+    display: grid;
+    height: 40px;
+    width: 40px;
+    place-items: center;
+    background-color: var(--color-panel);
+  }
+}

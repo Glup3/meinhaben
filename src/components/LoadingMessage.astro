@@ -1,4 +1,6 @@
-<span class="absolute inset-0 grid place-items-center bg-[#f3f5fa] p-4 text-center text-[12px] text-muted" data-photo-loading hidden aria-hidden="true">Verkäufer sucht noch das Ladekabel …</span>
+<span class="photo-loading" data-photo-loading hidden aria-hidden="true">
+  Verkäufer sucht noch das Ladekabel …
+</span>
 
 <script>
   const messages = [
@@ -21,3 +23,17 @@
     image.addEventListener('error', finish, { once: true });
   });
 </script>
+
+<style>
+  .photo-loading {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background-color: #f3f5fa;
+    padding: 16px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--color-muted);
+  }
+</style>

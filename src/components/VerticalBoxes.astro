@@ -1,15 +1,140 @@
 ---
-import Icon from './Icon.astro';
+import Icon from "./Icon.astro";
 const boxes = [
-  { name: 'Marktplatz', href: '/anzeigen/', icon: 'market', text: 'Gute Dinge finden – am vermutlich kleinsten Marktplatz Österreichs.' },
-  { name: 'Immobilien', href: '/immobilien/', icon: 'home', text: 'Dein neues Zuhause? Ich hätte erst mal einen Sessel.' },
-  { name: 'Auto & Motor', href: '/auto-motor/', icon: 'car', text: 'Große Gefühle. Kleiner Fuhrpark. Bitte anschnallen.' },
-  { name: 'Jobs', href: '/jobs/', icon: 'briefcase', text: 'Du suchst einen neuen Job? Ich suche jemanden zum Abholen.' },
+  {
+    name: "Marktplatz",
+    href: "/anzeigen/",
+    icon: "market",
+    text: "Gute Dinge finden – am vermutlich kleinsten Marktplatz Österreichs.",
+  },
+  {
+    name: "Immobilien",
+    href: "/immobilien/",
+    icon: "home",
+    text: "Dein neues Zuhause? Ich hätte erst mal einen Sessel.",
+  },
+  {
+    name: "Auto & Motor",
+    href: "/auto-motor/",
+    icon: "car",
+    text: "Große Gefühle. Kleiner Fuhrpark. Bitte anschnallen.",
+  },
+  {
+    name: "Jobs",
+    href: "/jobs/",
+    icon: "briefcase",
+    text: "Du suchst einen neuen Job? Ich suche jemanden zum Abholen.",
+  },
 ];
 ---
-<nav class="grid grid-cols-4 gap-2.5 mt-6 mx-0 mb-3 max-[760px]:grid-cols-[1fr] max-[760px]:gap-1.5 max-[360px]:grid-cols-[1fr]" aria-label="Unsere Bereiche">
-  {boxes.map(box => <a class="relative flex flex-col overflow-hidden border rounded-[5px] bg-[#f2f9fd] border-line [transition:none] [@media(hover:hover)]:[&:hover]:z-1 [@media(hover:hover)]:[&:hover]:[transform:scale(1.025)] [&_>_p]:flex [&_>_p]:items-center [&_>_p]:flex-1 [&_>_p]:py-2 [&_>_p]:min-h-0 [&_>_p]:pt-1.5 [&_>_p]:px-3 [&_>_p]:pb-3 [&_>_p]:text-[12px] [&_>_p]:leading-[1.4] [&_>_p]:text-navy max-[760px]:[&_>_p]:text-[12px] max-[760px]:[&_>_p]:p-2.5 [&:hover]:border-brand [&:hover]:[transform:none] max-[760px]:grid max-[760px]:grid-cols-[130px_1fr] max-[760px]:items-center" href={box.href}>
-    <div class="flex items-center gap-2 py-1.75 text-brand justify-start min-h-9 pt-2 px-3 pb-0 bg-transparent [&_h2]:font-bold [&_h2]:text-[14px] [&_svg]:text-navy [&_svg]:w-4.5 [&_svg]:h-4.5 max-[760px]:gap-2 max-[760px]:p-2.5 max-[760px]:[&_h2]:text-[14px] max-[760px]:[&_svg]:w-4.5 max-[760px]:[&_svg]:h-4.5"><Icon name={box.icon} size={32} /><h2>{box.name}</h2></div>
-    <p>{box.text}</p>
-  </a>)}
+
+<nav class="vertical-boxes" aria-label="Unsere Bereiche">
+  {boxes.map((box) => (
+    <a class="vertical-card" href={box.href}>
+      <div class="vertical-heading">
+        <Icon name={box.icon} size={32} />
+        <h2>{box.name}</h2>
+      </div>
+      <p>{box.text}</p>
+    </a>
+  ))}
 </nav>
+
+<style>
+  .vertical-boxes {
+    margin-inline: 0;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    @media (width < 760px) {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+    @media (width < 360px) {
+      grid-template-columns: 1fr;
+    }
+  }
+  .vertical-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 5px;
+    border: 1px solid var(--color-line);
+    background-color: #f2f9fd;
+    transition: none;
+    @media (width < 760px) {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      align-items: center;
+    }
+    & > p {
+      display: flex;
+      min-height: 0;
+      flex: 1;
+      align-items: center;
+      padding-inline: 12px;
+      padding-block: 8px;
+      padding-top: 6px;
+      padding-bottom: 12px;
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--color-navy);
+    }
+    @media (width < 760px) {
+      & > p {
+        padding: 10px;
+        font-size: 12px;
+      }
+    }
+    &:hover {
+      transform: none;
+      border-color: var(--color-brand);
+    }
+    @media (hover: hover) {
+      &:hover {
+        z-index: 1;
+        transform: scale(1.025);
+      }
+    }
+  }
+  .vertical-heading {
+    display: flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    background-color: transparent;
+    padding-inline: 12px;
+    padding-block: 7px;
+    padding-top: 8px;
+    padding-bottom: 0;
+    color: var(--color-brand);
+    @media (width < 760px) {
+      gap: 8px;
+      padding: 10px;
+    }
+    & h2 {
+      font-size: 14px;
+      font-weight: 700;
+    }
+    @media (width < 760px) {
+      & h2 {
+        font-size: 14px;
+      }
+    }
+    & :global(svg) {
+      height: 18px;
+      width: 18px;
+      color: var(--color-navy);
+    }
+    @media (width < 760px) {
+      & :global(svg) {
+        height: 18px;
+        width: 18px;
+      }
+    }
+  }
+</style>

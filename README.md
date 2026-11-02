@@ -20,19 +20,16 @@ UI at `http://localhost:4321`. PocketBase must be running for content sync,
   dialogs, item details, related listings, and the WhatsApp contact message.
 - `src/components/react/`: hydrated React islands for the featured carousel and
   photo gallery. Astro renders their initial HTML; React owns interactive state.
-- `src/styles/global.css`: Tailwind CSS v4 entry point and CSS theme (brand colors,
-  Open Sans, 4px spacing, and shared radius).
+- `src/styles/global.css`: shared CSS variables for brand colors, Open Sans,
+  page gutters and corners, plus base styles and accessibility defaults.
 
-Tailwind runs through `@tailwindcss/vite` in `astro.config.mjs`, following
-[Astro’s Tailwind 4 setup](https://docs.astro.build/en/guides/styling/#add-tailwind-4).
-Keep component styling in Astro markup with Tailwind utilities and responsive
-variants. Use data attributes and ARIA attributes for JavaScript hooks and
-interactive states. Global CSS contains the theme, base reset, and accessibility
-defaults. The
-spacing token uses pixels to preserve the design with the 14px root font size;
-use explicit pixel font sizes when matching existing typography. Tailwind’s theme
-and utilities are imported separately, keeping the existing base reset instead
-of Preflight so native controls, dialogs, and image sizing retain their appearance.
+Use descriptive component classes and scoped `<style>` blocks in Astro files.
+React islands use colocated `*.module.css` files, imported as `styles`. Keep
+responsive rules and interactive states with their component, using data and
+ARIA attributes for state and JavaScript hooks. Use `:global()` in Astro only
+when a selector deliberately crosses a component boundary, such as an Icon SVG
+or a listing grid containing ListingCard components. Keep shared design tokens
+in `global.css`; no CSS framework or utility generation is required.
 
 The interface follows willhaben’s marketplace with an original MEINHABEN
 speech-bubble logo, locally hosted Open Sans, linked vertical cards beneath the featured carousel. The homepage has a three-slide featured carousel
