@@ -16,7 +16,8 @@
     "pb:install": "node scripts/pocketbase.mjs install",
     "pb:dev": "node scripts/pocketbase.mjs serve --http=127.0.0.1:8090 --dev",
     "pb": "node scripts/pocketbase.mjs",
-    "test": "tsx --test src/components/react/*.test.tsx"
+    "test": "tsx --test src/components/react/*.test.tsx",
+    "test:listing-editor": "node --test scripts/listing-form.test.mjs scripts/listing-editor.test.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^7.1.2",

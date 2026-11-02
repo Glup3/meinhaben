@@ -172,11 +172,37 @@ rules hide draft listings and their photo records. Uploaded files are ordinary
 public files: knowing a draft photo URL still permits access. Use protected files
 and authorized delivery if draft images must be confidential.
 
-New databases start with empty collections. Create categories, listings and
-photos manually in PocketBase. The former example seed migration has been
-removed; this does not delete examples already stored in an existing database.
+New databases start with empty collections. Create categories in PocketBase,
+then use **New listing** to add listings and photos together. The former example
+seed migration has been removed; this does not delete examples already stored in
+an existing database.
 Delete those listings through the dashboard; related photo records are deleted
 automatically. Existing categories can be kept for real listings.
+
+## Create listings in one form
+
+Sign into the PocketBase dashboard and open **New listing** in the top navigation
+(dashboard route `/_/#/new-listing`). This superuser-only page combines listing
+fields, category selection, optional label/value details, and photo uploads.
+Select multiple JPEG, PNG or WebP photos at once (up to 12, 10 MB per photo),
+change their order with the arrow buttons, and edit their photo descriptions.
+The first photo becomes the cover. Categories must already exist.
+
+**Save draft** permits incomplete photo sets; **Create & publish** requires at
+least one photo and sets the publication date automatically. Both actions save
+the listing and its photos in a single database transaction through
+`POST /api/marketplace/listings`, protected by PocketBase superuser middleware.
+Failed validation rolls back the operation. The page uses the dashboard's own
+authenticated client, with no embedded credentials or separate login.
+
+The extension lives in `pocketbase/pb_hooks/listing-editor/` and is included in
+the existing backend Docker image. It targets PocketBase's experimental 0.40.6
+UI-extension API; verify it when upgrading PocketBase. Rebuild/deploy the website
+separately after publishing content. The editor does not trigger deployments.
+
+Run `pnpm run pb:install` and `pnpm run test:listing-editor` to test the form and
+its API. Integration tests start an isolated PocketBase process with temporary
+storage; they never use production credentials, records or uploads.
 
 ## Schema migrations and hooks
 
