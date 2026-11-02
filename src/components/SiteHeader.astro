@@ -1,6 +1,12 @@
 ---
 import Logo from "./Logo.astro";
+import Icon from "./Icon.astro";
 import { verticals } from "../data/verticals";
+const navIcons: Record<string, string> = {
+  immobilien: "home",
+  "auto-motor": "car",
+  jobs: "briefcase",
+};
 const pathname = Astro.url.pathname.replace(/\/$/, "");
 const marketActive =
   pathname === "/anzeigen" || pathname.startsWith("/inserat/");
@@ -17,16 +23,18 @@ const marketActive =
     >
       <Logo />
     </a>
-    <nav data-market-nav class="market-nav" aria-label="Marktplatz">
+    <nav data-market-nav class="market-nav" aria-label="Unsere Bereiche">
       <a href="/anzeigen/" aria-current={marketActive ? "page" : undefined}>
-        Marktplatz
+        <Icon name="market" class="nav-icon" size={22} />
+        <span>Marktplatz</span>
       </a>
       {verticals.map((vertical) => (
         <a
           href={`/${vertical.slug}/`}
           aria-current={pathname === `/${vertical.slug}` ? "page" : undefined}
         >
-          {vertical.name}
+          <Icon name={navIcons[vertical.slug]} class="nav-icon" size={22} />
+          <span>{vertical.name}</span>
         </a>
       ))}
     </nav>
@@ -113,7 +121,7 @@ const marketActive =
     row-gap: 0;
     @media (width < 760px) {
       grid-template-columns: 120px minmax(0, 1fr);
-      grid-template-rows: 64px 46px;
+      grid-template-rows: 64px auto;
       column-gap: 12px;
       row-gap: 0;
     }
@@ -130,6 +138,9 @@ const marketActive =
     transition:
       transform 150ms ease-out,
       opacity 100ms ease-out;
+    @media (width < 760px) {
+      display: none;
+    }
   }
   .header-logo {
     display: block;
@@ -152,11 +163,10 @@ const marketActive =
     justify-self: flex-end;
     @media (width < 760px) {
       grid-column: 1 / -1;
-      margin-inline: -16px;
-      grid-template-columns: repeat(4, minmax(120px, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       justify-self: stretch;
-      overflow-x: auto;
-      padding-inline: 16px;
+      gap: 4px;
+      padding-block: 4px 12px;
     }
     & [aria-current="page"] {
       color: var(--color-brand);
@@ -183,13 +193,26 @@ const marketActive =
     }
     @media (width < 760px) {
       & a {
-        padding-block: 10px;
+        min-width: 0;
+        min-height: 64px;
+        flex-direction: column;
+        gap: 6px;
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 2px;
+        font-size: 11px;
+        line-height: 1.25;
+        text-transform: none;
       }
-    }
-    @media (width < 360px) {
-      & a {
-        padding-inline: 12px;
-        font-size: 13px;
+      & [aria-current="page"] {
+        background-color: var(--color-panel);
+      }
+      & a:focus-visible {
+        outline: 2px solid var(--color-brand);
+        outline-offset: 2px;
+      }
+      & a:hover {
+        background-color: var(--color-panel);
       }
     }
     & a:focus-visible {
@@ -207,6 +230,13 @@ const marketActive =
       & small {
         display: none;
       }
+    }
+  }
+  .market-nav :global(.nav-icon) {
+    display: none;
+    flex-shrink: 0;
+    @media (width < 760px) {
+      display: block;
     }
   }
 </style>
