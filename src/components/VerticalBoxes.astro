@@ -49,11 +49,7 @@ const boxes = [
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 10px;
     @media (width < 760px) {
-      grid-template-columns: 1fr;
-      gap: 6px;
-    }
-    @media (width < 360px) {
-      grid-template-columns: 1fr;
+      display: none;
     }
   }
   .vertical-card {
@@ -65,11 +61,6 @@ const boxes = [
     border: 1px solid var(--color-line);
     background-color: #f2f9fd;
     transition: none;
-    @media (width < 760px) {
-      display: grid;
-      grid-template-columns: 130px 1fr;
-      align-items: center;
-    }
     & > p {
       display: flex;
       min-height: 0;
@@ -82,12 +73,6 @@ const boxes = [
       font-size: 12px;
       line-height: 1.4;
       color: var(--color-navy);
-    }
-    @media (width < 760px) {
-      & > p {
-        padding: 10px;
-        font-size: 12px;
-      }
     }
     &:hover {
       transform: none;
@@ -112,29 +97,14 @@ const boxes = [
     padding-top: 8px;
     padding-bottom: 0;
     color: var(--color-brand);
-    @media (width < 760px) {
-      gap: 8px;
-      padding: 10px;
-    }
     & h2 {
       font-size: 14px;
       font-weight: 700;
-    }
-    @media (width < 760px) {
-      & h2 {
-        font-size: 14px;
-      }
     }
     & :global(svg) {
       height: 18px;
       width: 18px;
       color: var(--color-navy);
-    }
-    @media (width < 760px) {
-      & :global(svg) {
-        height: 18px;
-        width: 18px;
-      }
     }
   }
 </style>

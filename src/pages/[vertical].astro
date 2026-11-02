@@ -59,11 +59,13 @@ const { vertical } = Astro.props;
   .vertical-page {
     margin-inline: auto;
     width: min(1440px, calc(100% - 2 * var(--page-gutter)));
-    padding-top: 24px;
+    padding-top: 29px;
     padding-bottom: 48px;
+    @media (width < 760px) {
+      padding-top: 20px;
+    }
   }
   .vertical-hero {
-    margin-top: 22px;
     display: grid;
     grid-template-columns: 1.6fr 1fr;
     overflow: hidden;
