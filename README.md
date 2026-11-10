@@ -1,22 +1,22 @@
 # meinhaben
 
-A static Astro marketplace for sharing used goods with friends and family.
+An Astro marketplace for sharing used goods with friends and family.
 The German UI loads listings, categories and photo galleries from PocketBase at
-build time. Migrations create the collections; content is managed in PocketBase.
+request time. Migrations create the collections; content is managed in PocketBase.
 
 ## UI development
 
 Follow the local development setup below, then run `pnpm run dev` to preview the
-UI at `http://localhost:4321`. PocketBase must be running for content sync,
-`pnpm run check` and `pnpm run build`; there is no static-data fallback.
+UI at `http://localhost:4321`. PocketBase is needed only when requesting marketplace pages. Checks and builds
+work offline; there is no sample-data fallback.
 
-- `src/content.config.ts`: public PocketBase loaders with explicit content schemas.
+- `src/data/schemas.ts`: validated public PocketBase record schemas.
 - `src/data/listings.ts`: maps PocketBase records into the UI model, including
   category names, German condition labels, cents, paragraphs and ordered photos.
 - `src/pages/index.astro`: homepage with featured carousel, vertical links, and selected listings.
-- `src/pages/anzeigen.astro`: live search, category and availability filters, price
-  sorting, and empty states. Filters are preserved in the URL.
-- `src/pages/inserat/[slug].astro`: prebuilt listing pages with accessible photo
+- `src/pages/anzeigen.astro`: request-rendered results and empty states; shared
+  search, category, budget, condition, availability and sorting URL filters still work.
+- `src/pages/inserat/[slug].astro`: request-rendered listing pages with accessible photo
   dialogs, item details, related listings, and the WhatsApp contact message.
 - `src/components/react/`: hydrated React islands for the featured carousel and
   photo gallery. Astro renders their initial HTML; React owns interactive state.
@@ -38,9 +38,9 @@ Immobilien, Auto & Motor, and Jobs link to individual humorous pages;
 these verticals contain no sale listings.
 
 The visible search bars have been removed. The Marktplatz card and “Alle Anzeigen”
-open `/anzeigen/`, which retains category, availability, budget and condition
-filters, sorting, and list/grid views. Previously shared search and homepage
-filter URLs still work, with their query state intact. Reset clears all filters.
+open `/anzeigen/`. Previously shared search, category, availability, budget,
+condition and price-sorting URLs still work, including homepage query redirects.
+The current design has no filter, sorting or view toolbar.
 Listing pages support native sharing with clipboard and visible link fallbacks.
 
 The contact dialog links to the seller's WhatsApp username `glup3` through
@@ -59,7 +59,7 @@ Open Sans is hosted locally under the SIL Open Font License in
 Search-engine indexing is disabled through page metadata; this is not access
 control or authentication.
 
-Link previews are rendered into the static HTML with Open Graph and Twitter
+Link previews are rendered into the response HTML with Open Graph and Twitter
 metadata. Listing links use the item's main photo; the homepage uses
 `public/images/meinhaben-share.jpg` (1200 × 630). Canonical and image URLs use
 the public `site` origin in `astro.config.mjs`. Search indexing stays disabled
@@ -99,49 +99,57 @@ pnpm run preview
 
 ## Content loading
 
-`src/content.config.ts` loads `categories`, published `listings`, and their
-`listing_images` through public read APIs. Explicit Astro schemas avoid needing
-superuser credentials in the frontend build. All records are fetched on each
-sync; removed or unpublished entries are removed from Astro's content store.
-Run `s` followed by Enter in the Astro dev terminal to sync dashboard edits.
-Only publish fields intended for visitors: public API rules expose those records
-directly, not just through the website. Missing categories/photos fail the build
-with the affected listing's slug instead of silently using static examples.
+The homepage, `/anzeigen/` and `/inserat/[slug]` query public PocketBase APIs on
+every request through `src/data/listings.ts`. `getListings(): Promise<Listing[]>`
+and `getCategories()` retain their exported UI contracts. `getMarketplace()`
+returns `{ listings, categories, unavailable }` for page-level error handling.
+There is no authenticated shared client, content collection sync, or content cache.
+Pagination fetches every public record. Listings and images use publication
+filters; draft listings are also rejected locally. Record validation preserves
+category, photo, condition, status, price and details requirements. Invalid public
+data fails closed with a 503 rather than leaking an incomplete listing.
 
-`POCKETBASE_URL` selects the backend URL at **build time**. The deployed build
-uses `https://meinhaben-admin.ditto.glup3.dev`; local development uses `.env`.
-PocketBase content changes need a new Astro build/deployment. There is no
-automatic content-change rebuild webhook in this starter. PocketBase must be
-reachable when Astro builds.
+Missing/unpublished slugs render the existing German 404 with HTTP 404. Backend
+errors/timeouts render German retry text with HTTP 503 and `Retry-After: 30`.
+Request-rendered responses carry `Cache-Control: no-store`; do not configure a
+proxy/CDN HTML cache in front of them. Images and sharing services can have their
+own independent caches. Fixed humorous vertical pages and the 404 stay prerendered;
+their footer has general marketplace links without live category links. The shared
+layout accepts optional `listings` and `categories` props and never fetches data.
 
-The Dockerfile uses a Node build stage to generate the site, then copies only
-`dist/` into the official `nginx:alpine` runtime image. Supply `SITE_URL` and
-`POCKETBASE_URL` as Docker build arguments. Optional `POCKETBASE_INTERNAL_URL`
-selects a separate API address for the builder; generated image URLs still use
-`POCKETBASE_URL`. These values are baked into the generated pages, so runtime
-environment changes and container restarts do not update the site.
+`POCKETBASE_URL` is the **runtime public origin** for API reads and uploaded photo
+links. Optional `POCKETBASE_INTERNAL_URL` overrides only server API reads. It must
+never be used in image/social URLs. Node resolves these environment variables on
+each call; `.env` is also supported in Astro development. `SITE_URL` remains a
+**build-time** canonical origin. No PB credentials belong on the public website.
+Content edits, uploads, publication changes and deletions appear on the next page
+request without a rebuild or restart. In-flight requests can observe concurrent
+edits across the separate public API reads; a transient inconsistent publication
+returns 503 and the next request retries from the backend.
 
-Docker cannot detect content changes in PocketBase. For content-only builds,
-change `CONTENT_VERSION` (for example, `--build-arg CONTENT_VERSION="$(date +%s)"`)
-or use `docker build --no-cache`. Coolify disables the build cache for the website
-to fetch fresh content on every deployment, including redeploys of the same commit.
-This also reruns dependency installation. Reusing an existing image intentionally
-serves its original generated pages; uploaded images still come from PocketBase.
+The Dockerfile builds without contacting PB and runs Astro's Node standalone
+server on `0.0.0.0:4321` as the unprivileged `node` user. Start a built site with
+`pnpm start` (set `HOST`/`PORT` as needed). `/healthz` checks process readiness
+independently of PB, so a backend outage does not cause website restart loops.
+Only `SITE_URL` is a Docker build argument; PB URLs are runtime environment values.
+Normal Docker build caching can stay enabled; `CONTENT_VERSION` is removed.
 
-For the complete local Docker stack, start PocketBase first, then build the website:
+For the complete local Docker stack, configure the backend's `PB_ADMIN_*` and
+`PB_ENCRYPTION_KEY` variables, then run:
 
 ```sh
-docker compose up -d --build --wait pocketbase
-docker compose build --build-arg CONTENT_VERSION="$(date +%s)" website
-docker compose up -d --no-build website
+docker compose up -d --build
 ```
 
 The website is at `http://localhost:8080`, PocketBase at `http://localhost:8090`.
-The website builder uses host networking to reach the backend's localhost-only
-port. This workflow requires Linux Docker Engine or Docker Desktop with host
-networking enabled. Configure the backend's `PB_ADMIN_*` and `PB_ENCRYPTION_KEY`
-variables first. For the portable development workflow, use `compose.local.yaml`
-and `pnpm run dev` as described above.
+The website reads `http://pocketbase:8090` on the private Compose network while
+visitor image links use `http://localhost:8090`. Host networking and a running PB
+during image build are no longer required. `compose.local.yaml` remains the
+localhost-only PB alternative for `pnpm run dev`.
+
+After `pnpm run build`, run `pnpm run test:ssr` to exercise the built Node runtime
+against an isolated HTTP fixture, including live changes, drafts, missing pages,
+metadata and outages. No production database is read or modified by these tests.
 
 ## Editing marketplace content
 
@@ -211,45 +219,38 @@ repository:
 
 | Resource | Build configuration | Purpose |
 | --- | --- | --- |
-| `meinhaben website` | Dockerfile, `/Dockerfile`, port 80 | Rolling website deployments at <https://meinhaben.glup3.dev> |
+| `meinhaben website` | Dockerfile, `/Dockerfile`, port 4321 | Rolling website deployments at <https://meinhaben.glup3.dev> |
 | `meinhaben PocketBase` | Docker Compose, `/docker-compose.production.yaml` | Existing database and uploads at <https://meinhaben-admin.ditto.glup3.dev> |
 
 ### Website
 
-Set **build-time** `SITE_URL=https://meinhaben.glup3.dev` and
-`POCKETBASE_URL=https://meinhaben-admin.ditto.glup3.dev`. The website reads the
-public PocketBase API during `docker build`; it needs no database credentials or
-persistent storage. Leave `POCKETBASE_INTERNAL_URL` unset for this independent
-resource. Keep Docker build-argument injection enabled and Docker Build Secrets
-disabled: the Dockerfile declares public URL arguments explicitly.
+This branch changes configuration files and documents rollout only; it does not
+deploy or change the saved Coolify resources. At the authorized rollout:
 
-Enable **Disable Build Cache** on the website application so every deployment
-fetches current PocketBase content. The Docker image is complete before it starts;
-a failed Astro build fails the deployment before replacing the running website.
-Restarting an existing container serves the same content. Content edits require a
-new image build/deployment and do not automatically trigger one.
+1. Keep **build-time** `SITE_URL=https://meinhaben.glup3.dev`. Set **runtime**
+   `POCKETBASE_URL=https://meinhaben-admin.ditto.glup3.dev`. Leave
+   `POCKETBASE_INTERNAL_URL` unset unless a verified private service address is
+   reachable from the independent website container. Remove PB URL build args.
+2. Change the application's exposed port from **80 to 4321** and readiness path
+   from `/` to **`/healthz`**, host `127.0.0.1`, port 4321. Keep the 60-second
+   start period, 5-second interval/timeout, 12 retries, timestamped container names,
+   no host port mapping, and 30-second graceful shutdown allowance.
+3. Re-enable Docker build caching; remove `CONTENT_VERSION` if configured. Keep
+   public `SITE_URL` build-argument injection enabled. No website persistent
+   storage or database credentials are needed for public rendering.
+4. Let Coolify manage normal domain/HTTPS/compression labels. Remove obsolete
+   Nginx-specific settings and any old custom retry/health/priority labels. Do not
+   enable shared HTML caching. The Node adapter serves the built static assets.
+5. Build and deploy only after approval. Verify readiness, homepage, filters,
+   listing galleries, share metadata, noindex, missing-slug 404 and draft hiding.
+   Make a reversible content edit in a **test backend** and confirm it appears on
+   the next request; test an unavailable backend for German 503/no-store behavior.
+   Verify rolling updates under traffic; readiness alone does not prove no drops.
 
-Enable the HTTP readiness check on `/`, host `127.0.0.1`, port 80, with a
-60-second start period, 5-second interval/timeout and 12 retries. Keep timestamped
-container names and no host port mappings so Coolify can run old and new
-containers together. Allow 30 seconds for graceful shutdown. The official Nginx
-image runs Nginx in the foreground and uses `SIGQUIT`; there is no custom website
-entrypoint or shutdown delay.
-
-Let Coolify manage the container labels using its standard domain, HTTPS and
-compression settings. Remove the custom `meinhaben-retry` middleware, its router
-reference, and the custom Traefik service health-check and router-priority labels.
-Keep the container HTTP readiness check enabled. Nginx also enables gzip for
-direct access and keeps one-year immutable caching scoped to fingerprinted
-`/_astro/` assets. Other requests use normal static routing and the generated 404.
-
-The old ten-second network linger was a local workaround without linked rollout
-test evidence. It is not an Astro or Traefik deployment requirement. Upstream
-[retry middleware](https://doc.traefik.io/traefik/reference/routing-configuration/http/middlewares/retry/)
-and [backend health checks](https://doc.traefik.io/traefik/reference/routing-configuration/http/load-balancing/service/#health-check)
-document those individual features, not that workaround. Verify rolling updates
-under traffic when deploying this change; readiness alone does not establish that
-every request survives a rollout.
+No PocketBase schema/auth changes or backend deployment are required. Retain the
+existing backend resource, volume and credentials. To roll back, restore the
+previous website image and port 80/readiness `/` configuration; that old static
+image serves its build-time snapshot. Rollback does not require a database restore.
 
 The signed GitHub push webhook deploys the website for frontend/build changes.
 Its watch paths cover `src/**`, `public/**`, `deploy/**`, `Dockerfile`,
@@ -275,7 +276,7 @@ Startup does not seed or reset content.
 Backend auto-deployment is disabled deliberately. After reviewing and backing up
 changes to `pocketbase/**` or `docker-compose.production.yaml`, deploy PocketBase
 first, verify its health and migrations, then deploy the website. This explicit
-ordering prevents a frontend build from racing a schema migration. Backend
+ordering prevents runtime reads from racing an incompatible schema migration. Backend
 updates still have a short interruption; routine website deployments do not
 restart PocketBase. Keep migrations compatible with the old website during
 rollout. Verify health at `/api/health`.
@@ -293,21 +294,20 @@ and use the URL template `{{pr_id}}.{{domain}}`. Wildcard DNS and the signed
 repository webhook (`push` and `pull_request` events) provide website URLs such
 as `https://42.meinhaben.glup3.dev`. Closing a PR removes its website preview.
 
-Set these **preview build-time** environment variables in the website application,
+Set these preview environment variables in the website application,
 separately from its production variables:
 
 | Variable | Preview value |
 | --- | --- |
-| `SITE_URL` | `$COOLIFY_URL` |
-| `POCKETBASE_URL` | `https://meinhaben-admin.ditto.glup3.dev` |
+| `SITE_URL` (build-time) | `$COOLIFY_URL` |
+| `POCKETBASE_URL` (runtime) | `https://meinhaben-admin.ditto.glup3.dev` |
 
 Keep `SITE_URL` non-literal so Coolify resolves `$COOLIFY_URL` to the current
 preview's HTTPS URL. Do not set `POCKETBASE_INTERNAL_URL` or any `PB_ADMIN_*` or
-`PB_ENCRYPTION_KEY` variables on the website application. Each preview generates
-its static pages from the production PocketBase API during the image build and uses the
-production origin for uploaded images. Production remains the only deployed
+`PB_ENCRYPTION_KEY` variables on the website application. Each preview reads the production public PocketBase API at request time and uses
+the production origin for uploaded images. Apply port 4321 and `/healthz` to previews too. Production remains the only deployed
 PocketBase instance; previews have no database containers or persistent volumes.
-Changes to production content appear in a preview after redeploying it. Any
+Changes to production content appear in a preview on the next request. Any
 authenticated writes made through preview code affect production data too.
 
 `docker-compose.yaml` is only the complete local development stack; it is not

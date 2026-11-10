@@ -4,8 +4,12 @@ import FeaturedCarousel from "../components/FeaturedCarousel.astro";
 import VerticalBoxes from "../components/VerticalBoxes.astro";
 import Icon from "../components/Icon.astro";
 import ListingCard from "../components/ListingCard.astro";
-import { getListings } from "../data/listings";
-const listings = await getListings();
+import { getMarketplace } from "../data/listings";
+const { listings, categories, unavailable } = await getMarketplace();
+if (unavailable) {
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '30');
+}
 const latest = listings
   .filter((item) => item.status === "available" && item.price > 0)
   .slice(0, 8);
@@ -14,8 +18,9 @@ const freeListings = listings
   .slice(0, 8);
 ---
 
-<Layout>
+<Layout listings={listings} categories={categories}>
   <main id="main" class="home-page">
+    {unavailable && <p role="status">Die Anzeigen machen gerade eine kurze Pause. Bitte versuch es gleich noch einmal.</p>}
     <div class="marketplace-intro">
       <h1>Der vermutlich kleinste Marktplatz Österreichs</h1>
       <span>{listings.length} Anzeigen</span>
@@ -134,7 +139,7 @@ const freeListings = listings
   // Keep previously shared homepage filter URLs working after splitting discovery and results.
   const filters = ['q', 'kategorie', 'gratis', 'budget', 'zustand', 'verfuegbar', 'sortierung'];
   const params = new URLSearchParams(location.search);
-  if (filters.some(key => params.has(key))) location.replace(`/anzeigen/${location.hash}`);
+  if (filters.some(key => params.has(key))) location.replace(`/anzeigen/${location.search}${location.hash}`);
 </script>
 
 <style>
