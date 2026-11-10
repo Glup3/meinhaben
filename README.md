@@ -55,7 +55,13 @@ a message. Free and sold listings omit the button.
 Upload item photos through the PocketBase dashboard. The homepage carousel uses
 photos from available listings; sample listing photos are no longer bundled.
 Open Sans is hosted locally under the SIL Open Font License in
-`public/fonts/OpenSans-OFL.txt`. The original Inter asset and license are retained.
+`public/fonts/OpenSans-OFL.txt`. The German UI preloads a 65 KB WOFF2 Latin face
+from `src/assets/fonts/`; Vite fingerprints it for immutable asset caching.
+`font-display: optional` prevents a late font swap on slow first visits; cached
+refreshes use Open Sans immediately. The original font covers other scripts in
+listing content through a disjoint Unicode range. Regenerate the WOFF2 with
+`scripts/build-font.py` using `fonttools[woff]==4.68.0` and `brotli==1.2.1`;
+site builds need neither Python nor font conversion tools. The original Inter asset and license are retained.
 Search-engine indexing is disabled through page metadata; this is not access
 control or authentication.
 
@@ -126,6 +132,10 @@ Content edits, uploads, publication changes and deletions appear on the next pag
 request without a rebuild or restart. In-flight requests can observe concurrent
 edits across the separate public API reads; a transient inconsistent publication
 returns 503 and the next request retries from the backend.
+
+The Node adapter buffers each small HTML response until rendering finishes,
+preventing a partially streamed header from painting during a cached refresh.
+This is per-request rendering, with no content cache.
 
 The Dockerfile builds without contacting PB and runs Astro's Node standalone
 server on `0.0.0.0:4321` as the unprivileged `node` user. Start a built site with
