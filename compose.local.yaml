@@ -1,3 +1,5 @@
+# The Astro Node app runs separately with pnpm dev and request-time API reads.
+# Checks/builds do not need this service.
 # Optional local alternative to pnpm run pb:dev. Binds only to localhost.
 services:
   pocketbase:

@@ -10,21 +10,24 @@
   "scripts": {
     "dev": "astro dev --host 0.0.0.0",
     "build": "astro build",
+    "start": "node ./dist/server/entry.mjs",
     "preview": "astro preview --host 0.0.0.0",
     "check": "astro check",
     "astro": "astro",
     "pb:install": "node scripts/pocketbase.mjs install",
     "pb:dev": "node scripts/pocketbase.mjs serve --http=127.0.0.1:8090 --dev",
     "pb": "node scripts/pocketbase.mjs",
-    "test": "tsx --import ./scripts/test-css-modules.mjs --test src/components/react/*.test.tsx",
-    "test:seller": "tsx --test tests/seller.integration.test.ts"
+    "test": "tsx --import ./scripts/test-css-modules.mjs --test src/components/react/*.test.tsx src/components/seller/*.test.tsx src/data/*.test.ts",
+    "test:seller": "tsx --test tests/seller.integration.test.ts",
+    "test:ssr": "node scripts/test-ssr.mjs"
   },
   "dependencies": {
+    "@astrojs/node": "11.1.11",
     "@astrojs/react": "^7.1.2",
     "astro": "7.4.2",
-    "astro-loader-pocketbase": "4.0.8",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1"
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",

@@ -4,39 +4,38 @@ import Layout from "../../layouts/Layout.astro";
 import Icon from "../../components/Icon.astro";
 import ListingCard from "../../components/ListingCard.astro";
 import {
-  getListings,
+  getMarketplace,
   formatPrice,
   statusLabels,
-  type Listing,
 } from "../../data/listings";
-export async function getStaticPaths() {
-  const listings = await getListings();
-  return listings.map((listing) => ({
-    params: { slug: listing.slug },
-    props: { listing },
-  }));
+import NotFound from "../404.astro";
+import Unavailable from "../../components/Unavailable.astro";
+const { listings, categories, unavailable } = await getMarketplace();
+const listing = listings.find(item => item.slug === Astro.params.slug);
+if (unavailable) {
+  Astro.response.status = 503;
+  Astro.response.headers.set('Retry-After', '30');
+} else if (!listing) {
+  Astro.response.status = 404;
 }
-interface Props {
-  listing: Listing;
-}
-const { listing } = Astro.props;
-const listings = await getListings();
-const photos = [
+const photos = listing ? [
   { src: listing.image, alt: listing.imageAlt },
-  ...(listing.extraImages || []),
-];
+  ...listing.extraImages,
+] : [];
 const related = listings
-  .filter((item) => item.slug !== listing.slug && item.status !== "sold")
+  .filter((item) => item.slug !== listing?.slug && item.status !== "sold")
   .sort(
     (a, b) =>
-      Number(b.category === listing.category) -
-      Number(a.category === listing.category),
+      Number(b.category === listing?.category) -
+      Number(a.category === listing?.category),
   )
   .slice(0, 3);
-const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Meinhaben. Ist das noch zu haben?`;
+const message = `Hey! Ich interessiere mich für „${listing?.title}“ auf Meinhaben. Ist das noch zu haben?`;
 ---
 
+{unavailable ? <Unavailable /> : !listing ? <NotFound /> : (
 <Layout
+  listings={listings} categories={categories}
   title={`${listing.title} – Meinhaben`}
   description={listing.description[0]}
   image={listing.image}
@@ -236,6 +235,7 @@ const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Mein
     ></p>
   </dialog>
 </Layout>
+)}
 <script>
   document.querySelector('#share-listing')?.addEventListener('click', async () => {
     const status = document.querySelector('#share-status')!;
@@ -255,12 +255,12 @@ const message = `Hey! Ich interessiere mich für „${listing.title}“ auf Mein
     button.setAttribute('aria-expanded', String(!reply.hidden));
   });
   const contact = document.querySelector<HTMLDialogElement>('#contact-dialog')!;
-  document.querySelector('#contact-button')!.addEventListener('click', () => { document.querySelector('#copy-status')!.textContent = ''; contact.showModal(); });
-  for (const dialog of [contact]) {
+  document.querySelector('#contact-button')?.addEventListener('click', () => { document.querySelector('#copy-status')!.textContent = ''; contact.showModal(); });
+  for (const dialog of contact ? [contact] : []) {
     dialog.querySelector('[data-close-dialog]')!.addEventListener('click', () => dialog.close());
     dialog.addEventListener('click', event => { const rect = dialog.getBoundingClientRect(); if (event.target === dialog && (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom)) dialog.close(); });
   }
-  document.querySelector('#copy-message')!.addEventListener('click', async () => {
+  document.querySelector('#copy-message')?.addEventListener('click', async () => {
     const textarea = document.querySelector<HTMLTextAreaElement>('#contact-message')!;
     const status = document.querySelector('#copy-status')!;
     try { await navigator.clipboard.writeText(textarea.value); status.textContent = 'Kopiert! Jetzt in unserem WhatsApp-Chat einfügen.'; }
