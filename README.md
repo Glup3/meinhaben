@@ -133,9 +133,10 @@ request without a rebuild or restart. In-flight requests can observe concurrent
 edits across the separate public API reads; a transient inconsistent publication
 returns 503 and the next request retries from the backend.
 
-The Node adapter buffers each small HTML response until rendering finishes,
-preventing a partially streamed header from painting during a cached refresh.
-This is per-request rendering, with no content cache.
+The navigation becomes visible once its complete HTML has been parsed, using
+CSS and an inert end marker. This prevents cached styles/fonts from exposing
+partly received links on refresh and does not depend on JavaScript or hydration.
+The Node adapter keeps its normal response streaming; there is no content cache.
 
 The Dockerfile builds without contacting PB and runs Astro's Node standalone
 server on `0.0.0.0:4321` as the unprivileged `node` user. Start a built site with
