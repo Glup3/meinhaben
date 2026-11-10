@@ -1,0 +1,40 @@
+---
+import '../../styles/global.css';
+import Logo from '../../components/Logo.astro';
+import SellerApp, { type Item, type Initial } from '../../components/seller/SellerApp';
+import { allRecords, authenticate, photoURL, SellerError } from '../../seller/server';
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+Astro.response.headers.set('Referrer-Policy', 'same-origin');
+let initial: Initial | null = null;
+let error = '';
+try {
+  const { token, seller } = await authenticate(Astro);
+  const filter = encodeURIComponent(`owner="${seller.id}"`);
+  const listings = await allRecords<Item>('listings', `sort=-created&filter=${filter}`, token);
+  const images = await allRecords('listing_images', `sort=sort_order&filter=${encodeURIComponent(`listing.owner="${seller.id}"`)}`, token);
+  const categories = await allRecords<Initial['categories'][number]>('categories', 'sort=sort_order', token);
+  initial = { listings, categories, photos: images.map(photo => ({ id: photo.id, listing: String(photo.listing), url: photoURL(photo) })) };
+} catch (cause) {
+  if (!(cause instanceof SellerError) || ![401, 403].includes(cause.status)) error = 'Der Verkäuferbereich ist gerade nicht erreichbar. Bitte später erneut versuchen.';
+}
+---
+<!doctype html>
+<html lang="de-AT">
+  <head>
+    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" /><title>Verkaufen – MEINHABEN</title>
+    <link rel="icon" href="/favicon.svg" />
+  </head>
+  <body>
+    <header><a href="/" aria-label="MEINHABEN Startseite"><Logo /></a><a href="/anzeigen/">Zum Marktplatz</a></header>
+    <main><SellerApp initial={initial} serverError={error} client:load /></main>
+  </body>
+</html>
+<style>
+  header { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:20px var(--page-gutter); border-bottom:1px solid var(--color-line); }
+  header a:first-child { width:160px; }
+  header a:last-child { color:var(--color-navy); }
+  main { max-width:760px; margin:auto; padding:28px var(--page-gutter) 60px; }
+</style>

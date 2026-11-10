@@ -151,6 +151,18 @@ After `pnpm run build`, run `pnpm run test:ssr` to exercise the built Node runti
 against an isolated HTTP fixture, including live changes, drafts, missing pages,
 metadata and outages. No production database is read or modified by these tests.
 
+## Private seller interface
+
+Open `/verkaufen/` for the mobile seller flow: camera/library photos, ordered
+cover, draft save, preview, publish, and own-listing edits/reserved/sold status.
+Accounts are manually created in the locked `sellers` auth collection; there is
+no public signup. Apply the backend migration **before** deploying this website,
+then bootstrap accounts and assign owners to existing listings in the dashboard.
+See [seller setup, rollout, security and recovery](docs/seller.md) for the exact
+steps, HTTP-only session/CSRF boundaries, public-file semantics and local tests.
+The website needs no superuser credentials. Seller tests use a disposable local
+PocketBase and never write production.
+
 ## Editing marketplace content
 
 - `categories`: name, unique slug, existing icon key (`home`, `tech`, `sun`),
@@ -172,8 +184,9 @@ still cascades normally.
 Details use `[{"label":"Marke","value":"Patagonia"}]`. Keep published slugs stable to
 avoid breaking shared links. Deleting a listing deletes its photo records too.
 
-All create/update/delete API rules are locked to superusers. Public list/view
-rules hide draft listings and their photo records. Uploaded files are ordinary
+Enabled sellers may write only their own listings and photos; categories and
+seller accounts remain managed by superusers. Public list/view rules hide draft
+listings and their photo records; an owner can also read their own drafts. Uploaded files are ordinary
 public files: knowing a draft photo URL still permits access. Use protected files
 and authorized delivery if draft images must be confidential.
 
@@ -247,8 +260,10 @@ deploy or change the saved Coolify resources. At the authorized rollout:
    the next request; test an unavailable backend for German 503/no-store behavior.
    Verify rolling updates under traffic; readiness alone does not prove no drops.
 
-No PocketBase schema/auth changes or backend deployment are required. Retain the
-existing backend resource, volume and credentials. To roll back, restore the
+The public SSR conversion alone needs no backend schema change. The stacked
+seller interface adds a committed migration: follow the backend-first rollout
+in [docs/seller.md](docs/seller.md) before enabling it. Retain the existing backend
+resource, volume and credentials. To roll back, restore the
 previous website image and port 80/readiness `/` configuration; that old static
 image serves its build-time snapshot. Rollback does not require a database restore.
 

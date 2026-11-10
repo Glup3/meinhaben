@@ -17,8 +17,10 @@
     "pb:install": "node scripts/pocketbase.mjs install",
     "pb:dev": "node scripts/pocketbase.mjs serve --http=127.0.0.1:8090 --dev",
     "pb": "node scripts/pocketbase.mjs",
-    "test": "tsx --import ./scripts/test-css-modules.mjs --test src/components/react/*.test.tsx src/data/*.test.ts",
-    "test:ssr": "node scripts/test-ssr.mjs"
+    "test": "tsx --import ./scripts/test-css-modules.mjs --test src/components/react/*.test.tsx src/components/seller/*.test.tsx src/data/*.test.ts",
+    "test:seller": "tsx --test tests/seller.integration.test.ts",
+    "test:ssr": "node scripts/test-ssr.mjs",
+    "test:seller:ssr": "SELLER_TEST_SSR=1 tsx --test tests/seller.integration.test.ts"
   },
   "dependencies": {
     "@astrojs/node": "11.1.11",
