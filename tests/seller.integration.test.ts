@@ -57,8 +57,11 @@ test('seller API and PocketBase rules against disposable real backend', async t 
     let token = '';
     await t.test('origin, login, seller authorization and secure cookie', async () => {
       assert.equal((await invoke('save', {}, 'https://evil.test')).status, 403);
+      assert.equal((await invoke('login', { email: seller.email, password }, '')).status, 403);
+      assert.equal((await invoke('login', { email: 'local-test@example.invalid', password })).status, 400);
+      jar.set(COOKIE, admin); assert.equal((await invoke('save', {})).status, 403); jar.clear();
       assert.equal((await invoke('save', {})).status, 401);
-      assert.equal((await invoke('login', { email: disabled.email, password })).status, 403);
+      assert.equal((await invoke('login', { email: disabled.email, password })).status, 400);
       assert.equal((await raw('collections/sellers/records', '', 'POST', { email: 'signup@example.invalid', password, passwordConfirm: password, enabled: true })).status, 403);
       assert.throws(() => assertSeller({ id: seller.id, collectionName: '_superusers', enabled: true }));
       const context = { url: new URL('https://seller.test/verkaufen/'), cookies: { set: (...args: any[]) => {
@@ -77,6 +80,7 @@ test('seller API and PocketBase rules against disposable real backend', async t 
       assert.equal((await raw(`collections/listings/records/${id}`)).status, 404);
       assert.equal((await raw('collections/listings/records')).body.totalItems, 0);
       assert.equal((await raw(`collections/listings/records/${id}`, token, 'PATCH', { owner: other.id })).status, 404);
+      assert.equal((await raw('collections/listings/records', token, 'POST', { ...draft, id: 'forgedlisting01', slug: 'forged', owner: other.id, status: 'available' })).status, 400);
       assert.equal((await invoke('publish', { id })).status, 400);
       await auth(other.email);
       assert.notEqual((await invoke('save', draft)).status, 200);
@@ -93,6 +97,10 @@ test('seller API and PocketBase rules against disposable real backend', async t 
           const result = await invoke('upload', form); assert.equal(result.status, 200, JSON.stringify(result.body));
         }
       }
+      const otherListing = await create('listings', { ...draft, id: 'otherlisting001', slug: 'other-draft', owner: other.id, status: 'available' });
+      assert.equal((await raw(`collections/listing_images/records/${imageIds[0]}`, jar.get(COOKIE)!, 'PATCH', { listing: otherListing.id })).status, 404);
+      const forged = new FormData(); forged.set('listing', otherListing.id); forged.set('alt', 'forged'); forged.set('image', new File([png], 'test.png', { type: 'image/png' }));
+      assert.equal((await raw('collections/listing_images/records', jar.get(COOKIE)!, 'POST', forged)).status, 400);
       assert.equal((await raw(`collections/listing_images/records/${imageIds[0]}`)).status, 404);
       let own = (await raw('collections/listing_images/records', jar.get(COOKIE)!)).body;
       assert.equal(own.totalItems, 2);
@@ -102,6 +110,8 @@ test('seller API and PocketBase rules against disposable real backend', async t 
       assert.deepEqual(own.items.map((p: any) => p.id), [...imageIds].reverse());
       assert.equal((await invoke('publish', { id })).status, 200);
       assert.equal((await raw(`collections/listings/records/${id}`)).status, 200);
+      assert.equal((await invoke('photos', { id, order: [imageIds[1]] })).status, 200);
+      assert.equal((await raw('collections/listing_images/records', jar.get(COOKIE)!)).body.totalItems, 2);
       assert.equal((await invoke('photos', { id, order: [imageIds[1]], remove: [imageIds[0]] })).status, 200);
       assert.equal((await invoke('photos', { id, order: [], remove: [imageIds[1]] })).status, 400);
       assert.equal((await invoke('status', { id, status: 'sold' })).status, 200);
@@ -110,6 +120,49 @@ test('seller API and PocketBase rules against disposable real backend', async t 
       assert.equal((await invoke('status', { id, status: 'available' })).status, 403);
       assert.equal((await raw(`collections/listing_images/records/${imageIds[1]}`, jar.get(COOKIE)!, 'PATCH', { alt: 'stolen' })).status, 404);
       await auth(seller.email);
+    });
+    if (process.env.SELLER_TEST_SSR === '1') await t.test('built HTTP app: login cookies, private page isolation, public edits and CSRF', async () => {
+      const reservation = createServer(); await new Promise<void>(r => reservation.listen(0, '127.0.0.1', r));
+      const appPort = (reservation.address() as { port: number }).port; await new Promise<void>(r => reservation.close(() => r()));
+      const origin = `http://127.0.0.1:${appPort}`;
+      const runtime = spawn(process.execPath, ['dist/server/entry.mjs'], { env: { ...process.env, HOST: '127.0.0.1', PORT: String(appPort) }, stdio: 'ignore' });
+      try {
+        for (let attempt = 0; ; attempt++) {
+          try { if ((await fetch(`${origin}/healthz`)).ok) break; } catch {}
+          if (attempt > 100) throw new Error('Built runtime failed to start');
+          await new Promise(r => setTimeout(r, 50));
+        }
+        const page = await fetch(`${origin}/verkaufen/`);
+        assert.equal(page.status, 200); assert.equal(page.headers.get('cache-control'), 'no-store');
+        assert.match(await page.text(), /Verkäufer-Anmeldung/);
+        const login = async (email: string) => {
+          const response = await fetch(`${origin}/verkaufen/api/login`, { method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+          assert.equal(response.status, 200, await response.text());
+          const cookie = response.headers.get('set-cookie')!;
+          assert.match(cookie, /HttpOnly/i); assert.match(cookie, /SameSite=Strict/i); assert.match(cookie, /Path=\/verkaufen/i); assert.match(cookie, /Max-Age=28800/i);
+          return cookie.split(';')[0];
+        };
+        // Simulate the production HTTPS reverse proxy: forwarded origin must be
+        // allowlisted and the real response must issue a Secure session cookie.
+        const publicOrigin = new URL(process.env.SITE_URL || 'https://meinhaben.glup3.dev');
+        const forwarded = await fetch(`${origin}/verkaufen/api/login`, { method: 'POST', headers: { Origin: publicOrigin.origin, 'X-Forwarded-Proto': publicOrigin.protocol.slice(0, -1), 'X-Forwarded-Host': publicOrigin.host, 'Content-Type': 'application/json' }, body: JSON.stringify({ email: seller.email, password }) });
+        assert.equal(forwarded.status, 200, await forwarded.text()); assert.match(forwarded.headers.get('set-cookie')!, /; Secure/i);
+        const spoofed = await fetch(`${origin}/verkaufen/api/login`, { method: 'POST', headers: { Origin: 'https://evil.test', 'X-Forwarded-Proto': 'https', 'X-Forwarded-Host': 'evil.test', 'Content-Type': 'application/json' }, body: JSON.stringify({ email: seller.email, password }) });
+        assert.equal(spoofed.status, 403);
+        const cookie = await login(seller.email);
+        const privatePage = await fetch(`${origin}/verkaufen/`, { headers: { Cookie: cookie } });
+        const html = await privatePage.text(); assert.equal(privatePage.status, 200);
+        assert.match(html, /Text nach Retry/); assert.ok(!html.includes(cookie.split('=')[1])); assert.ok(!html.includes(password));
+        const otherCookie = await login(other.email);
+        assert.ok(!(await (await fetch(`${origin}/verkaufen/`, { headers: { Cookie: otherCookie } })).text()).includes('Text nach Retry'));
+        const mutation = async (requestOrigin: string, title: string) => fetch(`${origin}/verkaufen/api/save`, { method: 'POST', headers: { Origin: requestOrigin, Cookie: cookie, 'Content-Type': 'application/json' }, body: JSON.stringify({ ...draft, title }) });
+        assert.equal((await mutation('https://evil.test', 'CSRF')).status, 403);
+        assert.equal((await mutation(origin, 'Sofort sichtbar')).status, 200);
+        const publicPage = await fetch(`${origin}/inserat/artikel-${id}/`);
+        assert.equal(publicPage.status, 200); assert.match(await publicPage.text(), /Sofort sichtbar/);
+        const logout = await fetch(`${origin}/verkaufen/api/logout`, { method: 'POST', headers: { Origin: origin, Cookie: cookie, 'Content-Type': 'application/json' }, body: '{}' });
+        assert.equal(logout.status, 200); assert.match(logout.headers.get('set-cookie')!, /Max-Age=0|Expires=Thu, 01 Jan 1970/i);
+      } finally { runtime.kill('SIGTERM'); await new Promise(r => runtime.once('exit', r)); }
     });
     await t.test('sessions are revalidated after account revocation and logout', async () => {
       await raw(`collections/sellers/records/${seller.id}`, admin, 'PATCH', { enabled: false });

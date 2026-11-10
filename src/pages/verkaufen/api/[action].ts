@@ -9,8 +9,13 @@ export const POST: APIRoute = async (context) => {
     if (action === 'login') {
       const { email, password } = await context.request.json();
       if (typeof email !== 'string' || typeof password !== 'string') throw new SellerError(400, 'Bitte E-Mail und Passwort eingeben.');
-      const auth = await pb('collections/sellers/auth-with-password', '', 'POST', { identity: email, password });
-      assertSeller(auth.record); sessionCookie(context, auth.token);
+      let auth;
+      try { auth = await pb('collections/sellers/auth-with-password', '', 'POST', { identity: email, password }); assertSeller(auth.record); }
+      catch (error) {
+        if (error instanceof SellerError && error.status < 500) throw new SellerError(400, 'Anmeldung fehlgeschlagen. Bitte E-Mail, Passwort und Freigabe prüfen.');
+        throw error;
+      }
+      sessionCookie(context, auth.token);
       return json({ ok: true });
     }
     const { token, seller } = await authenticate(context);

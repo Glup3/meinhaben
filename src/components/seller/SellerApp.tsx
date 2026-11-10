@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import type { FormEvent } from 'react';
+import type { SubmitEvent } from 'react';
 import { prepareImage } from './images';
 import styles from './SellerApp.module.css';
 
@@ -20,10 +20,12 @@ async function api(action: string, body: unknown) {
 }
 export default function SellerApp({ initial, serverError }: { initial: Initial | null; serverError: string }) {
   const objectURLs = useRef(new Set<string>());
+  const errorRef = useRef<HTMLParagraphElement>(null);
   const [listings, setListings] = useState(initial?.listings || []);
   const [allPhotos, setAllPhotos] = useState(initial?.photos || []);
   const [item, setItem] = useState<Item | null>(null);
   const [photos, setPhotos] = useState<Photo[]>([]);
+  const [removedPhotos, setRemovedPhotos] = useState<string[]>([]);
   const [price, setPrice] = useState('0');
   const [free, setFree] = useState(true);
   const [dirty, setDirty] = useState(false);
@@ -34,21 +36,22 @@ export default function SellerApp({ initial, serverError }: { initial: Initial |
   const [loginOpen, setLoginOpen] = useState(!initial);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  useEffect(() => { if (error) errorRef.current?.scrollIntoView({ block: 'nearest' }); }, [error]);
   useEffect(() => {
-    const warn = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); event.returnValue = ''; } };
+    const warn = (event: BeforeUnloadEvent) => { if (dirty) { event.preventDefault(); } };
     window.addEventListener('beforeunload', warn); return () => window.removeEventListener('beforeunload', warn);
   }, [dirty]);
   useEffect(() => () => { for (const url of objectURLs.current) URL.revokeObjectURL(url); }, []);
-  // Blob URLs remain stable while editing; revoke only removed photos/closed editor.
+  // Keep selected-photo URLs alive through retries; release them on unmount.
   function open(record?: Item) {
     if (dirty && !window.confirm('Ungespeicherte Änderungen verwerfen?')) return;
     const next = record || { id: newId(), title: '', description: '', category: initial?.categories[0]?.id || '', price_cents: 0, condition: 'good', details: [], published: false, status: 'available', slug: '' };
     setItem({ ...next, details: next.details.map(d => ({ ...d })) });
     setPrice((next.price_cents / 100).toFixed(2)); setFree(next.price_cents === 0);
-    setPhotos(allPhotos.filter(p => p.listing === next.id)); setDirty(!record); setPreview(false); setMessage(''); setError('');
+    setPhotos(allPhotos.filter(p => p.listing === next.id)); setRemovedPhotos([]); setDirty(!record); setPreview(false); setMessage(''); setError('');
   }
   function change(patch: Partial<Item>) { setItem(value => value && ({ ...value, ...patch })); setDirty(true); setMessage(''); }
-  async function login(event: FormEvent) {
+  async function login(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault(); setPending('Anmelden …'); setError('');
     try {
       await api('login', { email, password }); setPassword('');
@@ -80,6 +83,7 @@ export default function SellerApp({ initial, serverError }: { initial: Initial |
       setPending('Text als Entwurf speichern …');
       let saved: Item = await api('save', { ...item, price_cents: Math.round(numeric * 100) });
       setItem(saved);
+      setListings(current => [saved, ...current.filter(p => p.id !== item.id)]);
       const uploaded: Photo[] = [];
       for (let index = 0; index < photos.length; index++) {
         const photo = photos[index];
@@ -88,18 +92,19 @@ export default function SellerApp({ initial, serverError }: { initial: Initial |
           const body = new FormData(); body.set('id', photo.id); body.set('listing', item.id); body.set('image', photo.file); body.set('alt', `${item.title} – Foto ${index + 1}`);
           const result = await api('upload', body);
           uploaded.push({ ...photo, url: result.url, uploaded: true });
+          setAllPhotos(current => [...current.filter(p => p.id !== photo.id), { ...photo, url: result.url, uploaded: true }]);
           setPhotos(current => current.map(p => p.id === photo.id ? { ...p, uploaded: true } : p));
         } else uploaded.push(photo);
       }
       setPending('Fotoreihenfolge speichern …');
-      await api('photos', { id: item.id, order: photos.map(p => p.id), remove: allPhotos.filter(p => p.listing === item.id && !photos.some(photo => photo.id === p.id)).map(p => p.id) });
+      await api('photos', { id: item.id, order: photos.map(p => p.id), remove: removedPhotos });
       if (publish) {
         if (!photos.length) throw new Error('Bitte mindestens ein Foto hinzufügen. Der Text ist bereits als Entwurf gespeichert.');
         setPending('Veröffentlichen …'); saved = await api('publish', { id: item.id }); setItem(saved);
       }
       setPhotos(uploaded); setAllPhotos(current => [...current.filter(p => p.listing !== item.id), ...uploaded]);
       setListings(current => [saved, ...current.filter(p => p.id !== item.id)]);
-      setDirty(false); setMessage(publish ? 'Veröffentlicht. Deine Anzeige ist sofort im Marktplatz sichtbar.' : saved.published ? 'Änderungen gespeichert und sofort sichtbar.' : 'Entwurf gespeichert.');
+      setRemovedPhotos([]); setDirty(false); setMessage(publish ? 'Veröffentlicht. Deine Anzeige ist sofort im Marktplatz sichtbar.' : saved.published ? 'Änderungen gespeichert und sofort sichtbar.' : 'Entwurf gespeichert.');
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Speichern fehlgeschlagen. Bitte erneut versuchen.'); }
     finally { setPending(''); }
   }
@@ -112,7 +117,7 @@ export default function SellerApp({ initial, serverError }: { initial: Initial |
   return <div className={styles.app}>
     <h1>Meine Anzeigen</h1><p>Gute Dinge dürfen weiterziehen.</p>
     <div role="status" aria-live="polite">{pending || message}</div>
-    {error && <p role="alert" className={styles.error}>{error}</p>}
+    {error && <p ref={errorRef} role="alert" className={styles.error}>{error}</p>}
     {initial && <nav className={styles.actions}>
       <button disabled={!!pending} onClick={() => open()}>+ Neue Anzeige</button>
       <button disabled={!!pending} onClick={() => setLoginOpen(!loginOpen)}>Erneut anmelden</button>
@@ -160,7 +165,7 @@ export default function SellerApp({ initial, serverError }: { initial: Initial |
               <div className={styles.actions}>
                 <button type="button" aria-label={`Foto ${index + 1} nach vorne`} disabled={index === 0 || !!pending} onClick={() => move(index, -1)}>←</button>
                 <button type="button" aria-label={`Foto ${index + 1} nach hinten`} disabled={index === photos.length - 1 || !!pending} onClick={() => move(index, 1)}>→</button>
-                <button type="button" onClick={() => { setPhotos(current => current.filter(p => p.id !== photo.id)); setDirty(true); }}>Entfernen</button>
+                <button type="button" onClick={() => { setPhotos(current => current.filter(p => p.id !== photo.id)); setRemovedPhotos(current => [...new Set([...current, photo.id])]); setDirty(true); }}>Entfernen</button>
               </div>
             </li>)}</ol>
           </section>

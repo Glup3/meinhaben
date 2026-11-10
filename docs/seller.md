@@ -41,6 +41,12 @@ To revoke access, set `enabled = false` or change the seller's password in the
 backend dashboard. Every protected page/action refreshes the auth token against
 PocketBase and requires the `sellers` collection plus `enabled = true`.
 
+To roll back the frontend, leave the backend migration installed and disable
+seller accounts if necessary; public SSR reads remain compatible. The migration's
+down function removes seller accounts and owner mappings, so it is destructive
+and is intended for disposable databases. Recover those mappings from a verified
+backup if a backend schema rollback is required.
+
 ## Security boundaries
 
 - The HttpOnly session cookie is scoped to `/verkaufen`, SameSite Strict, Secure
@@ -53,7 +59,10 @@ PocketBase and requires the `sellers` collection plus `enabled = true`.
 - Mutations, including login/logout, require an exact same-origin `Origin`
   header and reject cross-site Fetch Metadata. Missing origins fail closed.
   SameSite cookies provide another CSRF boundary. Reverse proxies must preserve
-  the external origin used by Astro; test this after deployment.
+  the external origin used by Astro; test this after deployment. Astro's
+  `security.allowedDomains` trusts the build-time `SITE_URL` host/protocol plus
+  explicit localhost/127.0.0.1 HTTP hosts. Set the correct preview `SITE_URL` at
+  build time as well; no wildcard or arbitrary forwarded host is trusted.
 - Browser input is allowlisted. The API chooses ownership and a stable unique
   slug when creating a draft; subsequent edits preserve both. PB independently
   limits writes to enabled sellers and their own records, rejects owner/relation
@@ -109,6 +118,8 @@ pnpm run test:seller
 pnpm test
 pnpm run check
 pnpm run build
+pnpm run test:ssr
+pnpm run test:seller:ssr
 ```
 
 `test:seller` starts the pinned PB binary on a free loopback port, applies the
@@ -118,3 +129,9 @@ process/data. It overrides configured backend URLs and never loads `.env`.
 Tests cover private drafts, no signup/self-promotion, owner isolation, CSRF,
 secure cookie options, account revocation, retries, order, public file semantics,
 publication validation, last-photo protection, and logout.
+
+`test:seller:ssr` additionally launches the built standalone app against that same
+disposable PB. It verifies real HTTP login/cookie issuance/logout, private page
+isolation, token absence from hydrated HTML, CSRF, and immediate public content
+visibility. `pnpm test` also verifies failed-upload recovery in the React editor
+and explicit rejection of unsupported phone image formats.
