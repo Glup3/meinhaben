@@ -39,6 +39,8 @@ const marketActive =
           <span>{vertical.name}</span>
         </a>
       ))}
+      <!-- Keep an incomplete navigation from painting between HTML packets. -->
+      <template data-nav-complete></template>
     </nav>
   </div>
 </header>
@@ -173,6 +175,11 @@ const marketActive =
     z-index: 1;
   }
   .market-nav {
+    /* CSS/font caches can be ready before all four links arrive. Reveal the
+       navigation once its final marker is parsed, without waiting for JS. */
+    &:not(:has(> template[data-nav-complete])) {
+      visibility: hidden;
+    }
     grid-column: 2;
     display: grid;
     grid-template-columns: repeat(4, max-content);
