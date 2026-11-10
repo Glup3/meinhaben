@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import openSansURL from "../assets/fonts/open-sans-latin.woff2?url";
 import Logo from "../components/Logo.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import DittoOutline from "../components/DittoOutline.astro";
@@ -31,6 +32,7 @@ const imageURL = new URL(image, Astro.site!);
 <html lang="de-AT">
   <head>
     <meta charset="UTF-8" />
+    <link rel="preload" href={openSansURL} as="font" type="font/woff2" crossorigin="anonymous" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
     <meta name="robots" content="noindex, nofollow" />

@@ -15,6 +15,8 @@ export default defineConfig({
     ],
   },
   output: "server",
-  adapter: node({ mode: "standalone" }),
+  // Small marketplace pages should paint as a complete document. Streaming can
+  // paint a partially parsed header when styles and fonts are already cached.
+  adapter: node({ mode: "standalone", experimentalDisableStreaming: true }),
   integrations: [react()],
 });
