@@ -5,16 +5,15 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 COPY . .
 ARG SITE_URL=https://meinhaben.glup3.dev
-ARG POCKETBASE_URL=https://meinhaben-admin.ditto.glup3.dev
-ARG POCKETBASE_INTERNAL_URL
-# Change this value for content-only rebuilds when Docker caching is enabled.
-ARG CONTENT_VERSION
 RUN pnpm run build
 
-FROM nginx:alpine AS runtime
-COPY deploy/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /usr/share/nginx/html
-EXPOSE 80
-# Keep the previous website running until the replacement serves HTTP.
-HEALTHCHECK --interval=5s --timeout=5s --start-period=60s --retries=12 CMD wget -q -O /dev/null http://127.0.0.1/ || exit 1
-# The official image runs Nginx in the foreground and uses SIGQUIT for shutdown.
+FROM node:24-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production HOST=0.0.0.0 PORT=4321
+COPY --from=build --chown=node:node /app/dist ./dist
+COPY --from=build --chown=node:node /app/node_modules ./node_modules
+COPY --from=build --chown=node:node /app/package.json ./package.json
+USER node
+EXPOSE 4321
+HEALTHCHECK --interval=5s --timeout=5s --start-period=60s --retries=12 CMD wget -q -O /dev/null http://127.0.0.1:4321/healthz || exit 1
+CMD ["node", "./dist/server/entry.mjs"]

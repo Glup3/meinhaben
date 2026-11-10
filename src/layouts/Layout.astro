@@ -4,26 +4,23 @@ import Logo from "../components/Logo.astro";
 import SiteHeader from "../components/SiteHeader.astro";
 import DittoOutline from "../components/DittoOutline.astro";
 import { verticals } from "../data/verticals";
-import { getListings, getCategories } from "../data/listings";
-const [headerListings, headerCategories] = await Promise.all([
-  getListings(),
-  getCategories(),
-]);
-const populatedCategories = headerCategories.filter((category) =>
-  headerListings.some((item) => item.category === category.name),
-);
+import type { Listing, Category } from "../data/listings";
 interface Props {
+  listings?: Listing[];
+  categories?: Category[];
   title?: string;
   description?: string;
   image?: string;
   imageAlt?: string;
 }
 const {
+  listings = [], categories = [],
   title = "Meinhaben – Vielleicht bald deins.",
   description = "Meine Sachen suchen ein neues Zuhause. Ein kleiner privater Marktplatz für Freunde und Familie.",
   image = "/images/meinhaben-share.jpg",
   imageAlt = "Meinhaben – Vielleicht bald deins. Gute Dinge dürfen weiterziehen.",
 } = Astro.props;
+const populatedCategories = categories.filter(category => listings.some(item => item.category === category.name));
 // Use the public origin, even during builds and local previews. Filter/query
 // variants share the same canonical page and social preview URL.
 const canonicalURL = new URL(Astro.url.pathname, Astro.site!);

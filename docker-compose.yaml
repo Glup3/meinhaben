@@ -3,20 +3,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      # The local backend must already be healthy before building the website.
-      # Host networking lets the builder reach its localhost-only published port.
-      network: host
       args:
         SITE_URL: ${SITE_URL:-http://localhost:8080}
-        POCKETBASE_URL: ${POCKETBASE_URL:-http://localhost:8090}
-        POCKETBASE_INTERNAL_URL: http://127.0.0.1:8090
-        CONTENT_VERSION: ${CONTENT_VERSION:-}
+    environment:
+      POCKETBASE_URL: ${POCKETBASE_URL:-http://localhost:8090}
+      POCKETBASE_INTERNAL_URL: http://pocketbase:8090
     restart: unless-stopped
     depends_on:
       pocketbase:
         condition: service_healthy
     ports:
-      - "127.0.0.1:8080:80"
+      - "127.0.0.1:8080:4321"
     stop_grace_period: 30s
 
   pocketbase:
